@@ -1,8 +1,8 @@
 const colors = {
-    White: 'FFFFFF',
-    Black: '000000',
-    Grey: '7f7f7f',
-    Light_Grey: 'AAAAAA',
+    White: '#FFFFFF',
+    Black: '#000000',
+    Grey: '#7f7f7f',
+    Light_Grey: '#AAAAAA',
 
     Red: '#E43727',
     Light_Red: '#FCEBE9',
