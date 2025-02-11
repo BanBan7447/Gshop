@@ -1,12 +1,19 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
-import Demo from './src/Stack/Demo'
+
+import Stack_Navigation from './src/navigation/Stack_Navigation'
+import { NavigationContainer } from '@react-navigation/native'
+import { AppProvider } from './src/context'
 
 const App = () => {
   return (
-    <View style={style_app.container}>
-      <Text>Hello World</Text>
-    </View>
+    <AppProvider>
+      <NavigationContainer>
+        <View style={style_app.container}>
+          <Stack_Navigation/>
+        </View>
+      </NavigationContainer>
+    </AppProvider>
   )
 }
 
@@ -14,6 +21,6 @@ export default App
 
 const style_app = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   }
 })
