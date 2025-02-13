@@ -5,6 +5,7 @@ import Tab_Navigation from './Tab_Navigation'
 import Page_Splash from '../stack/page_stack/Page_Splash'
 import Page_Search from '../stack/page_stack/Page_Search'
 import Page_Detail from '../stack/page_stack/Page_Detail'
+import Page_Detail_News from '../stack/page_stack/Page_Detail_News'
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 const Stack = createNativeStackNavigator();
@@ -16,6 +17,7 @@ const Stack_Navigation = () => {
       <Stack.Screen name='Tab' component={Tab_Navigation} />
       <Stack.Screen name='Search' component={Page_Search} />
       <Stack.Screen name='Detail' component={Page_Detail} />
+      <Stack.Screen name='DetailNews' component={Page_Detail_News} />
     </Stack.Navigator>
   )
 }
