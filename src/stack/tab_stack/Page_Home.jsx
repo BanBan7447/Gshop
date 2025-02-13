@@ -1,6 +1,10 @@
-import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView, LogBox } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView, LogBox, ToastAndroid, BackHandler, Alert } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import {
+  getCategories,
+  getProductsByCategory,
+  getAllProdcts,
+
   api_getProducts,
   api_getCategories,
   api_getImagesProduct,
@@ -11,6 +15,7 @@ import FastImage from 'react-native-fast-image';
 import Style_Home from '../../styles/Style_Home';
 import colors from '../../styles/colors';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { AppContext } from '../../context';
 
 // Tắt cảnh báo cụ thể
 LogBox.ignoreLogs([
@@ -33,6 +38,8 @@ const Page_Home = (props) => {
     { label: 'Giá thấp nhất', value: 'low_price' },
   ]);
 
+  const [loading, setLoading] = useState(true);
+
   // Hàm lấy danh mục
   const funGetCategories = async () => {
     try {
@@ -49,12 +56,47 @@ const Page_Home = (props) => {
   const funGetAllProducts = async () => {
     try {
       const response = await api_getProducts();
-      console.log('All Products:', response);  // In ra dữ liệu sản phẩm để kiểm tra
+      const getRandomViewer = () => Math.floor(Math.random() * 1000);
 
-      setProducts(response); // // Cập nhật danh sách sản phẩm với tất cả sản phẩm
+      // Thêm thuộc tính viewer cho mỗi sản phẩm
+      const productViewer = response.map(product => ({
+        ...product,
+        viewer: getRandomViewer()
+      }))
+
+      // Lọc sản phẩm theo các từ khóa
+      const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
+
+      const filterDataProduct = productViewer
+        .filter(product =>
+          keyWords.some(keyWords => product.name.includes(keyWords))
+        )
+        // Sắp xếp sản phẩm theo lượt xem từ cao đến thấp (nổi bật)
+        .sort((a, b) => b.viewer - a.viewer);
+
+      console.log('All Products:', filterDataProduct);  // In ra dữ liệu sản phẩm để kiểm tra
+      setProducts(filterDataProduct); // Cập nhật danh sách sản phẩm với tất cả sản phẩm
     } catch (e) {
       console.log(e);
     }
+  }
+
+  // Cập nhật lượt xem khi người dùng nhấn vào
+  const viewProductPress = async (_id) => {
+    const updateView = products.map(product => {
+      if (product._id === _id) {
+        return { ...product, viewer: product.viewer + 1 };
+      }
+
+      return product;
+    });
+
+    setProducts(updateView);
+
+    // Điều hướng qua detail
+    const productImagesArray = productImages[_id] ?? []; // Lấy ảnh cho sản phẩm
+    const updateProduct = updateView.find(product => product._id == _id) // Lấy thông tin sản phẩm sau khi tăng lượt xem
+    navigation.navigate('Detail', { id: _id, images: productImagesArray, productView: updateProduct });
   }
 
   // Hàm lấy ảnh cho từng sản phẩm
@@ -80,6 +122,21 @@ const Page_Home = (props) => {
     }
   }
 
+  // Hàm lọc sản phẩm theo giá
+  const filterProducts = (filter) => {
+    let sortedProducts;
+    if (filter === 'high_price') {
+      sortedProducts = [...products].sort((a, b) => b.price - a.price);
+    } else if (filter === 'low_price') {
+      sortedProducts = [...products].sort((a, b) => a.price - b.price);
+    } else if (filter === 'highlight') {
+      sortedProducts = [...products].sort((a, b) => b.viewer - a.viewer);
+    } else {
+      sortedProducts = [...products];
+    }
+    setProducts(sortedProducts);
+  }
+
   useEffect(() => {
     if (products.length > 0) {
       const productIds = products.map(product => product._id);
@@ -92,21 +149,6 @@ const Page_Home = (props) => {
     funGetAllProducts()
     funGetCategories();
   }, []);
-
-  // Hàm lọc sản phẩm theo giá
-  const filterProducts = (filter) => {
-    let sortedProducts;
-    if (filter === 'high_price') {
-      sortedProducts = [...products].sort((a, b) => b.price - a.price);
-    } else if (filter === 'low_price') {
-      sortedProducts = [...products].sort((a, b) => a.price - b.price);
-    } else if (filter === 'highlight') {
-      sortedProducts = [...products].sort(() => Math.random() - 0.5);
-    } else {
-      sortedProducts = [...products];
-    }
-    setProducts(sortedProducts);
-  }
 
   // Hàm render danh sách category
   const renderCategory = ({ item }) => {
@@ -162,11 +204,8 @@ const Page_Home = (props) => {
   // Hàm render Products
   const renderProduct = ({ item }) => {
     const { _id, name, price, id_category, state } = item;
-    //const ImageProduct = image[1]
-
-    // Lấy danh sách ảnh của sản phẩm từ productImages[_id]
     const productData = productImages[_id]?.[0]; // Lấy object đầu tiên trong mảng
-    const productImagesArray = productImages[_id] ?? [];
+    // const productImagesArray = productImages[_id] ?? [];
 
     console.log("Rendering product:", _id, "Image URL:", productData);
 
@@ -183,9 +222,7 @@ const Page_Home = (props) => {
     return (
       <TouchableOpacity
         style={Style_Home.card_product}
-        onPress={() => {
-          navigation.navigate('Detail', { id: _id, images: productImagesArray });
-        }}>
+        onPress={() => viewProductPress(_id)}>
 
         <View style={{ position: 'relative' }}>
           {

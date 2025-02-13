@@ -6,7 +6,8 @@ const AppContext = createContext();
 const AppProvider = (props) => {
     const { children } = props;
     const [users, setUsers] = useState(null);
-    const [cart, setCart] = useState(null);
+    // const [cart, setCart] = useState(null);
+    const [viewer, setViewer] = useState(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -27,7 +28,7 @@ const AppProvider = (props) => {
     }, []);
 
     return (
-        <AppContext.Provider value={{ users, setUsers, cart, setCart }}>
+        <AppContext.Provider value={{ users, setUsers, viewer, setViewer }}>
             {loading ? null : children}
         </AppContext.Provider>
     );
