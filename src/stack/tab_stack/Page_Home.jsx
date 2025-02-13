@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView, LogBox, ToastAndroid, BackHandler, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView, LogBox, ToastAndroid, BackHandler, Alert, Platform } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import {
   getCategories,
@@ -16,6 +16,7 @@ import Style_Home from '../../styles/Style_Home';
 import colors from '../../styles/colors';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { AppContext } from '../../context';
+import { useNavigation } from '@react-navigation/native';
 
 // Tắt cảnh báo cụ thể
 LogBox.ignoreLogs([
@@ -38,7 +39,34 @@ const Page_Home = (props) => {
     { label: 'Giá thấp nhất', value: 'low_price' },
   ]);
 
-  const [loading, setLoading] = useState(true);
+  const [exitApp, setExitApp] = useState(false);
+  const navigationExit = useNavigation();
+
+  useEffect(() => {
+    const backAction = () => {
+      if (navigationExit.isFocused()) {
+        if (exitApp) {
+          BackHandler.exitApp()
+          return true
+        } else {
+          if (Platform.OS === 'android') {
+            ToastAndroid.show('Nhấn lại để thoát', ToastAndroid.SHORT);
+          }
+          setExitApp(true)
+
+          // Reset lại trạng thái sau 2 giây
+          setTimeout(() => setExitApp(false), 2000)
+          return true;
+        }
+      } else {
+        return false
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, [exitApp]);
 
   // Hàm lấy danh mục
   const funGetCategories = async () => {
@@ -52,34 +80,136 @@ const Page_Home = (props) => {
     }
   };
 
+  // Hàm render danh sách category
+  const renderCategory = ({ item }) => {
+    const { _id, name_type } = item;
+
+    // Xác định màu của nút dựa trên việc nó có được chọn hay không?
+    const isSelected = selectCategory === _id;
+    const buttonStyle = isSelected ? { backgroundColor: colors.Red } : { backgroundColor: colors.Light_Blue };
+    const textStyle = isSelected ? { color: colors.White } : { color: colors.Black };
+
+    return (
+      <TouchableOpacity
+        style={[Style_Home.render_category, buttonStyle]}
+        onPress={() => {
+          if (_id == selectCategory) {
+            setSelectCategory(null);
+          } else {
+            setSelectCategory(_id);
+          }
+        }}>
+
+        <Text style={[Style_Home.render_text_category, textStyle]}>{name_type}</Text>
+      </TouchableOpacity>
+    )
+  };
+
+  // Cập nhật màu cho nút tất cả
+  const ButtonAllStyle = selectCategory === null ?
+    { backgroundColor: colors.Red } :
+    { backgroundColor: colors.Light_Blue };
+
+  const TextAllStyle = selectCategory === null ?
+    { color: colors.White } :
+    { color: colors.Black };
+
+  // Hàm xử lý danh sách sản phẩm
+  const processProducts = (products) => {
+    // View cố địn
+    const defaultViewers = {
+      "Lah Gundam - Entry Grade 1/144": 24,
+      "Zaku II (F Type) Solari's - High Grade 1/144": 27,
+      "Mighty Strike Freedom Gundam - High Grade 1/144": 34,
+      "Gundam Epyon (Mobile Suit Gundam Wing) - Real Grade 1/144": 35,
+      "Force Impulse Gundam- Real Grade 1/144": 40,
+      "Unicorn Gundam 02 Banshee Norn - Real Grade 1/144": 100,
+      "Gundam Astray Gold Frame Amatsu Mina - Real Grade 1/144": 120,
+      "EX Strike Freedom Gundam (Gundam Seed Destiny) - Master Grade 1/100": 53,
+      "Gunner Zaku Warrior (Lunamaria Hawke Use) - Master Grade 1/100": 65,
+      "Ex-S Gundam/S Gundam - Master Grade 1/100": 57,
+      "Gundam Astray Red Frame - Perfect Grade 1/60": 470,
+      "Build Strike Exceed Galaxy - Entry Grade 1/144": 23,
+      "RX-78-2 Gundam Classic Color GUNDAM NEXT FUTURE Limited - Entry Grade 1/144": 10,
+      "Gundam Perfect Strike Freedom Rouge - High Grade 1/144": 35,
+      "Black Knight Squad Shi-ve.A - High Grade 1/144": 80,
+      "Gyan Strom - Agnes Giebenrath Custom - High Grade 1/144": 35,
+      "Tallgeese EW - Real Grade 1/144": 430,
+      "Gundam Dynames - Master Grade 1/100": 463,
+      "Iron Blooded Orphans - High Grade 1/144": 120,
+      "Black Knight Squad Cal-re.A - High Grade 1/144": 98,
+      "GFAS-X1 Destroy Gundam - High Grade 1/144": 34,
+      "MSN 04 SAZABI - Real Grade 1/144": 470,
+      "RX-78-2 Gundam E.F.S.T Prototype - Perfect Grade 1/60": 400
+    }
+
+    // Từ khóa lọc sản phẩm
+    const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
+
+    return products
+      .map(product => ({
+        ...product,
+        viewer: defaultViewers[product._id] || defaultViewers[product.name]
+      }))
+      .filter(product =>
+        keyWords.some(keyWords => product.name.includes(keyWords))
+      )
+      .sort((a, b) => b.viewer - a.viewer);
+  }
+
   // Hàm lấy tất cả sản phẩm
   const funGetAllProducts = async () => {
     try {
       const response = await api_getProducts();
-      const getRandomViewer = () => Math.floor(Math.random() * 1000);
+      const filterDataProducts = processProducts(response);
+      //const getRandomViewer = () => Math.floor(Math.random() * 1000);
 
-      // Thêm thuộc tính viewer cho mỗi sản phẩm
-      const productViewer = response.map(product => ({
-        ...product,
-        viewer: getRandomViewer()
-      }))
+      // // Thêm thuộc tính viewer cho mỗi sản phẩm
+      // const productViewer = response.map(product => ({
+      //   ...product,
+      //   viewer: defaultViewers[product._id] || defaultViewers[product.name]
+      // }))
 
-      // Lọc sản phẩm theo các từ khóa
-      const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
+      // // Lọc sản phẩm theo các từ khóa
+      // const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
 
-      const filterDataProduct = productViewer
-        .filter(product =>
-          keyWords.some(keyWords => product.name.includes(keyWords))
-        )
-        // Sắp xếp sản phẩm theo lượt xem từ cao đến thấp (nổi bật)
-        .sort((a, b) => b.viewer - a.viewer);
+      // const filterDataProduct = productViewer
+      //   .filter(product =>
+      //     keyWords.some(keyWords => product.name.includes(keyWords))
+      //   )
+      //   // Sắp xếp sản phẩm theo lượt xem từ cao đến thấp (nổi bật)
+      //   .sort((a, b) => b.viewer - a.viewer);
 
-      console.log('All Products:', filterDataProduct);  // In ra dữ liệu sản phẩm để kiểm tra
-      setProducts(filterDataProduct); // Cập nhật danh sách sản phẩm với tất cả sản phẩm
+      console.log('All Products:', filterDataProducts);  // In ra dữ liệu sản phẩm để kiểm tra
+      setProducts(filterDataProducts); // Cập nhật danh sách sản phẩm với tất cả sản phẩm
     } catch (e) {
       console.log(e);
     }
   }
+
+  // Hàm lấy sản phẩm theo danh mục
+  const funGetProducts = async () => {
+    try {
+      const response = await api_getProductsByCategory(selectCategory);
+      const filterDataProducts = processProducts(response);
+      setProducts(filterDataProducts);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  // Gọi hàm funGetCategories khi màn hình home render
+  useEffect(() => {
+    funGetAllProducts()
+    funGetCategories();
+  }, []);
+
+  // Gọi hàm funGetProducts khi chọn danh mục
+  useEffect(() => {
+    if (selectCategory) {
+      funGetProducts(selectCategory);
+    }
+  }, [selectCategory]);
 
   // Cập nhật lượt xem khi người dùng nhấn vào
   const viewProductPress = async (_id) => {
@@ -143,63 +273,6 @@ const Page_Home = (props) => {
       getProductImages(productIds);
     }
   }, [products]);
-
-  // Gọi hàm funGetCategories khi màn hình home render
-  useEffect(() => {
-    funGetAllProducts()
-    funGetCategories();
-  }, []);
-
-  // Hàm render danh sách category
-  const renderCategory = ({ item }) => {
-    const { _id, name_type } = item;
-
-    // Xác định màu của nút dựa trên việc nó có được chọn hay không?
-    const isSelected = selectCategory === _id;
-    const buttonStyle = isSelected ? { backgroundColor: colors.Red } : { backgroundColor: colors.Light_Blue };
-    const textStyle = isSelected ? { color: colors.White } : { color: colors.Black };
-
-    return (
-      <TouchableOpacity
-        style={[Style_Home.render_category, buttonStyle]}
-        onPress={() => {
-          if (_id == selectCategory) {
-            setSelectCategory(null);
-          } else {
-            setSelectCategory(_id);
-          }
-        }}>
-
-        <Text style={[Style_Home.render_text_category, textStyle]}>{name_type}</Text>
-      </TouchableOpacity>
-    )
-  };
-
-  // Cập nhật màu cho nút tất cả
-  const ButtonAllStyle = selectCategory === null ?
-    { backgroundColor: colors.Red } :
-    { backgroundColor: colors.Light_Blue };
-
-  const TextAllStyle = selectCategory === null ?
-    { color: colors.White } :
-    { color: colors.Black };
-
-  // Hàm lấy sản phẩm theo danh mục
-  const funGetProducts = async () => {
-    try {
-      const response = await api_getProductsByCategory(selectCategory);
-      setProducts(response);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  // Gọi hàm funGetProducts khi chọn danh mục
-  useEffect(() => {
-    if (selectCategory) {
-      funGetProducts(selectCategory);
-    }
-  }, [selectCategory]);
 
   // Hàm render Products
   const renderProduct = ({ item }) => {

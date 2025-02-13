@@ -9,7 +9,9 @@ import colors from '../../styles/colors'
 import { api_getCategories, api_getProducts, api_getImagesProduct, getAllProdcts, getCategories } from '../../helper/ApiHelper'
 import FastImage from 'react-native-fast-image'
 
-const Page_Search = () => {
+const Page_Search = (props) => {
+    const { navigation } = props;
+
     const [searchText, setSearchText] = useState(''); // Lưu trữ từ khóa tìm kiếm
 
     const [products, setProducts] = useState([]);
@@ -22,12 +24,75 @@ const Page_Search = () => {
     const funGetAllProducts = async () => {
         try {
             const response = await api_getProducts();
-            setProducts(response);
-            setFilterProducts(response); // Ban đầu danh sách tìm kiếm trống
+
+            const defaultViewers = {
+                "Lah Gundam - Entry Grade 1/144": 24,
+                "Zaku II (F Type) Solari's - High Grade 1/144": 27,
+                "Mighty Strike Freedom Gundam - High Grade 1/144": 34,
+                "Gundam Epyon (Mobile Suit Gundam Wing) - Real Grade 1/144": 35,
+                "Force Impulse Gundam- Real Grade 1/144": 40,
+                "Unicorn Gundam 02 Banshee Norn - Real Grade 1/144": 100,
+                "Gundam Astray Gold Frame Amatsu Mina - Real Grade 1/144": 120,
+                "EX Strike Freedom Gundam (Gundam Seed Destiny) - Master Grade 1/100": 53,
+                "Gunner Zaku Warrior (Lunamaria Hawke Use) - Master Grade 1/100": 65,
+                "Ex-S Gundam/S Gundam - Master Grade 1/100": 57,
+                "Gundam Astray Red Frame - Perfect Grade 1/60": 470,
+                "Build Strike Exceed Galaxy - Entry Grade 1/144": 23,
+                "RX-78-2 Gundam Classic Color GUNDAM NEXT FUTURE Limited - Entry Grade 1/144": 10,
+                "Gundam Perfect Strike Freedom Rouge - High Grade 1/144": 35,
+                "Black Knight Squad Shi-ve.A - High Grade 1/144": 80,
+                "Gyan Strom - Agnes Giebenrath Custom - High Grade 1/144": 35,
+                "Tallgeese EW - Real Grade 1/144": 430,
+                "Gundam Dynames - Master Grade 1/100": 463,
+                "Iron Blooded Orphans - High Grade 1/144": 120,
+                "Black Knight Squad Cal-re.A - High Grade 1/144": 98,
+                "GFAS-X1 Destroy Gundam - High Grade 1/144": 34,
+                "MSN 04 SAZABI - Real Grade 1/144": 470,
+                "RX-78-2 Gundam E.F.S.T Prototype - Perfect Grade 1/60": 400
+            };
+
+            // Thêm thuộc tính viewer cho mỗi sản phẩm
+            const productViewer = response.map(product => ({
+                ...product,
+                viewer: defaultViewers[product._id] || defaultViewers[product.name]
+            }))
+
+            // Lọc sản phẩm theo các từ khóa
+            const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
+
+            const filterDataProduct = productViewer
+                .filter(product =>
+                    keyWords.some(keyWords => product.name.includes(keyWords))
+                )
+                // Sắp xếp sản phẩm theo lượt xem từ cao đến thấp (nổi bật)
+                .sort((a, b) => b.viewer - a.viewer);
+
+            console.log('All Products:', filterDataProduct);  // In ra dữ liệu sản phẩm để kiểm tra
+
+            setProducts(filterDataProduct); // Cập nhật danh sách sản phẩm với tất cả sản phẩm
+            setFilterProducts(filterDataProduct)
         } catch (e) {
             console.log(e);
         }
     };
+
+    // Cập nhật lượt xem khi người dùng nhấn vào
+    const viewProductPress = async (_id) => {
+        const updateView = products.map(product => {
+            if (product._id === _id) {
+                return { ...product, viewer: product.viewer + 1 };
+            }
+
+            return product;
+        });
+
+        setProducts(updateView);
+
+        // Điều hướng qua detail
+        const productImagesArray = productImages[_id] ?? []; // Lấy ảnh cho sản phẩm
+        const updateProduct = updateView.find(product => product._id == _id) // Lấy thông tin sản phẩm sau khi tăng lượt xem
+        navigation.navigate('Detail', { id: _id, images: productImagesArray, productView: updateProduct });
+    }
 
     // Hàm lấy ảnh cho từng sản phẩm
     const getProductImages = async (productIds) => {
@@ -103,7 +168,9 @@ const Page_Search = () => {
         const formatPrice = price.toLocaleString('vi-VN');
 
         return (
-            <TouchableOpacity style={Style_Home.card_product}>
+            <TouchableOpacity
+                style={Style_Home.card_product}
+                onPress={() => viewProductPress(_id)}>
                 {
                     productData ? (
                         <FastImage
@@ -142,7 +209,9 @@ const Page_Search = () => {
         <ScrollView
             style={Style_Search.container}
             showsVerticalScrollIndicator={false}>
-            <TouchableOpacity style={Style_Search.navigation}>
+            <TouchableOpacity
+                style={Style_Search.navigation}
+                onPress={() => navigation.navigate('Tab', { screen: 'Home' })}>
                 <Image
                     source={require('../../assets/icon/icon_long_arrow.png')}
                     style={Style_Search.img_icon} />
