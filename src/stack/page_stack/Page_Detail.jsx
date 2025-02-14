@@ -57,11 +57,11 @@ const Page_Detail = (props) => {
             const existingIndex = newCart.findIndex(item => item._id === id);
             if (existingIndex !== -1) {
                 // Nếu đã có thì tăng số lượng
-                newCart[existingIndex].quantity += 1;
+                newCart[existingIndex].quantityCart += 1;
             } else {
                 newCart.push({
                     ...product,
-                    quantity: 1,
+                    quantityCart: 1,
                     image: images[0]?.image
                 });
             }
