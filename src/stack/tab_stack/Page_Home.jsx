@@ -1,6 +1,10 @@
-import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView, LogBox } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView, LogBox, ToastAndroid, BackHandler, Alert, Platform } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import {
+  getCategories,
+  getProductsByCategory,
+  getAllProdcts,
+
   api_getProducts,
   api_getCategories,
   api_getImagesProduct,
@@ -11,6 +15,8 @@ import FastImage from 'react-native-fast-image';
 import Style_Home from '../../styles/Style_Home';
 import colors from '../../styles/colors';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { AppContext } from '../../context';
+import { useNavigation } from '@react-navigation/native';
 
 // Tắt cảnh báo cụ thể
 LogBox.ignoreLogs([
@@ -33,6 +39,35 @@ const Page_Home = (props) => {
     { label: 'Giá thấp nhất', value: 'low_price' },
   ]);
 
+  const [exitApp, setExitApp] = useState(false);
+  const navigationExit = useNavigation();
+
+  useEffect(() => {
+    const backAction = () => {
+      if (navigationExit.isFocused()) {
+        if (exitApp) {
+          BackHandler.exitApp()
+          return true
+        } else {
+          if (Platform.OS === 'android') {
+            ToastAndroid.show('Nhấn lại để thoát', ToastAndroid.SHORT);
+          }
+          setExitApp(true)
+
+          // Reset lại trạng thái sau 2 giây
+          setTimeout(() => setExitApp(false), 2000)
+          return true;
+        }
+      } else {
+        return false
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, [exitApp]);
+
   // Hàm lấy danh mục
   const funGetCategories = async () => {
     try {
@@ -44,69 +79,6 @@ const Page_Home = (props) => {
       console.log(e);
     }
   };
-
-  // Hàm lấy tất cả sản phẩm
-  const funGetAllProducts = async () => {
-    try {
-      const response = await api_getProducts();
-      console.log('All Products:', response);  // In ra dữ liệu sản phẩm để kiểm tra
-
-      setProducts(response); // // Cập nhật danh sách sản phẩm với tất cả sản phẩm
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  // Hàm lấy ảnh cho từng sản phẩm
-  const getProductImages = async (productIds) => {
-    try {
-      const imagesPromise = productIds.map(id => api_getImagesProduct(id));
-
-      // Chờ tất cả các yêu cầu hoàn thành
-      const imagesResult = await Promise.all(imagesPromise);
-
-      // Lưu kết quả ảnh vào state
-      const imagesObj = productIds.reduce((acc, productId, index) => {
-        acc[productId] = imagesResult[index];
-        return acc;
-      }, {});
-
-      // Kiểm tra dữ liệu trả về từ API
-      console.log("Images Results: ", imagesObj);
-
-      setProductImages(imagesObj);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  useEffect(() => {
-    if (products.length > 0) {
-      const productIds = products.map(product => product._id);
-      getProductImages(productIds);
-    }
-  }, [products]);
-
-  // Gọi hàm funGetCategories khi màn hình home render
-  useEffect(() => {
-    funGetAllProducts()
-    funGetCategories();
-  }, []);
-
-  // Hàm lọc sản phẩm theo giá
-  const filterProducts = (filter) => {
-    let sortedProducts;
-    if (filter === 'high_price') {
-      sortedProducts = [...products].sort((a, b) => b.price - a.price);
-    } else if (filter === 'low_price') {
-      sortedProducts = [...products].sort((a, b) => a.price - b.price);
-    } else if (filter === 'highlight') {
-      sortedProducts = [...products].sort(() => Math.random() - 0.5);
-    } else {
-      sortedProducts = [...products];
-    }
-    setProducts(sortedProducts);
-  }
 
   // Hàm render danh sách category
   const renderCategory = ({ item }) => {
@@ -142,15 +114,95 @@ const Page_Home = (props) => {
     { color: colors.White } :
     { color: colors.Black };
 
+  // Hàm xử lý danh sách sản phẩm
+  const processProducts = (products) => {
+    // View cố địn
+    const defaultViewers = {
+      "Lah Gundam - Entry Grade 1/144": 24,
+      "Zaku II (F Type) Solari's - High Grade 1/144": 27,
+      "Mighty Strike Freedom Gundam - High Grade 1/144": 34,
+      "Gundam Epyon (Mobile Suit Gundam Wing) - Real Grade 1/144": 35,
+      "Force Impulse Gundam- Real Grade 1/144": 40,
+      "Unicorn Gundam 02 Banshee Norn - Real Grade 1/144": 100,
+      "Gundam Astray Gold Frame Amatsu Mina - Real Grade 1/144": 120,
+      "EX Strike Freedom Gundam (Gundam Seed Destiny) - Master Grade 1/100": 53,
+      "Gunner Zaku Warrior (Lunamaria Hawke Use) - Master Grade 1/100": 65,
+      "Ex-S Gundam/S Gundam - Master Grade 1/100": 57,
+      "Gundam Astray Red Frame - Perfect Grade 1/60": 470,
+      "Build Strike Exceed Galaxy - Entry Grade 1/144": 23,
+      "RX-78-2 Gundam Classic Color GUNDAM NEXT FUTURE Limited - Entry Grade 1/144": 10,
+      "Gundam Perfect Strike Freedom Rouge - High Grade 1/144": 35,
+      "Black Knight Squad Shi-ve.A - High Grade 1/144": 80,
+      "Gyan Strom - Agnes Giebenrath Custom - High Grade 1/144": 35,
+      "Tallgeese EW - Real Grade 1/144": 430,
+      "Gundam Dynames - Master Grade 1/100": 463,
+      "Iron Blooded Orphans - High Grade 1/144": 120,
+      "Black Knight Squad Cal-re.A - High Grade 1/144": 98,
+      "GFAS-X1 Destroy Gundam - High Grade 1/144": 34,
+      "MSN 04 SAZABI - Real Grade 1/144": 470,
+      "RX-78-2 Gundam E.F.S.T Prototype - Perfect Grade 1/60": 400
+    }
+
+    // Từ khóa lọc sản phẩm
+    const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
+
+    return products
+      .map(product => ({
+        ...product,
+        viewer: defaultViewers[product._id] || defaultViewers[product.name]
+      }))
+      .filter(product =>
+        keyWords.some(keyWords => product.name.includes(keyWords))
+      )
+      .sort((a, b) => b.viewer - a.viewer);
+  }
+
+  // Hàm lấy tất cả sản phẩm
+  const funGetAllProducts = async () => {
+    try {
+      const response = await api_getProducts();
+      const filterDataProducts = processProducts(response);
+      //const getRandomViewer = () => Math.floor(Math.random() * 1000);
+
+      // // Thêm thuộc tính viewer cho mỗi sản phẩm
+      // const productViewer = response.map(product => ({
+      //   ...product,
+      //   viewer: defaultViewers[product._id] || defaultViewers[product.name]
+      // }))
+
+      // // Lọc sản phẩm theo các từ khóa
+      // const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
+
+      // const filterDataProduct = productViewer
+      //   .filter(product =>
+      //     keyWords.some(keyWords => product.name.includes(keyWords))
+      //   )
+      //   // Sắp xếp sản phẩm theo lượt xem từ cao đến thấp (nổi bật)
+      //   .sort((a, b) => b.viewer - a.viewer);
+
+      console.log('All Products:', filterDataProducts);  // In ra dữ liệu sản phẩm để kiểm tra
+      setProducts(filterDataProducts); // Cập nhật danh sách sản phẩm với tất cả sản phẩm
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   // Hàm lấy sản phẩm theo danh mục
   const funGetProducts = async () => {
     try {
       const response = await api_getProductsByCategory(selectCategory);
-      setProducts(response);
+      const filterDataProducts = processProducts(response);
+      setProducts(filterDataProducts);
     } catch (e) {
       console.log(e);
     }
   };
+
+  // Gọi hàm funGetCategories khi màn hình home render
+  useEffect(() => {
+    funGetAllProducts()
+    funGetCategories();
+  }, []);
 
   // Gọi hàm funGetProducts khi chọn danh mục
   useEffect(() => {
@@ -159,14 +211,74 @@ const Page_Home = (props) => {
     }
   }, [selectCategory]);
 
+  // Cập nhật lượt xem khi người dùng nhấn vào
+  const viewProductPress = async (_id) => {
+    const updateView = products.map(product => {
+      if (product._id === _id) {
+        return { ...product, viewer: product.viewer + 1 };
+      }
+
+      return product;
+    });
+
+    setProducts(updateView);
+
+    // Điều hướng qua detail
+    const productImagesArray = productImages[_id] ?? []; // Lấy ảnh cho sản phẩm
+    const updateProduct = updateView.find(product => product._id == _id) // Lấy thông tin sản phẩm sau khi tăng lượt xem
+    navigation.navigate('Detail', { id: _id, images: productImagesArray, productView: updateProduct });
+  }
+
+  // Hàm lấy ảnh cho từng sản phẩm
+  const getProductImages = async (productIds) => {
+    try {
+      const imagesPromise = productIds.map(id => api_getImagesProduct(id));
+
+      // Chờ tất cả các yêu cầu hoàn thành
+      const imagesResult = await Promise.all(imagesPromise);
+
+      // Lưu kết quả ảnh vào state
+      const imagesObj = productIds.reduce((acc, productId, index) => {
+        acc[productId] = imagesResult[index];
+        return acc;
+      }, {});
+
+      // Kiểm tra dữ liệu trả về từ API
+      console.log("Images Results: ", imagesObj);
+
+      setProductImages(imagesObj);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  // Hàm lọc sản phẩm theo giá
+  const filterProducts = (filter) => {
+    let sortedProducts;
+    if (filter === 'high_price') {
+      sortedProducts = [...products].sort((a, b) => b.price - a.price);
+    } else if (filter === 'low_price') {
+      sortedProducts = [...products].sort((a, b) => a.price - b.price);
+    } else if (filter === 'highlight') {
+      sortedProducts = [...products].sort((a, b) => b.viewer - a.viewer);
+    } else {
+      sortedProducts = [...products];
+    }
+    setProducts(sortedProducts);
+  }
+
+  useEffect(() => {
+    if (products.length > 0) {
+      const productIds = products.map(product => product._id);
+      getProductImages(productIds);
+    }
+  }, [products]);
+
   // Hàm render Products
   const renderProduct = ({ item }) => {
     const { _id, name, price, id_category, state } = item;
-    //const ImageProduct = image[1]
-
-    // Lấy danh sách ảnh của sản phẩm từ productImages[_id]
     const productData = productImages[_id]?.[0]; // Lấy object đầu tiên trong mảng
-    const productImagesArray = productImages[_id] ?? [];
+    // const productImagesArray = productImages[_id] ?? [];
 
     console.log("Rendering product:", _id, "Image URL:", productData);
 
@@ -183,9 +295,7 @@ const Page_Home = (props) => {
     return (
       <TouchableOpacity
         style={Style_Home.card_product}
-        onPress={() => {
-          navigation.navigate('Detail', { id: _id, images: productImagesArray });
-        }}>
+        onPress={() => viewProductPress(_id)}>
 
         <View style={{ position: 'relative' }}>
           {

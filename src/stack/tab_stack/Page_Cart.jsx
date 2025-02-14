@@ -1,41 +1,66 @@
-import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native'
-import React, { useContext } from 'react'
+import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid } from 'react-native'
+import React, { useContext, useState } from 'react'
 
 import Style_Cart from '../../styles/Style_Cart'
-import { AppContext } from '../../context'
+import { CartContext } from '../../context/CartContext'
 
 const Page_Cart = (props) => {
   const { navigation } = props
 
-  const { cart, setCart } = useContext(AppContext)
+  const { cart, setCart } = useContext(CartContext)
+
+  console.log('Danh sách sản phẩm có trong Cart: ', cart)
 
   // Hàm giảm số lượng
-  const minusItem = (itemId) => {
-    setCart(prevCart => {
-      const updateCart = prevCart.map(item =>
-        item.id === itemId && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      );
+  const minusItem = (_id) => { // Truyền updateProduct vô
+    console.log('ID sản phẩm cần giảm: ', _id)
 
-      const productToDelete = updateCart.find(item => item.id === itemId && item.quantity === 1);
-      if (productToDelete) {
-        return updateCart.filter(item => item.id !== itemId);
-      }
-      return updateCart;
-    });
+    // Tìm sản phẩm trong giỏ
+    const findProduct = cart.find(item => item._id === _id);
+
+    if (findProduct && findProduct.quantityCart > 1) {
+      // Lớn hơn 1 thì giảm xuống 1
+      setCart(cart.map(item =>
+        item._id === _id
+          ? { ...item, quantityCart: item.quantityCart - 1 }
+          : item
+      ));
+    } else {
+      // Bằng 1 thì xóa luôn
+      setCart(cart.filter(item => item._id !== _id))
+    }
   }
 
   // Hàm tăng số lượng
-  const plusItem = (itemId) => {
-    setCart(prevCart => prevCart.map(item =>
-      item.id === itemId ? { ...item, quantity: item.quantity + 1 } : item
-    ))
+  const plusItem = (_id) => {
+    console.log('ID sản phẩm cần tăng: ', _id)
+
+    setCart(cart.map(item => {
+      if(item._id === _id){
+        const stockQuantity = item.quantity;
+        const cartQuantity = item.quantityCart;
+
+        if(cartQuantity > stockQuantity){
+          ToastAndroid.show('Sản phẩm đã hết hàng', ToastAndroid.SHORT);
+          return item;
+        }
+
+        return {...item, quantityCart: item.quantityCart + 1}
+      }
+      return item;
+    }))
+
+    // setCart(cart.map(item =>
+    //   item._id === _id
+    //     ? { ...item, quantityCart: item.quantityCart + 1 }
+    //     : item
+    // ))
   }
 
   // Hàm xóa sản phẩm
-  const removeItem = (itemId) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== itemId))
+  const removeItem = (_id) => {
+    console.log('ID sản phẩm cần xóa: ', _id)
+    setCart(cart.filter(item => item._id !== _id))
   }
 
   // Hàm render danh sách giỏ hàng
@@ -62,17 +87,17 @@ const Page_Cart = (props) => {
           <View style={Style_Cart.container_quantity}>
             <TouchableOpacity
               style={Style_Cart.btn_quantity}
-              onPress={() => minusItem(item.id)}>
+              onPress={() => minusItem(item._id)}>
               <Image
                 source={require('../../assets/icon/icon_minus.png')}
                 style={Style_Cart.icon_quantity} />
             </TouchableOpacity>
 
-            <Text style={Style_Cart.text_quantity}>{item.quantity}</Text>
+            <Text style={Style_Cart.text_quantity}>{item.quantityCart}</Text>
 
             <TouchableOpacity
               style={Style_Cart.btn_quantity}
-              onPress={() => plusItem(item.id)}>
+              onPress={() => plusItem(item._id)}>
               <Image
                 source={require('../../assets/icon/icon_plus.png')}
                 style={Style_Cart.icon_quantity} />
@@ -82,10 +107,10 @@ const Page_Cart = (props) => {
 
         <TouchableOpacity
           style={Style_Cart.btn_delete}
-          onPress={() => removeItem(item.id)}>
+          onPress={() => removeItem(item._id)}>
           <Image
             source={require('../../assets/icon/icon_x_black.png')}
-            style={Style_Cart.icon_quantity}/>
+            style={Style_Cart.icon_quantity} />
         </TouchableOpacity>
       </View>
     )
@@ -98,13 +123,12 @@ const Page_Cart = (props) => {
       </Text>
 
       {
-        cart && cart.length > 0 ? (
+        cart.length > 0 ? (
           <View style={Style_Cart.container_cart}>
             <FlatList
               data={cart}
               renderItem={renderCart}
-              keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()} />
-
+              keyExtractor={(item) => item._id.toString()} />
             <View style={Style_Cart.container_bottom}>
               <TouchableOpacity style={Style_Cart.btn_payment}>
                 <Text style={Style_Cart.text_payment}>Thanh Toán</Text>
