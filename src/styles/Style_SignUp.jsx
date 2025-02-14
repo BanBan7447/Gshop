@@ -10,9 +10,10 @@ const Style_SignUp = StyleSheet.create({
         padding: 16,
     },
     logoContainer: {
-        position: 'absolute',
-        top: 20,
-        left: 20,
+        width: 112,
+        height: 40,
+        marginBottom: 56,
+        alignSelf: 'flex-start', // Đưa logo về góc trái
     },
     logoText: {
         fontSize: 28,

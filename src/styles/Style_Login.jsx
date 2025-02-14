@@ -9,9 +9,10 @@ const Style_Login = StyleSheet.create({
         padding: 20,
     },
     logoContainer: {
-      width: 112,
-      height: 40,
-      marginBottom: 56
+        width: 112,
+        height: 40,
+        marginBottom: 56,
+        alignSelf: 'flex-start', // Đưa logo về góc trái
     },
     title: {
         fontSize: 32,

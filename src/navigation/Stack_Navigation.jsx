@@ -9,6 +9,12 @@ import Page_Login from '../stack/page_stack/Page_Login'
 import Page_SignUp from '../stack/page_stack/Page_SingUp'
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import Page_Profile from '../stack/tab_stack/Page_Profile'
+import Page_Address_Screen from '../stack/page_stack/Page_Address_Screen'
+import Page_ChangPass from '../stack/page_stack/Page_ChangPass'
+import Page_Edit_Profile from '../stack/page_stack/Page_Edit_Profile'
+import Page_MyAddress from '../stack/page_stack/Page_MyAddress'
+import Page_MyOder from '../stack/page_stack/Page_MyOder'
 const Stack = createNativeStackNavigator();
 
 const Stack_Navigation = () => {
@@ -20,6 +26,10 @@ const Stack_Navigation = () => {
       <Stack.Screen name='Detail' component={Page_Detail} />
       <Stack.Screen name='Login' component={Page_Login} />
       <Stack.Screen name='SignUp' component={Page_SignUp} />
+      <Stack.Screen name='EditProfile' component={Page_Edit_Profile} />
+      <Stack.Screen name='MyOrder' component={Page_MyOder} />
+      <Stack.Screen name='Location' component={Page_MyAddress} />
+      <Stack.Screen name='ChangePass' component={Page_ChangPass} />
     </Stack.Navigator>
   )
 }

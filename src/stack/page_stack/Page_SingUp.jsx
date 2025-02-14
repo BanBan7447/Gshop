@@ -6,9 +6,10 @@ import Style_SignUp from '../../styles/Style_SignUp';
 const Page_SignUp = () => {
     return (
         <View style={Style_SignUp.container}>
-            <View style={Style_SignUp.logoContainer}>
-                <Image source={require('../../assets/image/logo_app_2.png')} />
-            </View>
+        <Image
+            style={Style_SignUp.logoContainer}
+            source={require('../../assets/image/logo_app_2.png')} />
+        
 
             <Text style={Style_SignUp.title}>Đăng ký</Text>
             <View>

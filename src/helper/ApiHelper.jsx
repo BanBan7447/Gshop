@@ -1,7 +1,24 @@
 import AxiosInstance from "./AxiosInstance";
 
 // Gọi API đăng nhập
+const api_login = async (data) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>> get_api_login')
+        const { email, password } = data;
+        const body = {
+            email: email,
+            password: password
+        }
+        console.log(`Email: ${email}, Password: ${password}`)
 
+        const response = await AxiosInstance().post('/user/login', body);
+        if (response.status == true) {
+            return response.data;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
 
 // Gọi API đăng ký
 
@@ -89,6 +106,7 @@ const api_getDetailProduct = async (id) => {
 }
 
 export {
+    api_login,
     api_getCategories,
     api_getProducts,
     api_getImagesProduct,

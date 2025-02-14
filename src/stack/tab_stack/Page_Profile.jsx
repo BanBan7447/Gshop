@@ -11,7 +11,7 @@ const Page_Profile = (props) => {
   const { users, setUsers } = useContext(AppContext); // Lay thong tin nguoi dung tu Context
 
   //Ham dang xuat
-  const OnLogout = async () => {
+  const onLogout = async () => {
     setUsers(null); // Xoa thong tin nguoi dung trong Context
     await AsyncStorage.removeItem('userInfo');
   }
@@ -34,10 +34,10 @@ const Page_Profile = (props) => {
     )
   }
   return (
-   <View style={Style_Profile.container}>
-   {users ? (
+    <View style={Style_Profile.container}>
+      {users ? (
         <View>
-          <View style={Style_Profile.container_info}>se cX
+          <View style={Style_Profile.container_info}>
             <Image
               //source={{uri: users.avatar ? users.avatar : 'https://i.pinimg.com/736x/fd/1f/34/fd1f347ffac0a91e0ecd38c306b1ce37.jpg'}}
               source={{ uri: 'https://i.pinimg.com/736x/fd/1f/34/fd1f347ffac0a91e0ecd38c306b1ce37.jpg' }}
@@ -64,7 +64,7 @@ const Page_Profile = (props) => {
             icon={require('../../assets/icon/icon_location.png')}
             label={'Địa chỉ giao hàng'}
             onPress={() => navigation.navigate('Location')} />
-
+          
           <ProfileOption
             icon={require('../../assets/icon/icon_security.png')}
             label={'Bảo mật'}
@@ -127,7 +127,7 @@ const Page_Profile = (props) => {
             onPress={() => navigation.navigate('Help')} />
         </View>
       )}
-   </View>
+    </View>
   )
 }
 
