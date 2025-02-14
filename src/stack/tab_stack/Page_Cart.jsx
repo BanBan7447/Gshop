@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid } from 'react-native'
 import React, { useContext, useState } from 'react'
 
 import Style_Cart from '../../styles/Style_Cart'
@@ -18,11 +18,11 @@ const Page_Cart = (props) => {
     // Tìm sản phẩm trong giỏ
     const findProduct = cart.find(item => item._id === _id);
 
-    if (findProduct && findProduct.quantity > 1) {
+    if (findProduct && findProduct.quantityCart > 1) {
       // Lớn hơn 1 thì giảm xuống 1
       setCart(cart.map(item =>
         item._id === _id
-          ? { ...item, quantity: item.quantity - 1 }
+          ? { ...item, quantityCart: item.quantityCart - 1 }
           : item
       ));
     } else {
@@ -35,11 +35,26 @@ const Page_Cart = (props) => {
   const plusItem = (_id) => {
     console.log('ID sản phẩm cần tăng: ', _id)
 
-    setCart(cart.map(item =>
-      item._id === _id
-        ? { ...item, quantity: item.quantity + 1 }
-        : item
-    ))
+    setCart(cart.map(item => {
+      if(item._id === _id){
+        const stockQuantity = item.quantity;
+        const cartQuantity = item.quantityCart;
+
+        if(cartQuantity > stockQuantity){
+          ToastAndroid.show('Sản phẩm đã hết hàng', ToastAndroid.SHORT);
+          return item;
+        }
+
+        return {...item, quantityCart: item.quantityCart + 1}
+      }
+      return item;
+    }))
+
+    // setCart(cart.map(item =>
+    //   item._id === _id
+    //     ? { ...item, quantityCart: item.quantityCart + 1 }
+    //     : item
+    // ))
   }
 
   // Hàm xóa sản phẩm
@@ -78,7 +93,7 @@ const Page_Cart = (props) => {
                 style={Style_Cart.icon_quantity} />
             </TouchableOpacity>
 
-            <Text style={Style_Cart.text_quantity}>{item.quantity}</Text>
+            <Text style={Style_Cart.text_quantity}>{item.quantityCart}</Text>
 
             <TouchableOpacity
               style={Style_Cart.btn_quantity}
