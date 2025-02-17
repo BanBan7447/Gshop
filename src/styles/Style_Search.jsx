@@ -45,6 +45,13 @@ const Style_Search = StyleSheet.create({
         flex: 1,
         fontSize: 16,
         marginStart: -4
+    },
+
+    container_loading:{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)'
     }
 })
 

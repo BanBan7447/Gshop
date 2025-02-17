@@ -116,7 +116,7 @@ const Style_Detail = StyleSheet.create({
         fontFamily: 'Inter Medium',
         color: colors.Black,
         fontSize: 16,
-        marginBottom: 24
+        marginBottom: 16
     },
 
     text_title_describe: {
@@ -190,6 +190,13 @@ const Style_Detail = StyleSheet.create({
         fontFamily: 'Inter Medium',
         color: colors.White,
         fontSize: 14
+    },
+
+    container_loading:{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)'
     }
     
 })

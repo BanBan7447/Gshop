@@ -19,6 +19,7 @@ const Page_Search = (props) => {
     const [categories, setCategories] = useState([]);
 
     const [filterProducts, setFilterProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     // Hàm lấy tất cả sản phẩm
     const funGetAllProducts = async () => {
@@ -73,6 +74,8 @@ const Page_Search = (props) => {
             setFilterProducts(filterDataProduct)
         } catch (e) {
             console.log(e);
+        } finally {
+            setLoading(false); // Dừng loading sau khi tải xong
         }
     };
 
@@ -206,44 +209,54 @@ const Page_Search = (props) => {
     };
 
     return (
-        <ScrollView
-            style={Style_Search.container}
-            showsVerticalScrollIndicator={false}>
-            <TouchableOpacity
-                style={Style_Search.navigation}
-                onPress={() => navigation.navigate('Tab', { screen: 'Home' })}>
-                <Image
-                    source={require('../../assets/icon/icon_long_arrow.png')}
-                    style={Style_Search.img_icon} />
+        <View style={{ flex: 1 }}>
+            {
+                loading ? (
+                    <View style={Style_Search.container_loading}>
+                        <ActivityIndicator size='large' color={colors.Red} />
+                    </View>
+                ) : (
+                    <ScrollView
+                        style={Style_Search.container}
+                        showsVerticalScrollIndicator={false}>
+                        <TouchableOpacity
+                            style={Style_Search.navigation}
+                            onPress={() => navigation.navigate('Tab', { screen: 'Home' })}>
+                            <Image
+                                source={require('../../assets/icon/icon_long_arrow.png')}
+                                style={Style_Search.img_icon} />
 
-                <Text style={Style_Search.text_navigation}>Tìm kiếm</Text>
-            </TouchableOpacity>
+                            <Text style={Style_Search.text_navigation}>Tìm kiếm</Text>
+                        </TouchableOpacity>
 
-            <View style={Style_Search.contain_text_input}>
-                <Image
-                    source={require('../../assets/icon/icon_search.png')}
-                    style={Style_Search.img_icon} />
+                        <View style={Style_Search.contain_text_input}>
+                            <Image
+                                source={require('../../assets/icon/icon_search.png')}
+                                style={Style_Search.img_icon} />
 
-                <TextInput
-                    style={Style_Search.text_input}
-                    placeholder='Tìm kiếm'
-                    placeholderTextColor={colors.Black}
-                    value={searchText}
-                    onChangeText={text => funFilterProducts(text)} />
-            </View>
+                            <TextInput
+                                style={Style_Search.text_input}
+                                placeholder='Tìm kiếm'
+                                placeholderTextColor={colors.Black}
+                                value={searchText}
+                                onChangeText={text => funFilterProducts(text)} />
+                        </View>
 
-            <FlatList
-                data={filterProducts}
-                renderItem={renderProduct}
-                keyExtractor={item => item._id}
-                numColumns={2}
-                initialNumToRender={20}
-                maxToRenderPerBatch={20}
-                windowSize={21}
-                showsVerticalScrollIndicator={false}
-                scrollEnabled={false}
-                style={Style_Home.container_product} />
-        </ScrollView>
+                        <FlatList
+                            data={filterProducts}
+                            renderItem={renderProduct}
+                            keyExtractor={item => item._id}
+                            numColumns={2}
+                            initialNumToRender={20}
+                            maxToRenderPerBatch={20}
+                            windowSize={21}
+                            showsVerticalScrollIndicator={false}
+                            scrollEnabled={false}
+                            style={Style_Home.container_product} />
+                    </ScrollView>
+                )
+            }
+        </View>
     )
 }
 

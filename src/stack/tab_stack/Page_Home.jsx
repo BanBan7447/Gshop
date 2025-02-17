@@ -1,15 +1,10 @@
 import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView, LogBox, ToastAndroid, BackHandler, Alert, Platform } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import {
-  getCategories,
-  getProductsByCategory,
-  getAllProdcts,
-
   api_getProducts,
   api_getCategories,
   api_getImagesProduct,
-  api_getProductsByCategory,
-  api_getDetailProduct,
+  api_getProductsByCategory
 } from '../../helper/ApiHelper';
 import FastImage from 'react-native-fast-image';
 import Style_Home from '../../styles/Style_Home';
@@ -41,6 +36,8 @@ const Page_Home = (props) => {
 
   const [exitApp, setExitApp] = useState(false);
   const navigationExit = useNavigation();
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const backAction = () => {
@@ -157,7 +154,7 @@ const Page_Home = (props) => {
       .sort((a, b) => b.viewer - a.viewer);
   }
 
-  // Hàm lấy tất cả sản phẩm
+  // Hàm lấy danh sách tất cả sản phẩm
   const funGetAllProducts = async () => {
     try {
       const response = await api_getProducts();
@@ -184,6 +181,8 @@ const Page_Home = (props) => {
       setProducts(filterDataProducts); // Cập nhật danh sách sản phẩm với tất cả sản phẩm
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoading(false); // Dừng loading sau khi tải xong
     }
   }
 
@@ -195,6 +194,8 @@ const Page_Home = (props) => {
       setProducts(filterDataProducts);
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -267,6 +268,7 @@ const Page_Home = (props) => {
     setProducts(sortedProducts);
   }
 
+  // Hàm getProductImages để lấy ảnh
   useEffect(() => {
     if (products.length > 0) {
       const productIds = products.map(product => product._id);
@@ -342,130 +344,140 @@ const Page_Home = (props) => {
   };
 
   return (
-    <ScrollView
-      style={Style_Home.container}
-      showsVerticalScrollIndicator={false}>
-      <View style={Style_Home.container_title}>
-        <Image
-          source={require('../../assets/image/logo_app_2.png')}
-          style={Style_Home.img_logo} />
+    <View style={{ flex: 1 }}>
+      {
+        loading ? (
+          <View style={Style_Home.container_loading}>
+            <ActivityIndicator size='large' color={colors.Red} />
+          </View>
+        ) : (
+          <ScrollView
+            style={Style_Home.container}
+            showsVerticalScrollIndicator={false}>
+            <View style={Style_Home.container_title}>
+              <Image
+                source={require('../../assets/image/logo_app_2.png')}
+                style={Style_Home.img_logo} />
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Search')}>
-          <Image
-            source={require('../../assets/icon/icon_search.png')}
-            style={Style_Home.img_icon} />
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={[{ key: 'all' }, ...categories]}
-        renderItem={({ item }) => {
-          if (item.key === 'all') {
-            return (
               <TouchableOpacity
-                onPress={() => {
-                  setSelectCategory(null);
-                  funGetAllProducts();
-                }}
-                style={[Style_Home.render_category, ButtonAllStyle]}>
-                <Text style={[Style_Home.render_text_category, TextAllStyle]}>Tất cả</Text>
+                onPress={() => navigation.navigate('Search')}>
+                <Image
+                  source={require('../../assets/icon/icon_search.png')}
+                  style={Style_Home.img_icon} />
               </TouchableOpacity>
-            );
-          } else {
-            return renderCategory({ item }); // render danh sách danh mục
-          }
-        }}
-        keyExtractor={item => item._id || item.key}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={Style_Home.container_category}
-      />
+            </View>
 
-      <View style={Style_Home.container_filer}>
-        <Text style={Style_Home.title}>Đề xuất cho bạn</Text>
+            <FlatList
+              data={[{ key: 'all' }, ...categories]}
+              renderItem={({ item }) => {
+                if (item.key === 'all') {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSelectCategory(null);
+                        funGetAllProducts();
+                      }}
+                      style={[Style_Home.render_category, ButtonAllStyle]}>
+                      <Text style={[Style_Home.render_text_category, TextAllStyle]}>Tất cả</Text>
+                    </TouchableOpacity>
+                  );
+                } else {
+                  return renderCategory({ item }); // render danh sách danh mục
+                }
+              }}
+              keyExtractor={item => item._id || item.key}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={Style_Home.container_category}
+            />
 
-        <DropDownPicker
-          open={open}
-          value={value}
-          items={items}
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setItems}
-          containerStyle={{
-            width: 160,
-            height: 40,
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
+            <View style={Style_Home.container_filer}>
+              <Text style={Style_Home.title}>Đề xuất cho bạn</Text>
 
-          style={{
-            borderWidth: 0,
-          }}
+              <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={setValue}
+                setItems={setItems}
+                containerStyle={{
+                  width: 160,
+                  height: 40,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
 
-          textStyle={{
-            fontSize: 16,
-            color: colors.Black,
-            marginRight: 10,
-            textAlign: 'left'
-          }}
+                style={{
+                  borderWidth: 0,
+                }}
 
-          labelStyle={{
-            textAlign: 'right'
-          }}
+                textStyle={{
+                  fontSize: 16,
+                  color: colors.Black,
+                  marginRight: 10,
+                  textAlign: 'left'
+                }}
 
-          dropDownContainerStyle={{
-            backgroundColor: colors.White, // Màu nền của dropdown
-            borderTopStartRadius: 12,
-            borderTopEndRadius: 12,
-            borderBottomStartRadius: 12,
-            borderBottomStartRadius: 12,
-            borderWidth: 1,
-            borderColor: colors.Light_Grey,
-            width: '100%'
-          }}
+                labelStyle={{
+                  textAlign: 'right'
+                }}
 
-          onChangeValue={(value) => {
-            filterProducts(value)
-          }}
+                dropDownContainerStyle={{
+                  backgroundColor: colors.White, // Màu nền của dropdown
+                  borderTopStartRadius: 12,
+                  borderTopEndRadius: 12,
+                  borderBottomStartRadius: 12,
+                  borderBottomStartRadius: 12,
+                  borderWidth: 1,
+                  borderColor: colors.Light_Grey,
+                  width: '100%'
+                }}
 
-          showArrowIcon={true}
-          ArrowDownIconComponent={() => {
-            return (
-              <Image
-                style={{ width: 12, height: 12 }}
-                source={require('../../assets/icon/icon_arrow_down.png')} />
-            )
-          }}
+                onChangeValue={(value) => {
+                  filterProducts(value)
+                }}
 
-          ArrowUpIconComponent={() => {
-            return (
-              <Image
-                style={{ width: 12, height: 12, transform: [{ rotate: '180deg' }] }}
-                source={require('../../assets/icon/icon_arrow_down.png')} />
-            )
-          }}
+                showArrowIcon={true}
+                ArrowDownIconComponent={() => {
+                  return (
+                    <Image
+                      style={{ width: 12, height: 12 }}
+                      source={require('../../assets/icon/icon_arrow_down.png')} />
+                  )
+                }}
 
-          scrollViewProps={{
-            nestedScrollEnabled: false,
-            keyboardShouldPersistTaps: 'handled'
-          }}
-        />
-      </View>
+                ArrowUpIconComponent={() => {
+                  return (
+                    <Image
+                      style={{ width: 12, height: 12, transform: [{ rotate: '180deg' }] }}
+                      source={require('../../assets/icon/icon_arrow_down.png')} />
+                  )
+                }}
 
-      <FlatList
-        data={products}
-        renderItem={renderProduct}
-        keyExtractor={item => item._id}
-        numColumns={2}
-        initialNumToRender={20}
-        maxToRenderPerBatch={20}
-        windowSize={21}
-        showsVerticalScrollIndicator={false}
-        scrollEnabled={false}
-        style={Style_Home.container_product} />
+                scrollViewProps={{
+                  nestedScrollEnabled: false,
+                  keyboardShouldPersistTaps: 'handled'
+                }}
+              />
+            </View>
 
-    </ScrollView>
+            <FlatList
+              data={products}
+              renderItem={renderProduct}
+              keyExtractor={item => item._id}
+              numColumns={2}
+              initialNumToRender={20}
+              maxToRenderPerBatch={20}
+              windowSize={21}
+              showsVerticalScrollIndicator={false}
+              scrollEnabled={false}
+              style={Style_Home.container_product} />
+
+          </ScrollView>
+        )
+      }
+    </View>
   )
 }
 
