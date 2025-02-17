@@ -111,29 +111,41 @@ const Page_Detail = (props) => {
 
             {product ? (
                 <>
-                    <FlatList
-                        data={images.flatMap(item => item.image)} // Trải phẳng mảng ảnh
-                        keyExtractor={(item, index) => index.toString()}
-                        horizontal
-                        pagingEnabled={true}
-                        showsHorizontalScrollIndicator={false}
-                        initialNumToRender={5}
-                        renderItem={({ item }) => (
-                            <FastImage
-                                style={{
-                                    width: screenWidth,
-                                    height: 240,
-                                    backgroundColor: 'black'
-                                }}
-                                source={{
-                                    uri: item,
-                                    priority: FastImage.priority.high,
-                                    cache: FastImage.cacheControl.immutable,
-                                }}
-                                resizeMode={FastImage.resizeMode.contain}
-                            />
-                        )}
-                    />
+                    <View style={{ position: 'relative' }}>
+                        <FlatList
+                            data={images.flatMap(item => item.image)} // Trải phẳng mảng ảnh
+                            keyExtractor={(item, index) => index.toString()}
+                            horizontal
+                            pagingEnabled={true}
+                            showsHorizontalScrollIndicator={false}
+                            initialNumToRender={5}
+                            renderItem={({ item }) => (
+                                <FastImage
+                                    style={{
+                                        width: screenWidth,
+                                        height: 240,
+                                        backgroundColor: 'black'
+                                    }}
+                                    source={{
+                                        uri: item,
+                                        priority: FastImage.priority.high,
+                                        cache: FastImage.cacheControl.immutable,
+                                    }}
+                                    resizeMode={FastImage.resizeMode.contain}
+                                />
+                            )}
+                        />
+
+                        <View style={Style_Detail.container_view}>
+                            <Image
+                                source={require('../../assets/icon/icon_eye.png')}
+                                style={Style_Detail.img_icon_view} />
+                            <Text
+                                style={Style_Detail.text_view}>
+                                {productView?.viewer}
+                            </Text>
+                        </View>
+                    </View>
 
                     <View style={Style_Detail.container_info}>
                         <Text style={Style_Detail.text_name}>{product.name}</Text>
@@ -158,11 +170,6 @@ const Page_Detail = (props) => {
                                 </Text>
                             </Text>
                         ) : null}
-
-                        <Text>
-                            lượt xem: {productView?.viewer}
-                        </Text>
-
 
                         <Text style={Style_Detail.text_title_describe}>Mô tả</Text>
 

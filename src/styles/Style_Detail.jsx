@@ -165,6 +165,32 @@ const Style_Detail = StyleSheet.create({
         fontSize: 24,
         marginVertical: 8
     },
+
+    container_view: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+        backgroundColor: colors.Black,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        opacity: 0.8,
+        flexDirection: 'row',
+        borderRadius: 100,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+
+    img_icon_view: {
+        width: 20,
+        height: 20,
+        marginRight: 10
+    },
+
+    text_view: {
+        fontFamily: 'Inter Medium',
+        color: colors.White,
+        fontSize: 14
+    }
     
 })
 
