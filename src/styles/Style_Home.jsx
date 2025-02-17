@@ -126,6 +126,13 @@ const Style_Home = StyleSheet.create({
         fontFamily: 'Inter Bold',
         color: colors.White,
         fontSize: 12
+    },
+
+    container_loading:{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)'
     }
 })
 
