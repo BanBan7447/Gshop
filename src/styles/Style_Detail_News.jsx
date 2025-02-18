@@ -61,6 +61,13 @@ const Style_Detail_News = StyleSheet.create({
         marginTop: 16,
         marginBottom: 16,
         borderRadius: 16
+    },
+
+    container_loading:{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)'
     }
 })
 

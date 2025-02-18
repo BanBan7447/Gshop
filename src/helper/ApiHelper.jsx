@@ -105,11 +105,43 @@ const api_getDetailProduct = async (id) => {
     }
 }
 
+// Gọi API lấy danh sách tin tức
+const api_getNews = async () => {
+    try{
+        console.log('>>>>>>>>>>>>>> get api list news');
+        const response = await AxiosInstance().get('/news/list');
+
+        if(response.status == true){
+            console.log('Data News', response);
+            return response.data
+        }
+
+    }catch(e){
+        console.log(e)
+    }
+}
+
+// Gọi API lấy chi tiết tin tức
+const api_getDetailNews = async (_id) => {
+    try{
+        console.log('>>>>>>>>>>>>>>>>>> get Detail News');
+        const response = await AxiosInstance().get(`/news/detail_news?_id=${_id}`)
+        
+        if(response.status == true){
+            return response.data;
+        }
+    }catch(e){
+        console.log(e);
+    }
+}
+
 export {
     api_login,
     api_getCategories,
     api_getProducts,
     api_getImagesProduct,
     api_getProductsByCategory,
-    api_getDetailProduct
+    api_getDetailProduct,
+    api_getNews,
+    api_getDetailNews
 }
