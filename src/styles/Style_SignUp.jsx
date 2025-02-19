@@ -1,13 +1,12 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
+import colors from './colors';
 
 const Style_SignUp = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        padding: 16,
+        backgroundColor: colors.White,
+        padding: 20,
     },
     logoContainer: {
         width: 112,
@@ -24,36 +23,32 @@ const Style_SignUp = StyleSheet.create({
         fontSize: 32,
         fontWeight: 'bold',
         marginBottom: 20,
-        color: '#000000'
+        color: '#000000',
+        textAlign: 'center'
     },
     name:{
         fontSize: 16,
         color: '#7F7F7F',
-        marginRight: 325,
         marginBottom: 10
     },
     phone:{
         fontSize: 16,
         color: '#7F7F7F',
-        marginRight: 280,
         marginBottom: 10
     },
     email:{
         fontSize: 16,
         color: '#7F7F7F',
-        marginRight: 335,
         marginBottom: 10
     },
     welcom:{
         fontSize: 16,
         color: '#7F7F7F',
-        marginRight: 200,
         marginBottom: 10
     },
     passs:{
         fontSize: 16,
         color: '#7F7F7F',
-        marginRight: 305,
         marginBottom: 10
     },
     input: {
@@ -84,13 +79,11 @@ const Style_SignUp = StyleSheet.create({
     forgotPassword: {
         alignSelf: 'flex-end',
         color: '#000',
-        marginBottom: 30,
-        marginLeft: 260,
+        marginBottom: 24,
         fontSize: 16,
-        
     },
     loginButton: {
-        width: 392,
+        width: '100%',
         height: 56,
         backgroundColor: '#E43727',
         justifyContent: 'center',
@@ -106,10 +99,11 @@ const Style_SignUp = StyleSheet.create({
     newUserText: {
         fontSize: 16,
         color: '#000000',
-        marginBottom: 5,
+        marginBottom: 8,
+        textAlign: 'center'
     },
     registerButton: {
-        width: 392,
+        width: '100%',
         height: 56,
         backgroundColor: '#266FDA',
         justifyContent: 'center',
