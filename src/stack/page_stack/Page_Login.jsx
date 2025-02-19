@@ -12,59 +12,57 @@ const Page_Login = (props) => {
     const { navigation } = props;
     const { users, setUsers } = useContext(AppContext);
 
-    const [email, setEmail] = useState("tranbichngoc@gmail.com");
+    const [email_phone, setEmail_phone] = useState("");
     const [password, setPassword] = useState("1234");
     const [hidePassword, setHidePassword] = useState("false");
 
 
- // Hàm tự động định dạng số điện thoại khi nhập
- const formatPhone = (text) => {
-    // Bước 1: Xóa tất cả các ký tự không phải số
-    const cleaned = text.replace(/\D/g, "");
+    // Hàm tự động định dạng số điện thoại khi nhập
+    const formatPhone = (text) => {
+        // Bước 1: Xóa tất cả các ký tự không phải số
+        const cleaned = text.replace(/\D/g, "");
 
-    let pattern;
-    // Bước 2: Xác định pattern phù hợp theo độ dài của số điện thoại
-    if (cleaned.length >= 4 && cleaned.length <= 6) {
-      // Nếu số có từ 4 đến 6 chữ số, format dạng "000 000"
-      pattern = /(\d{3})(\d{1,3})/; // Bắt từ 1 đến 3 chữ số cuối (có thể có hoặc không)
-    } else if (cleaned.length >= 7 && cleaned.length <= 10) {
-      // Nếu số có từ 7 đến 10 chữ số, format dạng "000 000 0000"
-      pattern = /(\d{3})(\d{3})(\d{1,4})/; //Bắt từ 1 đến 4 chữ số cuối (có thể có hoặc không)
-    } else {
-      return cleaned; // Nếu quá dài (hơn 10 số), giữ nguyên
+        let pattern;
+        // Bước 2: Xác định pattern phù hợp theo độ dài của số điện thoại
+        if (cleaned.length >= 4 && cleaned.length <= 6) {
+            // Nếu số có từ 4 đến 6 chữ số, format dạng "000 000"
+            pattern = /(\d{3})(\d{1,3})/; // Bắt từ 1 đến 3 chữ số cuối (có thể có hoặc không)
+        } else if (cleaned.length >= 7 && cleaned.length <= 10) {
+            // Nếu số có từ 7 đến 10 chữ số, format dạng "000 000 0000"
+            pattern = /(\d{3})(\d{3})(\d{1,4})/; //Bắt từ 1 đến 4 chữ số cuối (có thể có hoặc không)
+        } else {
+            return cleaned; // Nếu quá dài (hơn 10 số), giữ nguyên
+        }
+
+        // Bước 3: Thay thế số theo pattern đã chọn
+        return cleaned.replace(pattern, (match, p1, p2, p3) => {
+            return [p1, p2, p3].filter(Boolean).join(" ");
+            // filter(Boolean): Loại bỏ giá trị `undefined` để tránh lỗi khi nối chuỗi
+            // và ghép các phần còn lại lại với nhau bằng dấu cách " "
+        });
+    };
+
+    const handleChangeText = (text) => {
+        // Bước 1: Xóa tất cả ký tự không phải số
+        const cleaned = text.replace(/\D/g, "");
+
+        // Bước 2: Kiểm tra số điện thoại hợp lệ
+        if (cleaned.length > 10) {
+            setEmail_phone(cleaned);
+        } else if (/^\d+$/.test(cleaned) && cleaned.length > 3) {
+            setEmail_phone(formatPhone(cleaned))
+        } else {
+            setEmail_phone(text)
+        }
     }
-
-    // Bước 3: Thay thế số theo pattern đã chọn
-    return cleaned.replace(pattern, (match, p1, p2, p3) => {
-      return [p1, p2, p3].filter(Boolean).join(" ");
-      // filter(Boolean): Loại bỏ giá trị `undefined` để tránh lỗi khi nối chuỗi
-      // và ghép các phần còn lại lại với nhau bằng dấu cách " "
-    });
-  };
-
-  const handleChangeText = (text) => {
-    // Bước 1: Xóa tất cả ký tự không phải số
-    const cleaned = text.replace(/\D/g, "");
-
-    // Bước 2: Kiểm tra số điện thoại hợp lệ
-    if (cleaned.length > 10) {
-      setEmail_phone(cleaned);
-    } else if (/^\d+$/.test(cleaned) && cleaned.length > 3) {
-      setEmail_phone(formatPhone(cleaned))
-    } else {
-      setEmail_phone(text)
-    }
-  }
-
-
 
     // Hàm đăng nhập
-     const onLogin = async () => {
+    const onLogin = async () => {
         if (!email || !password) {
             Alert.alert('Chưa nhập thông tin', 'Vui lòng nhập thông tin đầy đủ');
             return;
         }
-        try{
+        try {
             const body = {
                 email: email,
                 password: password
@@ -81,14 +79,14 @@ const Page_Login = (props) => {
 
 
                 ToastAndroid.show('Đăng nhập thành công', ToastAndroid.LONG);
-                navigation.navigate('Tab', { screen: 'Profile'});
+                navigation.navigate('Tab', { screen: 'Profile' });
             } else {
                 Alert.alert('Sai thông tin', 'Email/SĐT hoặc Mật khẩu không đúng');
             }
         } catch (e) {
             Alert.alert('Lỗi kết nối', 'Có lỗi xảy ra khi kết nối đến máy chủ. Vui lòng thử lại sau');
         }
-     }
+    }
 
     return (
         <View style={Style_Login.container}>
@@ -99,11 +97,12 @@ const Page_Login = (props) => {
             <Text style={Style_Login.title}>Đăng nhập</Text>
 
             <View style={Style_Login.inputGroup}>
-                <Text style={Style_Login.label}>Email</Text>
+                <Text style={Style_Login.label}>Email hoặc số điện thoại</Text>
                 <TextInput
                     style={Style_Login.input}
-                    value={email}
-                    onChangeText={text => setEmail(text)}/>
+                    value={email_phone}
+                    onChangeText={handleChangeText}
+                    keyboardType='default' />
             </View>
 
             <View style={Style_Login.inputGroup}>
@@ -115,8 +114,14 @@ const Page_Login = (props) => {
                         value={password}
                         onChangeText={text => setPassword(text)}
                     />
-                    <TouchableOpacity>
-                        <Image source={require('../../assets/icon/icon_show.png')} style={Style_Login.eyeIcon} />
+                    <TouchableOpacity 
+                        onPress={() => setHidePassword(!hidePassword)}
+                        >
+                        <Image
+                        source={hidePassword
+                         ? require('../../assets/icon/icon_show.png')
+                         : require('../../assets/icon/icon_show.png')}  
+                         style={Style_Login.eyeIcon}/>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -125,7 +130,7 @@ const Page_Login = (props) => {
                 <Text style={Style_Login.forgotPassword}>Quên mật khẩu?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={Style_Login.loginButton}
                 onPress={() => onLogin()}>
 
