@@ -16,6 +16,48 @@ const Page_Login = (props) => {
     const [password, setPassword] = useState("1234");
     const [hidePassword, setHidePassword] = useState("false");
 
+
+ // Hàm tự động định dạng số điện thoại khi nhập
+ const formatPhone = (text) => {
+    // Bước 1: Xóa tất cả các ký tự không phải số
+    const cleaned = text.replace(/\D/g, "");
+
+    let pattern;
+    // Bước 2: Xác định pattern phù hợp theo độ dài của số điện thoại
+    if (cleaned.length >= 4 && cleaned.length <= 6) {
+      // Nếu số có từ 4 đến 6 chữ số, format dạng "000 000"
+      pattern = /(\d{3})(\d{1,3})/; // Bắt từ 1 đến 3 chữ số cuối (có thể có hoặc không)
+    } else if (cleaned.length >= 7 && cleaned.length <= 10) {
+      // Nếu số có từ 7 đến 10 chữ số, format dạng "000 000 0000"
+      pattern = /(\d{3})(\d{3})(\d{1,4})/; //Bắt từ 1 đến 4 chữ số cuối (có thể có hoặc không)
+    } else {
+      return cleaned; // Nếu quá dài (hơn 10 số), giữ nguyên
+    }
+
+    // Bước 3: Thay thế số theo pattern đã chọn
+    return cleaned.replace(pattern, (match, p1, p2, p3) => {
+      return [p1, p2, p3].filter(Boolean).join(" ");
+      // filter(Boolean): Loại bỏ giá trị `undefined` để tránh lỗi khi nối chuỗi
+      // và ghép các phần còn lại lại với nhau bằng dấu cách " "
+    });
+  };
+
+  const handleChangeText = (text) => {
+    // Bước 1: Xóa tất cả ký tự không phải số
+    const cleaned = text.replace(/\D/g, "");
+
+    // Bước 2: Kiểm tra số điện thoại hợp lệ
+    if (cleaned.length > 10) {
+      setEmail_phone(cleaned);
+    } else if (/^\d+$/.test(cleaned) && cleaned.length > 3) {
+      setEmail_phone(formatPhone(cleaned))
+    } else {
+      setEmail_phone(text)
+    }
+  }
+
+
+
     // Hàm đăng nhập
      const onLogin = async () => {
         if (!email || !password) {
