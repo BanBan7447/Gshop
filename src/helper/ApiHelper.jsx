@@ -21,7 +21,29 @@ const api_login = async (data) => {
 }
 
 // Gọi API đăng ký
+const api_signUp = async (data) => {
+    try {
+        const { name, email, phone_number, password } = data;
+        const body = {
+            name: name,
+            email: email,
+            phone_number: phone_number,
+            password: password
+        }
 
+        const response = await AxiosInstance().post('/user/register', body);
+
+        if (response.status == true) {
+            return true;
+        }
+
+        return false
+
+    } catch (e) {
+        console.log(e);
+        return false
+    }
+};
 
 // Gọi API lấy danh sách danh mục
 const api_getCategories = async () => {
@@ -137,6 +159,7 @@ const api_getDetailNews = async (_id) => {
 
 export {
     api_login,
+    api_signUp,
     api_getCategories,
     api_getProducts,
     api_getImagesProduct,
