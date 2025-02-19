@@ -1,22 +1,21 @@
 import { View, Text, Image, TouchableOpacity, ScrollView, Modal, FlatList, ActivityIndicator } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 
-import { api_getDetailProduct } from '../../helper/ApiHelper';
+import { getDetailProduct, api_getDetailProduct } from '../../helper/ApiHelper';
 
 import Style_Detail from '../../styles/Style_Detail';
 import colors from '../../styles/colors';
 
 import FastImage from 'react-native-fast-image';
 import { Dimensions } from 'react-native';
-
-import { AppContext } from '../../context';
+import { CartContext } from '../../context/CartContext';
 
 const Page_Detail = (props) => {
     const { navigation, route } = props;
 
-    const { id, images } = route.params;
+    const { id, images, productView } = route.params;
     const [product, setProduct] = useState(null);
-    const { cart, setCart } = useContext(AppContext);
+    const { cart, setCart } = useContext(CartContext);
 
     console.log("Detail page loaded with ID:", id, "Image URL:", images);
 
@@ -49,31 +48,26 @@ const Page_Detail = (props) => {
     //const imageUrl = images?.[0]?.image?.[0] ?? null;
 
     const addToCart = () => {
-        if (product && product._id) {
-            setCart((prevCart) => {
-                const newCart = prevCart ? [...prevCart] : [];
+        console.log('>>>>>>>>>>>>>>>> Đã thêm sản phẩm')
 
-                // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
-                const existingIndex = newCart.findIndex(item => item._id === product._id);
-                if (existingIndex !== -1) {
-                    // Nếu đã có thì tăng số lượng
-                    newCart[existingIndex].quantity += 1;
-                } else {
-                    newCart.push({
-                        ...product,
-                        quantity: 1,
-                        image: images[0]?.image
-                    });
-                }
+        setCart((prevCart) => {
+            const newCart = prevCart ? [...prevCart] : [];
 
-                return newCart;
-            });
-        }
+            // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
+            const existingIndex = newCart.findIndex(item => item._id === id);
+            if (existingIndex !== -1) {
+                // Nếu đã có thì tăng số lượng
+                newCart[existingIndex].quantityCart += 1;
+            } else {
+                newCart.push({
+                    ...product,
+                    quantityCart: 1,
+                    image: images[0]?.image
+                });
+            }
 
-        setShowNotification(true) // Hiển thị thông báo khi thêm vào giỏ hàng
-        setTimeout(() => {
-            setShowNotification(false);
-        }, 3000)
+            return newCart;
+        });
     };
 
     return (
@@ -145,33 +139,30 @@ const Page_Detail = (props) => {
                         <Text style={Style_Detail.text_name}>{product.name}</Text>
                         <Text style={Style_Detail.text_price}>{product.price.toLocaleString('vi-VN')}đ</Text>
 
-                        {/* <Text style={Style_Detail.text_title_state}>
-                            Trạng thái: <Text style={{
-                                color: product.state === 'Hết hàng' ? colors.Red :
-                                    (product.state.startsWith('Chỉ còn') ? colors.Orange : colors.Green)
-                            }}>
-                                {product.state}
-                            </Text>
-                        </Text> */}
-
-                        <Text style={Style_Detail.text_title_state}>
-                            Trạng thái: <Text
-                                style={{
-                                    color: product.status
-                                        ? colors.Green
-                                        : (product.quantity >= 1 && product.quantity <= 10)
-                                            ? colors.Orange
-                                            : colors.Red
+                        {product.status ? (
+                            <Text style={Style_Detail.text_title_state}>
+                                Trạng thái: <Text style={{
+                                    color:
+                                        product.quantity === 0
+                                            ? colors.Red
+                                            : product.quantity <= 10
+                                                ? colors.Orange
+                                                : colors.Green
                                 }}>
-
-                                {product.status
-                                    ? `Còn ${product.quantity} bộ`
-                                    : (product.quantity >= 1 && product.quantity <= 10)
-                                        ? `Chỉ còn ${product.quantity} bộ`
-                                        : 'Hết hàng'
-                                }
+                                    {product.quantity === 0
+                                        ? "Hết hàng"
+                                        : product.quantity <= 10
+                                            ? `Chỉ còn ${product.quantity} bộ`
+                                            : `Còn ${product.quantity} bộ`
+                                    }
+                                </Text>
                             </Text>
+                        ) : null}
+
+                        <Text>
+                            lượt xem: {productView?.viewer}
                         </Text>
+
 
                         <Text style={Style_Detail.text_title_describe}>Mô tả</Text>
 
@@ -183,7 +174,7 @@ const Page_Detail = (props) => {
                                 { backgroundColor: isOutStock ? colors.Black : colors.Red }
                             ]}
                             disabled={isOutStock}
-                            onPress={addToCart}>
+                            onPress={() => addToCart()}>
 
                             <Text style={Style_Detail.text_AddCart}>
                                 {isOutStock ? 'Sản phẩm đã hết hàng' : 'Thêm vào giỏ hàng'}
