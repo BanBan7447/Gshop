@@ -1,7 +1,7 @@
 import { View, Text, Image, TouchableOpacity, ScrollView, Modal, FlatList, ActivityIndicator } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 
-import { api_getDetailProduct } from '../../helper/ApiHelper';
+import { getDetailProduct, api_getDetailProduct, api_getRateByProduct } from '../../helper/ApiHelper';
 
 import Style_Detail from '../../styles/Style_Detail';
 import colors from '../../styles/colors';
@@ -16,16 +16,14 @@ const Page_Detail = (props) => {
     const { id, images, productView } = route.params;
     const [product, setProduct] = useState(null);
     const { cart, setCart } = useContext(CartContext);
+    const [totalRate, setTotalRate] = useState(0);
+    const [reviews, setReviews] = useState([]);
 
     console.log("Detail page loaded with ID:", id, "Image URL:", images);
 
-    // Trạng thái giỏ hàng
-    const [showNotification, setShowNotification] = useState(false);
-
+    const [showNotification, setShowNotification] = useState(false); // Trạng thái giỏ hàng
     const screenWidth = Dimensions.get('window').width; // Lấy chiều rộng màn hình
-
-    // Thêm trạng thái để kiểm tra nếu sản phẩm đã hết hàng
-    const isOutStock = product?.status === false;
+    const isOutStock = product?.status === false; // Thêm trạng thái để kiểm tra nếu sản phẩm đã hết hàng
 
     // Hàm lấy dữ liệu sản phẩm
     const funGetDetailProduct = async () => {
@@ -39,9 +37,28 @@ const Page_Detail = (props) => {
         }
     };
 
+    // Hàm lấy dữ liệu đánh giá
+    const funGetRating = async () => {
+        try {
+            const reviews = await api_getRateByProduct(id);
+            if (reviews && reviews.length > 0) {
+                const totalPoints = reviews.reduce((sum, review) => sum + review.star, 0);
+                const averageRating = totalPoints / reviews.length; // Tính trung bình điểm đánh giá
+                setTotalRate(averageRating.toFixed(1));
+                setReviews(reviews)
+            } else {
+                setTotalRate("0.0");
+                setReviews([]);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     // Gọi hàm funGetDetailProduct khi render
     useEffect(() => {
         funGetDetailProduct();
+        funGetRating();
     }, [id]);
 
     // Kiểm tra và lấy url từ images
@@ -74,7 +91,7 @@ const Page_Detail = (props) => {
         <View style={{ flex: 1 }}>
             {
                 product ? (
-                    <ScrollView style={Style_Detail.container}>
+                    <View style={{ flex: 1, backgroundColor: colors.White }}>
                         <View style={Style_Detail.container_title}>
                             <TouchableOpacity
                                 style={Style_Detail.navigation}
@@ -99,70 +116,85 @@ const Page_Detail = (props) => {
                             </TouchableOpacity>
                         </View>
 
-                        <View style={{ position: 'relative' }}>
-                            <FlatList
-                                data={images.flatMap(item => item.image)} // Trải phẳng mảng ảnh
-                                keyExtractor={(item, index) => index.toString()}
-                                horizontal
-                                pagingEnabled={true}
-                                showsHorizontalScrollIndicator={false}
-                                initialNumToRender={5}
-                                renderItem={({ item }) => (
-                                    <FastImage
-                                        style={{
-                                            width: screenWidth,
-                                            height: 240,
-                                            backgroundColor: 'black'
-                                        }}
-                                        source={{
-                                            uri: item,
-                                            priority: FastImage.priority.high,
-                                            cache: FastImage.cacheControl.immutable,
-                                        }}
-                                        resizeMode={FastImage.resizeMode.contain}
-                                    />
-                                )}
-                            />
+                        <ScrollView style={Style_Detail.container}>
+                            <View style={{ position: 'relative' }}>
+                                <FlatList
+                                    data={images.flatMap(item => item.image)} // Trải phẳng mảng ảnh
+                                    keyExtractor={(item, index) => index.toString()}
+                                    horizontal
+                                    pagingEnabled={true}
+                                    showsHorizontalScrollIndicator={false}
+                                    initialNumToRender={5}
+                                    renderItem={({ item }) => (
+                                        <FastImage
+                                            style={{
+                                                width: screenWidth,
+                                                height: 240,
+                                                backgroundColor: 'black'
+                                            }}
+                                            source={{
+                                                uri: item,
+                                                priority: FastImage.priority.high,
+                                                cache: FastImage.cacheControl.immutable,
+                                            }}
+                                            resizeMode={FastImage.resizeMode.contain}
+                                        />
+                                    )}
+                                />
 
-                            <View style={Style_Detail.container_view}>
-                                <Image
-                                    source={require('../../assets/icon/icon_eye.png')}
-                                    style={Style_Detail.img_icon_view} />
-                                <Text
-                                    style={Style_Detail.text_view}>
-                                    {productView?.viewer}
-                                </Text>
-                            </View>
-                        </View>
-
-                        <View style={Style_Detail.container_info}>
-                            <Text style={Style_Detail.text_name}>{product.name}</Text>
-                            <Text style={Style_Detail.text_price}>{product.price.toLocaleString('vi-VN')}đ</Text>
-
-                            {product.status ? (
-                                <Text style={Style_Detail.text_title_state}>
-                                    Trạng thái: <Text style={{
-                                        color:
-                                            product.quantity === 0
-                                                ? colors.Red
-                                                : product.quantity <= 10
-                                                    ? colors.Orange
-                                                    : colors.Green
-                                    }}>
-                                        {product.quantity === 0
-                                            ? "Hết hàng"
-                                            : product.quantity <= 10
-                                                ? `Chỉ còn ${product.quantity} bộ`
-                                                : `Còn ${product.quantity} bộ`
-                                        }
+                                <View style={Style_Detail.container_view}>
+                                    <Image
+                                        source={require('../../assets/icon/icon_eye.png')}
+                                        style={Style_Detail.img_icon_view} />
+                                    <Text
+                                        style={Style_Detail.text_view}>
+                                        {productView?.viewer}
                                     </Text>
-                                </Text>
-                            ) : null}
+                                </View>
+                            </View>
 
-                            <Text style={Style_Detail.text_title_describe}>Mô tả</Text>
+                            <View style={Style_Detail.container_info}>
+                                <Text style={Style_Detail.text_name}>{product.name}</Text>
 
-                            <Text style={Style_Detail.text_describe}>{product.description}</Text>
+                                <View style={Style_Detail.info_rate}>
+                                    <Text style={Style_Detail.text_price}>{product.price.toLocaleString('vi-VN')}đ</Text>
+                                    <TouchableOpacity
+                                        style={Style_Detail.btn_rate}
+                                        onPress={() => navigation.navigate('Rating', {reviews, totalRate, product})}>
+                                        <Image
+                                            source={require('../../assets/icon/icon_star.png')}
+                                            style={{ width: 24, height: 24 }} />
+                                        <Text style={Style_Detail.text_rate}>{totalRate}/5.0</Text>
+                                    </TouchableOpacity>
+                                </View>
 
+                                {product.status ? (
+                                    <Text style={Style_Detail.text_title_state}>
+                                        Trạng thái: <Text style={{
+                                            color:
+                                                product.quantity === 0
+                                                    ? colors.Red
+                                                    : product.quantity <= 10
+                                                        ? colors.Orange
+                                                        : colors.Green
+                                        }}>
+                                            {product.quantity === 0
+                                                ? "Hết hàng"
+                                                : product.quantity <= 10
+                                                    ? `Chỉ còn ${product.quantity} bộ`
+                                                    : `Còn ${product.quantity} bộ`
+                                            }
+                                        </Text>
+                                    </Text>
+                                ) : null}
+
+                                <Text style={Style_Detail.text_title_describe}>Mô tả</Text>
+
+                                <Text style={Style_Detail.text_describe}>{product.description}</Text>
+                            </View>
+                        </ScrollView>
+
+                        <View style={Style_Detail.container_bottom}>
                             <TouchableOpacity
                                 style={[
                                     Style_Detail.btn_AddCart,
@@ -176,8 +208,7 @@ const Page_Detail = (props) => {
                                 </Text>
                             </TouchableOpacity>
                         </View>
-
-                    </ScrollView>
+                    </View>
                 ) : (
                     <View style={Style_Detail.container_loading}>
                         <ActivityIndicator size='large' color={colors.Red} />

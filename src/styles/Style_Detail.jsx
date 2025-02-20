@@ -139,8 +139,7 @@ const Style_Detail = StyleSheet.create({
         backgroundColor: colors.Red,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 16,
-        marginBottom: 24
+        borderRadius: 16
     },
 
     text_AddCart: {
@@ -150,6 +149,7 @@ const Style_Detail = StyleSheet.create({
     },
 
     container_error: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -197,6 +197,32 @@ const Style_Detail = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.8)'
+    },
+
+    container_bottom: {
+        paddingHorizontal: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: colors.White,
+        marginVertical: 16
+    },
+
+    text_rate: {
+        fontFamily: 'Inter SemiBold',
+        fontSize: 16,
+        color: colors.Black,
+        marginLeft: 6
+    },
+
+    btn_rate: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+
+    info_rate: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
     }
     
 })
