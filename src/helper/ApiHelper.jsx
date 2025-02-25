@@ -4,12 +4,13 @@ import AxiosInstance from "./AxiosInstance";
 const api_login = async (data) => {
     try {
         console.log('>>>>>>>>>>>>>>>>> get_api_login')
-        const { email, password } = data;
+        const { email, phone_number, password } = data;
         const body = {
             email: email,
+            phone_number: phone_number,
             password: password
         }
-        console.log(`Email: ${email}, Password: ${password}`)
+        console.log(`Email: ${email} | Phone: ${phone_number}, Password: ${password}`)
 
         const response = await AxiosInstance().post('/user/login', body);
         if (response.status == true) {
@@ -43,7 +44,7 @@ const api_signUp = async (data) => {
         console.log(e);
         return false
     }
-};
+}
 
 // Gọi API lấy thông tin chi tiết của user
 const api_getDetailUser = async (_id) => {
