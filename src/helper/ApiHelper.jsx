@@ -46,6 +46,20 @@ const api_signUp = async (data) => {
     }
 }
 
+// Gọi API lấy thông tin chi tiết của user
+const api_getDetailUser = async (_id) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get Detail User');
+        const response = await AxiosInstance().get(`/user/detail_user?_id=${_id}`);
+
+        if(response.status == true){
+            return response.data;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 // Gọi API lấy danh sách danh mục
 const api_getCategories = async () => {
     try {
@@ -60,6 +74,8 @@ const api_getCategories = async () => {
         console.log(e);
     }
 }
+
+
 
 // Gọi API lấy danh sách sản phẩm
 const api_getProducts = async () => {
@@ -158,14 +174,32 @@ const api_getDetailNews = async (_id) => {
     }
 }
 
+// Gọi API lấy danh sách đánh giá theo sản phẩm
+const api_getRateByProduct = async (id_product) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get Rate Product');
+        const response = await AxiosInstance().get(`/rating/list_product?id_product=${id_product}`);
+
+        if (response.status == true) {
+            return response.data;
+        } else {
+            return [];
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 export {
     api_login,
     api_signUp,
+    api_getDetailUser,
     api_getCategories,
     api_getProducts,
     api_getImagesProduct,
     api_getProductsByCategory,
     api_getDetailProduct,
     api_getNews,
-    api_getDetailNews
+    api_getDetailNews,
+    api_getRateByProduct
 }

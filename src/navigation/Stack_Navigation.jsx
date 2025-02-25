@@ -13,6 +13,7 @@ import Page_Edit_Profile from '../stack/page_stack/Page_Edit_Profile'
 import Page_MyAddress from '../stack/page_stack/Page_MyAddress'
 import Page_MyOder from '../stack/page_stack/Page_MyOder'
 import Page_Detail_News from '../stack/page_stack/Page_Detail_News'
+import Page_Rating from '../stack/page_stack/Page_Rating'
 import Page_FQA from '../stack/page_stack/Page_FQA'
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -33,6 +34,7 @@ const Stack_Navigation = () => {
       <Stack.Screen name='Location' component={Page_MyAddress} />
       <Stack.Screen name='ChangePass' component={Page_ChangPass} />
       <Stack.Screen name='DetailNews' component={Page_Detail_News} />
+      <Stack.Screen name='Rating' component={Page_Rating}/>
       <Stack.Screen name='FQA' component={Page_FQA} />
     </Stack.Navigator>
   )
