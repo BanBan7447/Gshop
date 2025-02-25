@@ -52,7 +52,7 @@ const api_getDetailUser = async (_id) => {
         console.log('>>>>>>>>>>>>>>>>>> get Detail User');
         const response = await AxiosInstance().get(`/user/detail_user?_id=${_id}`);
 
-        if(response.status == true){
+        if (response.status == true) {
             return response.data;
         }
     } catch (e) {
@@ -146,30 +146,30 @@ const api_getDetailProduct = async (id) => {
 
 // Gọi API lấy danh sách tin tức
 const api_getNews = async () => {
-    try{
+    try {
         console.log('>>>>>>>>>>>>>> get api list news');
         const response = await AxiosInstance().get('/news/list');
 
-        if(response.status == true){
+        if (response.status == true) {
             console.log('Data News', response);
             return response.data
         }
 
-    }catch(e){
+    } catch (e) {
         console.log(e)
     }
 }
 
 // Gọi API lấy chi tiết tin tức
 const api_getDetailNews = async (_id) => {
-    try{
+    try {
         console.log('>>>>>>>>>>>>>>>>>> get Detail News');
         const response = await AxiosInstance().get(`/news/detail_news?_id=${_id}`)
-        
-        if(response.status == true){
+
+        if (response.status == true) {
             return response.data;
         }
-    }catch(e){
+    } catch (e) {
         console.log(e);
     }
 }
@@ -190,6 +190,28 @@ const api_getRateByProduct = async (id_product) => {
     }
 }
 
+// Gọi API đổi mật khẩu
+const api_changePassword = async (userId, newPassword, confirmPassword) => {
+    try {
+        const response = await AxiosInstance().put('/user/changPass', {
+            userId,
+            newPassword,
+            confirmPassword,
+        });
+
+        if (response.status === 200) {
+            console.log('Đổi mật khẩu thành công:', response.data);
+            return response.data;
+        } else {
+            console.error('Lỗi khi đổi mật khẩu:', response.data);
+            throw new Error(response.data.message || 'Có lỗi xảy ra');
+        }
+    } catch (error) {
+        console.error('Lỗi khi gọi API:', error);
+        throw error;
+    }
+};
+
 export {
     api_login,
     api_signUp,
@@ -201,5 +223,6 @@ export {
     api_getDetailProduct,
     api_getNews,
     api_getDetailNews,
-    api_getRateByProduct
+    api_getRateByProduct,
+    api_changePassword
 }
