@@ -20,7 +20,7 @@ const Page_News = (props) => {
       setNews(response);
     } catch (e) {
       console.log(e);
-    }finally{
+    } finally {
       setLoading(false);
     }
   };

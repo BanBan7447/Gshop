@@ -4,15 +4,14 @@ import colors from './colors'
 const Style_Cart = StyleSheet.create({
     container: {
         flex: 1,
-        position: 'relative',
         backgroundColor: colors.White,
         paddingTop: 20,
         paddingHorizontal: 20,
     },
 
     container_cart: {
-        width: '100%',
-        flex: 1
+        flex: 1,
+        width: '100%'
     },
 
     title_cart: {
@@ -26,21 +25,49 @@ const Style_Cart = StyleSheet.create({
         flexDirection: 'row',
         width: '100%',
         height: 88,
-        marginBottom: 24
+        marginBottom: 24,
+        alignItems: 'center'
+    },
+
+    checkBox: {
+        width: 24,
+        height: 24,
+        borderWidth: 1,
+        borderRadius: 100,
+        borderColor: colors.Black,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10
+    },
+
+    checkBox_selected: {
+        backgroundColor: colors.Blue
     },
 
     img_product: {
         width: 88,
         height: 88,
+        borderRadius: 16,
+        marginRight: 12,
+        marginLeft: 8
+    },
+
+    loading_img_product: {
+        width: 88,
+        height: 88,
         borderRadius: 12,
-        marginRight: 12
+        overflow: 'hidden',
+        marginBottom: 8,
+        marginRight: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
     container_info: {
         flex: 1,
         justifyContent: 'space-between'
     },
-    
+
     text_name: {
         fontFamily: 'Inter SemiBold',
         fontSize: 18,
@@ -125,8 +152,8 @@ const Style_Cart = StyleSheet.create({
         borderRadius: 14,
         marginTop: 16,
     },
-    
-    text_shopping:{
+
+    text_shopping: {
         fontFamily: 'Inter Bold',
         fontSize: 16,
         color: colors.White
@@ -136,7 +163,31 @@ const Style_Cart = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         left: 0,
-        right: 0,
+        right: 0
+    },
+
+    container_checkAll: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8
+    },
+
+    content_checkAll: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+
+    text_totalPrice: {
+        fontFamily: 'Inter Bold',
+        color: colors.Red,
+        fontSize: 24
+    },
+
+    label_checkAll: {
+        fontFamily: 'Inter SemiBold',
+        color: colors.Black,
+        fontSize: 16
     },
 
     btn_payment: {
@@ -146,7 +197,7 @@ const Style_Cart = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
-        marginBottom: 24,
+        marginBottom: 12,
     },
 
     text_payment: {

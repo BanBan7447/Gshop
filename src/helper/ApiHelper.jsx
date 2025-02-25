@@ -75,8 +75,6 @@ const api_getCategories = async () => {
     }
 }
 
-
-
 // Gọi API lấy danh sách sản phẩm
 const api_getProducts = async () => {
     try {
@@ -212,6 +210,38 @@ const api_changePassword = async (userId, newPassword, confirmPassword) => {
     }
 };
 
+// Gọi API thêm đánh giá
+const api_addReview = async (star, content, id_user, id_product) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get Add Review');
+        const response = await AxiosInstance().post('/rating/add', {
+            star, content, id_user, id_product
+        });
+
+        console.log('📌 Phản hồi từ server:', response);
+
+        if (response.status == true) {
+            return response;
+        }
+    } catch (e) {
+        console.log('❌ Lỗi khi thêm đánh giá:', e);
+    }
+}
+
+// Gọi API cập nhật view của sản phẩm
+const api_updateView = async (id) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get api update View');
+        const response = AxiosInstance().put(`/product/update_view?id=${id}`);
+
+        if (response.status == true) {
+            return response
+        }
+    } catch (e) {
+        console.log("Lỗi khi tăng view", e)
+    }
+}
+
 export {
     api_login,
     api_signUp,
@@ -224,5 +254,7 @@ export {
     api_getNews,
     api_getDetailNews,
     api_getRateByProduct,
-    api_changePassword
+    api_changePassword,
+    api_addReview,
+    api_updateView
 }

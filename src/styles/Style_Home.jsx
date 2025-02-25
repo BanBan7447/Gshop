@@ -128,11 +128,43 @@ const Style_Home = StyleSheet.create({
         fontSize: 12
     },
 
-    container_loading:{
+    container_loading: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.8)'
+    },
+
+    img_skeleton: {
+        width: '100%',
+        height: 160,
+        borderRadius: 16,
+        overflow: 'hidden',
+        marginBottom: 8,
+        backgroundColor: colors.Grey
+    },
+
+    name_skeleton: {
+        width: '80%',
+        height: 12,
+        borderRadius: 100,
+        marginBottom: 4,
+        backgroundColor: colors.Black
+    },
+
+    type_product_skeleton: {
+        width: '50%',
+        height: 12,
+        borderRadius: 100,
+        marginBottom: 4,
+        backgroundColor: colors.Grey
+    },
+
+    price_product_skeleton: {
+        width: '80%',
+        height: 12,
+        borderRadius: 100,
+        backgroundColor: colors.Black
     }
 })
 

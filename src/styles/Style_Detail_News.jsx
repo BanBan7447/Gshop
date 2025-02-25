@@ -52,7 +52,9 @@ const Style_Detail_News = StyleSheet.create({
     content_news: {
         fontFamily: 'Inter Regular',
         color: colors.Black,
-        fontSize: 14
+        fontSize: 14,
+        textAlign: 'justify',
+        lineHeight: 24
     },
 
     images_news: {

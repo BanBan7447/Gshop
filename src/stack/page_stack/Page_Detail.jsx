@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity, ScrollView, Modal, FlatList, ActivityIndicator } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 
 import { getDetailProduct, api_getDetailProduct, api_getRateByProduct } from '../../helper/ApiHelper';
 
@@ -9,6 +9,7 @@ import colors from '../../styles/colors';
 import FastImage from 'react-native-fast-image';
 import { Dimensions } from 'react-native';
 import { CartContext } from '../../context/CartContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Page_Detail = (props) => {
     const { navigation, route } = props;
@@ -23,7 +24,7 @@ const Page_Detail = (props) => {
 
     const [showNotification, setShowNotification] = useState(false); // Trạng thái giỏ hàng
     const screenWidth = Dimensions.get('window').width; // Lấy chiều rộng màn hình
-    const isOutStock = product?.status === false; // Thêm trạng thái để kiểm tra nếu sản phẩm đã hết hàng
+    const isOutStock = product?.status === "Hết hàng"; // Thêm trạng thái để kiểm tra nếu sản phẩm đã hết hàng
 
     // Hàm lấy dữ liệu sản phẩm
     const funGetDetailProduct = async () => {
@@ -54,6 +55,12 @@ const Page_Detail = (props) => {
             console.log(e);
         }
     }
+
+    useFocusEffect(
+        useCallback(() => {
+            funGetRating()
+        }, [])
+    );
 
     // Gọi hàm funGetDetailProduct khi render
     useEffect(() => {
@@ -86,6 +93,17 @@ const Page_Detail = (props) => {
             return newCart;
         });
     };
+
+    // Xử lý hiển thị thứ tự ảnh sản phẩm
+    const [currentIndex, setCurrentIndex] = useState(0); // State để theo dõi ảnh hiện tại
+    // const flastListRef = useRef(null);
+
+    // Xử lý sự kiện khi ảnh thay đổi
+    const onViewableItemsChanged = useRef(({ viewableItems }) => {
+        if (viewableItems.length > 0) {
+            setCurrentIndex(viewableItems[0].index);
+        }
+    }).current;
 
     return (
         <View style={{ flex: 1 }}>
@@ -125,19 +143,21 @@ const Page_Detail = (props) => {
                                     pagingEnabled={true}
                                     showsHorizontalScrollIndicator={false}
                                     initialNumToRender={5}
-                                    renderItem={({ item }) => (
+                                    onViewableItemsChanged={onViewableItemsChanged}
+                                    viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
+                                    renderItem={({ item, index }) => (
                                         <FastImage
                                             style={{
                                                 width: screenWidth,
                                                 height: 240,
-                                                backgroundColor: 'black'
+                                                backgroundColor: colors.Black
                                             }}
                                             source={{
                                                 uri: item,
                                                 priority: FastImage.priority.high,
                                                 cache: FastImage.cacheControl.immutable,
                                             }}
-                                            resizeMode={FastImage.resizeMode.contain}
+                                            resizeMode={index === 0 ? FastImage.resizeMode.cover : FastImage.resizeMode.contain}
                                         />
                                     )}
                                 />
@@ -151,6 +171,12 @@ const Page_Detail = (props) => {
                                         {productView?.viewer}
                                     </Text>
                                 </View>
+
+                                <View style={Style_Detail.container_numberPic}>
+                                    <Text style={Style_Detail.text_view}>
+                                        {currentIndex + 1}/{images.flatMap(item => item.image).length}
+                                    </Text>
+                                </View>
                             </View>
 
                             <View style={Style_Detail.container_info}>
@@ -160,7 +186,7 @@ const Page_Detail = (props) => {
                                     <Text style={Style_Detail.text_price}>{product.price.toLocaleString('vi-VN')}đ</Text>
                                     <TouchableOpacity
                                         style={Style_Detail.btn_rate}
-                                        onPress={() => navigation.navigate('Rating', {reviews, totalRate, product})}>
+                                        onPress={() => navigation.navigate('Rating', { reviews, totalRate, product, images })}>
                                         <Image
                                             source={require('../../assets/icon/icon_star.png')}
                                             style={{ width: 24, height: 24 }} />

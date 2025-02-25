@@ -1,15 +1,62 @@
-import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid } from 'react-native'
-import React, { useContext, useState } from 'react'
+import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid, ActivityIndicator } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 
 import Style_Cart from '../../styles/Style_Cart'
 import { CartContext } from '../../context/CartContext'
+import colors from '../../styles/colors'
 
 const Page_Cart = (props) => {
   const { navigation } = props
-
-  const { cart, setCart } = useContext(CartContext)
+  const { cart, setCart } = useContext(CartContext);
+  const [loading, setLoading] = useState(true);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [isCheckedAll, setIsCheckedAll] = useState(false);
 
   console.log('Danh sách sản phẩm có trong Cart: ', cart)
+
+  // Hàm chọn || bỏ chọn sản phẩm
+  const toggleSelectItems = (_id) => {
+    setSelectedItems(prev => {
+      if (prev.includes(_id)) {
+        const updateItem = prev.filter(id => id !== _id);
+        setIsCheckedAll(false);
+        return updateItem
+      } else {
+        const updateItem = [...prev, _id];
+        if (updateItem.length === cart.length) {
+          setIsCheckedAll(true);
+        }
+        return updateItem;
+      }
+    })
+  };
+
+  // Hàm chọn || bỏ chọn tất cả sản phẩm
+  const toggleSelectAll = () => {
+    if (isCheckedAll) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(cart.map((item) => item._id));
+    }
+    setIsCheckedAll(!isCheckedAll);
+  }
+
+  // Tính tổng giá trị của các sản phẩm được chọn
+  useEffect(() => {
+    const total = cart
+      .filter(item => selectedItems.includes(item._id))
+      .reduce((sum, item) => sum + item.price * item.quantityCart, 0);
+    setTotalPrice(total)
+  }, [selectedItems, cart]);
+
+  // Tự động chọn tất cả sản phẩm lần đầu khi vào giỏ hàng
+  useEffect(() => {
+    if (cart.length > 0 && selectedItems.length === 0) {
+      setSelectedItems(cart.map(item => item._id));
+      setIsCheckedAll(true);
+    }
+  }, [cart])
 
   // Hàm giảm số lượng
   const minusItem = (_id) => { // Truyền updateProduct vô
@@ -36,16 +83,16 @@ const Page_Cart = (props) => {
     console.log('ID sản phẩm cần tăng: ', _id)
 
     setCart(cart.map(item => {
-      if(item._id === _id){
+      if (item._id === _id) {
         const stockQuantity = item.quantity;
         const cartQuantity = item.quantityCart;
 
-        if(cartQuantity > stockQuantity){
+        if (cartQuantity > stockQuantity) {
           ToastAndroid.show('Sản phẩm đã hết hàng', ToastAndroid.SHORT);
           return item;
         }
 
-        return {...item, quantityCart: item.quantityCart + 1}
+        return { ...item, quantityCart: item.quantityCart + 1 }
       }
       return item;
     }))
@@ -65,13 +112,27 @@ const Page_Cart = (props) => {
 
   // Hàm render danh sách giỏ hàng
   const renderCart = ({ item }) => {
+    const isChecked = selectedItems.includes(item._id);
+
     return (
       <View style={Style_Cart.container_product}>
+        <TouchableOpacity
+          onPress={() => toggleSelectItems(item._id)}
+          style={[Style_Cart.checkBox, isChecked && Style_Cart.checkBox_selected]}>
+          {isChecked &&
+            <Image
+              style={{ width: 12, height: 12 }}
+              source={require('../../assets/icon/icon_tick_white.png')} />
+          }
+        </TouchableOpacity>
+
         {
           item.image && item.image.length > 0 && (
             <Image
-              source={{ uri: item.image[0] }}
-              style={Style_Cart.img_product} />
+              source={{ uri: item.image[1] }}
+              style={Style_Cart.img_product}
+              onLoad={() => setLoading(false)}
+              onError={() => setLoading(false)} />
           )
         }
 
@@ -128,8 +189,27 @@ const Page_Cart = (props) => {
             <FlatList
               data={cart}
               renderItem={renderCart}
-              keyExtractor={(item) => item._id.toString()} />
+              keyExtractor={(item) => item._id.toString()}
+              showsVerticalScrollIndicator={false} />
+
             <View style={Style_Cart.container_bottom}>
+              <View style={Style_Cart.container_checkAll}>
+                <View style={Style_Cart.content_checkAll}>
+                  <TouchableOpacity
+                    onPress={toggleSelectAll}
+                    style={[Style_Cart.checkBox, isCheckedAll && Style_Cart.checkBox_selected]}>
+                    {isCheckedAll &&
+                      <Image
+                        style={{ width: 12, height: 12 }}
+                        source={require('../../assets/icon/icon_tick_white.png')} />
+                    }
+                  </TouchableOpacity>
+
+                  <Text style={Style_Cart.label_checkAll}>Tất cả</Text>
+                </View>
+
+                <Text style={Style_Cart.text_totalPrice}>{totalPrice.toLocaleString('vi-VN')}</Text>
+              </View>
               <TouchableOpacity style={Style_Cart.btn_payment}>
                 <Text style={Style_Cart.text_payment}>Thanh Toán</Text>
               </TouchableOpacity>
