@@ -170,7 +170,7 @@ const Style_Detail = StyleSheet.create({
         position: 'absolute',
         top: 10,
         left: 10,
-        backgroundColor: colors.Black,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
         paddingHorizontal: 16,
         paddingVertical: 8,
         opacity: 0.8,
@@ -178,6 +178,18 @@ const Style_Detail = StyleSheet.create({
         borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+
+    container_numberPic: {
+        position: 'absolute',
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        bottom: 10,
+        right: 10
     },
 
     img_icon_view: {

@@ -4,7 +4,9 @@ import {
   api_getProducts,
   api_getCategories,
   api_getImagesProduct,
-  api_getProductsByCategory
+  api_getProductsByCategory,
+  api_updateView,
+  api_getDetailProduct,
 } from '../../helper/ApiHelper';
 import FastImage from 'react-native-fast-image';
 import Style_Home from '../../styles/Style_Home';
@@ -12,6 +14,7 @@ import colors from '../../styles/colors';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { AppContext } from '../../context';
 import { useNavigation } from '@react-navigation/native';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 // Tắt cảnh báo cụ thể
 LogBox.ignoreLogs([
@@ -113,70 +116,21 @@ const Page_Home = (props) => {
 
   // Hàm xử lý danh sách sản phẩm
   const processProducts = (products) => {
-    // View cố địn
-    const defaultViewers = {
-      "Lah Gundam - Entry Grade 1/144": 24,
-      "Zaku II (F Type) Solari's - High Grade 1/144": 27,
-      "Mighty Strike Freedom Gundam - High Grade 1/144": 34,
-      "Gundam Epyon (Mobile Suit Gundam Wing) - Real Grade 1/144": 35,
-      "Force Impulse Gundam- Real Grade 1/144": 40,
-      "Unicorn Gundam 02 Banshee Norn - Real Grade 1/144": 100,
-      "Gundam Astray Gold Frame Amatsu Mina - Real Grade 1/144": 120,
-      "EX Strike Freedom Gundam (Gundam Seed Destiny) - Master Grade 1/100": 53,
-      "Gunner Zaku Warrior (Lunamaria Hawke Use) - Master Grade 1/100": 65,
-      "Ex-S Gundam/S Gundam - Master Grade 1/100": 57,
-      "Gundam Astray Red Frame - Perfect Grade 1/60": 470,
-      "Build Strike Exceed Galaxy - Entry Grade 1/144": 23,
-      "RX-78-2 Gundam Classic Color GUNDAM NEXT FUTURE Limited - Entry Grade 1/144": 10,
-      "Gundam Perfect Strike Freedom Rouge - High Grade 1/144": 35,
-      "Black Knight Squad Shi-ve.A - High Grade 1/144": 80,
-      "Gyan Strom - Agnes Giebenrath Custom - High Grade 1/144": 35,
-      "Tallgeese EW - Real Grade 1/144": 430,
-      "Gundam Dynames - Master Grade 1/100": 463,
-      "Iron Blooded Orphans - High Grade 1/144": 120,
-      "Black Knight Squad Cal-re.A - High Grade 1/144": 98,
-      "GFAS-X1 Destroy Gundam - High Grade 1/144": 34,
-      "MSN 04 SAZABI - Real Grade 1/144": 470,
-      "RX-78-2 Gundam E.F.S.T Prototype - Perfect Grade 1/60": 400
-    }
-
     // Từ khóa lọc sản phẩm
     const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
 
     return products
-      .map(product => ({
-        ...product,
-        viewer: defaultViewers[product._id] || defaultViewers[product.name]
-      }))
       .filter(product =>
         keyWords.some(keyWords => product.name.includes(keyWords))
       )
       .sort((a, b) => b.viewer - a.viewer);
   }
 
-  // Hàm lấy danh sách tất cả sản phẩm
+  // Hàm lấy tất cả sản phẩm
   const funGetAllProducts = async () => {
     try {
       const response = await api_getProducts();
       const filterDataProducts = processProducts(response);
-      //const getRandomViewer = () => Math.floor(Math.random() * 1000);
-
-      // // Thêm thuộc tính viewer cho mỗi sản phẩm
-      // const productViewer = response.map(product => ({
-      //   ...product,
-      //   viewer: defaultViewers[product._id] || defaultViewers[product.name]
-      // }))
-
-      // // Lọc sản phẩm theo các từ khóa
-      // const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
-
-      // const filterDataProduct = productViewer
-      //   .filter(product =>
-      //     keyWords.some(keyWords => product.name.includes(keyWords))
-      //   )
-      //   // Sắp xếp sản phẩm theo lượt xem từ cao đến thấp (nổi bật)
-      //   .sort((a, b) => b.viewer - a.viewer);
-
       console.log('All Products:', filterDataProducts);  // In ra dữ liệu sản phẩm để kiểm tra
       setProducts(filterDataProducts); // Cập nhật danh sách sản phẩm với tất cả sản phẩm
     } catch (e) {
@@ -214,19 +168,15 @@ const Page_Home = (props) => {
 
   // Cập nhật lượt xem khi người dùng nhấn vào
   const viewProductPress = async (_id) => {
-    const updateView = products.map(product => {
-      if (product._id === _id) {
-        return { ...product, viewer: product.viewer + 1 };
-      }
+    // Gọi hàm api_updateView
+    await api_updateView(_id);
+    console.log("mã sản phẩm: ", _id)
 
-      return product;
-    });
-
-    setProducts(updateView);
+    // Lấy chi tiết sản phẩm mới từ Back End
+    const updateProduct = await api_getDetailProduct(_id);
 
     // Điều hướng qua detail
     const productImagesArray = productImages[_id] ?? []; // Lấy ảnh cho sản phẩm
-    const updateProduct = updateView.find(product => product._id == _id) // Lấy thông tin sản phẩm sau khi tăng lượt xem
     navigation.navigate('Detail', { id: _id, images: productImagesArray, productView: updateProduct });
   }
 
@@ -278,7 +228,7 @@ const Page_Home = (props) => {
 
   // Hàm render Products
   const renderProduct = ({ item }) => {
-    const { _id, name, price, id_category, state } = item;
+    const { _id, name, price, id_category, status, isActive } = item;
     const productData = productImages[_id]?.[0]; // Lấy object đầu tiên trong mảng
     // const productImagesArray = productImages[_id] ?? [];
 
@@ -288,11 +238,11 @@ const Page_Home = (props) => {
     const category = categories.find(cat => cat._id == id_category);
     const categoryName = category ? category.name_type : "Không xác định";
 
-    // Định dạng giá tiền
-    const formatPrice = price.toLocaleString('vi-VN');
+    const formatPrice = price.toLocaleString('vi-VN'); // Định dạng giá tiền
+    const isOutStock = status === 'Hết hàng'; // Kiểm tra nếu sản phẩm hết hàng
+    if (!isActive) return null; // Ngừng kinh doanh thì không hiển thị
 
-    // Kiểm tra nếu sản phẩm hết hàng
-    const isOutStock = state === 'Hết hàng';
+    const loadingRender = !productData;
 
     return (
       <TouchableOpacity
@@ -301,18 +251,17 @@ const Page_Home = (props) => {
 
         <View style={{ position: 'relative' }}>
           {
-            productData ? (
+            loadingRender ? (
+              <SkeletonPlaceholder>
+                <View style={Style_Home.img_skeleton} />
+              </SkeletonPlaceholder>
+            ) : (
               <FastImage
                 style={Style_Home.img_product}
                 source={{
                   uri: productData.image[1],
                   priority: FastImage.priority.high,
-                }}
-              />
-            ) : (
-              <View style={Style_Home.loading_img_product}>
-                <ActivityIndicator size='large' color={colors.Red} />
-              </View>
+                }} />
             )
           }
 
@@ -325,20 +274,32 @@ const Page_Home = (props) => {
           }
         </View>
 
-        <Text
-          style={Style_Home.name_product}
-          numberOfLines={1}>
-          {name}
-        </Text>
+        {
+          loadingRender ? (
+            <SkeletonPlaceholder>
+              <View style={Style_Home.name_skeleton} />
+              <View style={Style_Home.type_product_skeleton} />
+              <View style={Style_Home.price_product_skeleton} />
+            </SkeletonPlaceholder>
+          ) : (
+            <View>
+              <Text
+                style={Style_Home.name_product}
+                numberOfLines={1}>
+                {name}
+              </Text>
 
-        <Text style={Style_Home.type_product}>
-          {categoryName}
-        </Text>
+              <Text style={Style_Home.type_product}>
+                {categoryName}
+              </Text>
 
-        <Text
-          style={Style_Home.price_product}>
-          {formatPrice}đ
-        </Text>
+              <Text
+                style={Style_Home.price_product}>
+                {formatPrice}đ
+              </Text>
+            </View>
+          )
+        }
       </TouchableOpacity>
     )
   };
@@ -463,7 +424,7 @@ const Page_Home = (props) => {
             </View>
 
             <FlatList
-              data={products}
+              data={products.filter(product => product.isActive)}
               renderItem={renderProduct}
               keyExtractor={item => item._id}
               numColumns={2}
