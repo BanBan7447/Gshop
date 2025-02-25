@@ -49,7 +49,7 @@ const Page_Login = (props) => {
         // Bước 2: Kiểm tra số điện thoại hợp lệ
         if (cleaned.length > 10) {
             setEmail_phone(cleaned);
-        } else if (/^\d+$/.test(cleaned) && cleaned.length > 3) {
+        } else if (/^\d+$/.test(cleaned) && cleaned.length > 5) {
             setEmail_phone(formatPhone(cleaned))
         } else {
             setEmail_phone(text)
@@ -58,13 +58,14 @@ const Page_Login = (props) => {
 
     // Hàm đăng nhập
     const onLogin = async () => {
-        if (!email || !password) {
+        if (!email_phone || !password) {
             Alert.alert('Chưa nhập thông tin', 'Vui lòng nhập thông tin đầy đủ');
             return;
         }
         try {
             const body = {
-                email: email,
+                email_phone: email_phone.includes('@') ? email_phone : null, // Tra ve email neu co @ hoac nguoc lai
+                phone_number: email_phone.includes('@') ? null : email_phone,
                 password: password
             }
             const response = await api_login(body);
@@ -126,7 +127,8 @@ const Page_Login = (props) => {
                 </View>
             </View>
 
-            <TouchableOpacity style={Style_Login.forgotPasswordContainer}>
+            <TouchableOpacity style={Style_Login.forgotPasswordContainer}
+             onPress={() => navigation.navigate('ChangePass')}>
                 <Text style={Style_Login.forgotPassword}>Quên mật khẩu?</Text>
             </TouchableOpacity>
 
