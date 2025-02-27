@@ -4,13 +4,13 @@ import AxiosInstance from "./AxiosInstance";
 const api_login = async (data) => {
     try {
         console.log('>>>>>>>>>>>>>>>>> get_api_login')
-        const { email, phone_number, password } = data;
+        const { email_phone, phone_number, password } = data;
         const body = {
-            email: email,
+            email: email_phone,
             phone_number: phone_number,
             password: password
         }
-        console.log(`Email: ${email} | Phone: ${phone_number}, Password: ${password}`)
+        console.log(`Email: ${email_phone} | Phone: ${phone_number}, Password: ${password}`)
 
         const response = await AxiosInstance().post('/user/login', body);
         if (response.status == true) {
@@ -21,7 +21,7 @@ const api_login = async (data) => {
     }
 }
 
-// Gọi API đăng ký
+// Gọi API đăng ký 
 const api_signUp = async (data) => {
     try {
         const { name, email, phone_number, password } = data;
@@ -74,6 +74,8 @@ const api_getCategories = async () => {
         console.log(e);
     }
 }
+
+
 
 // Gọi API lấy danh sách sản phẩm
 const api_getProducts = async () => {
@@ -210,38 +212,6 @@ const api_changePassword = async (userId, newPassword, confirmPassword) => {
     }
 };
 
-// Gọi API thêm đánh giá
-const api_addReview = async (star, content, id_user, id_product) => {
-    try {
-        console.log('>>>>>>>>>>>>>>>>>> get Add Review');
-        const response = await AxiosInstance().post('/rating/add', {
-            star, content, id_user, id_product
-        });
-
-        console.log('📌 Phản hồi từ server:', response);
-
-        if (response.status == true) {
-            return response;
-        }
-    } catch (e) {
-        console.log('❌ Lỗi khi thêm đánh giá:', e);
-    }
-}
-
-// Gọi API cập nhật view của sản phẩm
-const api_updateView = async (id) => {
-    try {
-        console.log('>>>>>>>>>>>>>>>>>> get api update View');
-        const response = AxiosInstance().put(`/product/update_view?id=${id}`);
-
-        if (response.status == true) {
-            return response
-        }
-    } catch (e) {
-        console.log("Lỗi khi tăng view", e)
-    }
-}
-
 export {
     api_login,
     api_signUp,
@@ -254,7 +224,5 @@ export {
     api_getNews,
     api_getDetailNews,
     api_getRateByProduct,
-    api_changePassword,
-    api_addReview,
-    api_updateView
+    api_changePassword
 }

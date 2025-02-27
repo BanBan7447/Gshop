@@ -8,14 +8,20 @@ import { AppContext } from '../../context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const Page_Login = (props) => {
-    const { navigation } = props;
+// const Page_Login = (props) => {
+//     const { navigation } = props;
+//     const { users, setUsers } = useContext(AppContext);
+
+//     const [email_phone, setEmail_phone] = useState("");
+//     const [password, setPassword] = useState("1234");
+//     const [hidePassword, setHidePassword] = useState("false");
+
+const Page_Login = ({ navigation, route }) => {
     const { users, setUsers } = useContext(AppContext);
 
-    const [email_phone, setEmail_phone] = useState("");
-    const [password, setPassword] = useState("1234");
-    const [hidePassword, setHidePassword] = useState("false");
-
+    const [email_phone, setEmail_phone] = useState(route.params?.email || '');
+    const [password, setPassword] = useState(route.params?.password || '');
+    const [hidePassword, setHidePassword] = useState(false);
 
     // Hàm tự động định dạng số điện thoại khi nhập
     const formatPhone = (text) => {
@@ -115,20 +121,20 @@ const Page_Login = (props) => {
                         value={password}
                         onChangeText={text => setPassword(text)}
                     />
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         onPress={() => setHidePassword(!hidePassword)}
-                        >
+                    >
                         <Image
-                        source={hidePassword
-                         ? require('../../assets/icon/icon_show.png')
-                         : require('../../assets/icon/icon_show.png')}  
-                         style={Style_Login.eyeIcon}/>
+                            source={hidePassword
+                                ? require('../../assets/icon/icon_show.png')
+                                : require('../../assets/icon/icon_show.png')}
+                            style={Style_Login.eyeIcon} />
                     </TouchableOpacity>
                 </View>
             </View>
 
             <TouchableOpacity style={Style_Login.forgotPasswordContainer}
-             onPress={() => navigation.navigate('ChangePass')}>
+                onPress={() => navigation.navigate('ChangePass')}>
                 <Text style={Style_Login.forgotPassword}>Quên mật khẩu?</Text>
             </TouchableOpacity>
 

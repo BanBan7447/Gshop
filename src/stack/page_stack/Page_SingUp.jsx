@@ -56,6 +56,7 @@ const Page_SignUp = (props) => {
         }
     }
     // Hàm đăng ký
+    // 
     const onSignUp = async () => {
         try {
             const body = {
@@ -63,25 +64,53 @@ const Page_SignUp = (props) => {
                 email: email,
                 phone_number: phone_number,
                 password: password
-            }
+            };
+
+    // const onSignUp = async () => {
+    //     try {
+    //         const body = {
+    //             name,
+    //             email,
+    //             phone_number,
+    //             password
+    //         };
+
             // Kiểm tra mật khẩu (ít nhất 1 chữ hoa, 1 chữ thường và 1 số)
             const checkPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
             if (!checkPassword.test(password)) {
-                Alert.alert('Sai mật khẩu', 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số')
-                return; // Dừng hàm nếu mật khẩu không hợp lệ
+                Alert.alert('Sai mật khẩu', 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số');
+                return;
             }
 
-            const response = await api_signUp(body);
+                    const response = await api_signUp(body);
 
-            if (response) {
-                ToastAndroid.show('Đăng ký thành công', ToastAndroid.LONG);
-            } else {
-                Alert.alert('Đăng ký thất bại', 'Email hoặc SĐT đã tồn tại')
-            }
-        } catch (e) {
-            Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng ký.');
-        }
-    }
+                    if (response) {
+                        ToastAndroid.show('Đăng ký thành công', ToastAndroid.LONG);
+
+                        // Chuyển đến màn hình đăng nhập và truyền email + password
+                        navigation.navigate('Login', { email, password });
+                    } else {
+                        Alert.alert('Đăng ký thất bại', 'Email hoặc SĐT đã tồn tại');
+                    }
+                } catch (e) {
+                    Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng ký.');
+                }
+            };
+    //         const response = await api_signUp(body);
+
+    //         if (response) {
+    //             ToastAndroid.show('Đăng ký thành công', ToastAndroid.LONG);
+
+    //             // Điều hướng sang trang đăng nhập và truyền dữ liệu
+    //             navigation.navigate('Login', { email, password });
+    //         } else {
+    //             Alert.alert('Đăng ký thất bại', 'Email hoặc SĐT đã tồn tại');
+    //         }
+    //     } catch (e) {
+    //         Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng ký.');
+    //     }
+    // };
+
     return (
         <ScrollView>
             <View style={Style_SignUp.container}>
@@ -91,14 +120,14 @@ const Page_SignUp = (props) => {
 
 
                 <Text style={Style_SignUp.title}>Đăng ký</Text>
-                
+
                 <Text style={Style_SignUp.name}>Họ tên</Text>
                 <TextInput
                     style={Style_SignUp.input}
                     value={name}
                     onChangeText={text => setName(text)}
                 />
-                
+
                 <Text style={Style_SignUp.phone}>Số điện thoại</Text>
                 <TextInput
                     style={Style_SignUp.input}
@@ -106,7 +135,7 @@ const Page_SignUp = (props) => {
                     value={phone_number}
                     onChangeText={handleChangeText}
                 />
-                
+
                 <Text style={Style_SignUp.email}>Email</Text>
                 <TextInput
                     style={Style_SignUp.input}
@@ -126,11 +155,11 @@ const Page_SignUp = (props) => {
                     />
                     <TouchableOpacity
                         onPress={() => setHidePassword(!hidePassword)}>
-                        <Image 
-                        source={hidePassword
-                           ? require('../../assets/icon/icon_show.png')
-                           : require('../../assets/icon/icon_show.png')} 
-                           style={Style_SignUp.eyeIcon} />
+                        <Image
+                            source={hidePassword
+                                ? require('../../assets/icon/icon_show.png')
+                                : require('../../assets/icon/icon_show.png')}
+                            style={Style_SignUp.eyeIcon} />
                     </TouchableOpacity>
                 </View>
 
@@ -139,14 +168,14 @@ const Page_SignUp = (props) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity style={Style_SignUp.loginButton}
-                onPress={() => onSignUp()}>
+                    onPress={() => onSignUp()}>
                     <Text style={Style_SignUp.loginButtonText}>Đăng ký</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>
                     <Text style={Style_SignUp.newUserText}>Bạn mới sử dụng GShop?</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={Style_SignUp.registerButton}
-                onPress={() => navigation.navigate('Login')}>
+                    onPress={() => navigation.navigate('Login')}>
                     <Text style={Style_SignUp.registerButtonText}>Đăng nhập</Text>
                 </TouchableOpacity>
             </View>
