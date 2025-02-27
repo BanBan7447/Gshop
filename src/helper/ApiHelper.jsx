@@ -212,6 +212,69 @@ const api_changePassword = async (userId, newPassword, confirmPassword) => {
     }
 };
 
+// Gọi API thêm đánh giá
+const api_addReview = async (star, content, id_user, id_product) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get Add Review');
+        const response = await AxiosInstance().post('/rating/add', {
+            star, content, id_user, id_product
+        });
+
+        console.log('📌 Phản hồi từ server:', response);
+
+        if (response.status == true) {
+            return response;
+        }
+    } catch (e) {
+        console.log('❌ Lỗi khi thêm đánh giá:', e);
+    }
+}
+
+// Gọi API cập nhật view của sản phẩm
+const api_updateView = async (id) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get api update View');
+        const response = AxiosInstance().put(`/product/update_view?id=${id}`);
+
+        if (response.status == true) {
+            return response
+        }
+    } catch (e) {
+        console.log("Lỗi khi tăng view", e)
+    }
+}
+
+// Gọi API thêm sản phẩm vào giỏ hàng
+const api_addToCart = async (id_user, id_product, quantity) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get add cart');
+        const response = await AxiosInstance().post('/cart/add', {
+            id_user, id_product, quantity
+        });
+
+        if(response.status == true){
+            return response.data;
+        }
+    } catch(e) {
+        console.log(e);
+    }
+}
+
+// Gọi API lấy giỏ hàng
+const api_getCarts = async (id_user) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get cart');
+        const response = await AxiosInstance().get(`/cart/${id_user}`);
+
+        if(response.status == true){
+            return response.data;
+        }
+    } catch(e) {
+        console.log(e);
+        return null
+    }
+}
+
 export {
     api_login,
     api_signUp,
@@ -224,5 +287,9 @@ export {
     api_getNews,
     api_getDetailNews,
     api_getRateByProduct,
-    api_changePassword
+    api_changePassword,
+    api_addReview,
+    api_updateView,
+    api_addToCart,
+    api_getCarts
 }

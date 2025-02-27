@@ -67,7 +67,7 @@ const Style_Cart = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-between'
     },
-
+    
     text_name: {
         fontFamily: 'Inter SemiBold',
         fontSize: 18,
@@ -152,8 +152,8 @@ const Style_Cart = StyleSheet.create({
         borderRadius: 14,
         marginTop: 16,
     },
-
-    text_shopping: {
+    
+    text_shopping:{
         fontFamily: 'Inter Bold',
         fontSize: 16,
         color: colors.White
@@ -205,6 +205,11 @@ const Style_Cart = StyleSheet.create({
         fontSize: 18,
         color: colors.White
     },
+
+    container_loading: {
+        flex: 1,
+        backgroundColor: colors.White
+    }
 })
 
 export default Style_Cart
