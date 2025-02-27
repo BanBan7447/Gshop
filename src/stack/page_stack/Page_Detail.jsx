@@ -10,6 +10,7 @@ import FastImage from 'react-native-fast-image';
 import { Dimensions } from 'react-native';
 import { CartContext } from '../../context/CartContext';
 import { useFocusEffect } from '@react-navigation/native';
+import { AppContext } from '../../context';
 
 const Page_Detail = (props) => {
     const { navigation, route } = props;
@@ -22,9 +23,12 @@ const Page_Detail = (props) => {
 
     console.log("Detail page loaded with ID:", id, "Image URL:", images);
 
-    const [showNotification, setShowNotification] = useState(false); // Trạng thái giỏ hàng
+    const [notification, setNotification] = useState(false);
+
     const screenWidth = Dimensions.get('window').width; // Lấy chiều rộng màn hình
     const isOutStock = product?.status === "Hết hàng"; // Thêm trạng thái để kiểm tra nếu sản phẩm đã hết hàng
+
+    const { users } = useContext(AppContext);
 
     // Hàm lấy dữ liệu sản phẩm
     const funGetDetailProduct = async () => {
@@ -72,6 +76,11 @@ const Page_Detail = (props) => {
     //const imageUrl = images?.[0]?.image?.[0] ?? null;
 
     const addToCart = () => {
+        if (!users) {
+            navigation.navigate('Login');
+            return
+        }
+
         console.log('>>>>>>>>>>>>>>>> Đã thêm sản phẩm')
 
         setCart((prevCart) => {
@@ -92,6 +101,11 @@ const Page_Detail = (props) => {
 
             return newCart;
         });
+
+        setNotification(true);
+        setTimeout(() => {
+            setNotification('');
+        }, 2000)
     };
 
     // Xử lý hiển thị thứ tự ảnh sản phẩm
@@ -108,8 +122,20 @@ const Page_Detail = (props) => {
     return (
         <View style={{ flex: 1 }}>
             {
+                notification ? (
+                    <View style={Style_Detail.card}>
+                        <Image
+                            source={require('../../assets/icon/icon_check_green.png')}
+                            style={{ width: 24, height: 24 }} />
+                        <Text style={Style_Detail.text_card}>Đã thêm vào giỏ hàng</Text>
+                    </View>
+                ) : null
+            }
+
+            {
                 product ? (
                     <View style={{ flex: 1, backgroundColor: colors.White }}>
+
                         <View style={Style_Detail.container_title}>
                             <TouchableOpacity
                                 style={Style_Detail.navigation}
@@ -129,7 +155,7 @@ const Page_Detail = (props) => {
                                     style={Style_Detail.img_icon_cart} />
 
                                 <View style={Style_Detail.numberCart}>
-                                    <Text style={Style_Detail.text_cart}>{cart ? cart.length : 0}</Text>
+                                    <Text style={Style_Detail.text_numberCart}>{cart ? cart.length : 0}</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>

@@ -5,13 +5,14 @@ import Styles_News from '../../styles/Styles_News'
 import { AppContext } from '../../context'
 import { api_getNews } from '../../helper/ApiHelper'
 import Style_Detail_News from '../../styles/Style_Detail_News'
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
 
 const Page_News = (props) => {
   const { navigation } = props;
 
   const [news, setNews] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Lấy data tin tức
   const get_News = async () => {
@@ -21,7 +22,7 @@ const Page_News = (props) => {
     } catch (e) {
       console.log(e);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -32,16 +33,36 @@ const Page_News = (props) => {
 
   const renderNews = ({ item }) => {
     const { images, title, date, _id } = item;
+    const isLoadingRender = !item;
 
     return (
       <TouchableOpacity
         style={Styles_News.container_news}
-        onPress={() => navigation.navigate('DetailNews', { newsId: _id })}>
-        <Image
-          source={{ uri: images[0] }}
-          style={Styles_News.thumbnails_news} />
-        <Text style={Styles_News.title_news}>{title}</Text>
-        <Text style={Styles_News.date_news}>{date}</Text>
+        onPress={() => navigation.navigate('DetailNews', { newsId: _id })}
+        disabled={isLoadingRender}>
+        {
+          isLoadingRender ? (
+            <SkeletonPlaceholder>
+              <View style={Styles_News.thumbnails_news} />
+              <View style={Styles_News.skeleton_titleNews_1} />
+              <View style={Styles_News.skeleton_titleNews_2} />
+              <View style={Styles_News.skeleton_dateNews} />
+            </SkeletonPlaceholder>
+          ) : (
+            <View>
+              <Image
+                source={{ uri: images[0] }}
+                style={Styles_News.thumbnails_news} />
+              <Text
+                style={Styles_News.title_news}
+                numberOfLines={2}
+                ellipsizeMode='tail'>
+                {title}
+              </Text>
+              <Text style={Styles_News.date_news}>{date}</Text>
+            </View>
+          )
+        }
       </TouchableOpacity>
     )
   }
@@ -51,7 +72,7 @@ const Page_News = (props) => {
     item.title.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={Style_Detail_News.container_loading}>
         <ActivityIndicator size="large" color={colors.Red} />
@@ -61,7 +82,7 @@ const Page_News = (props) => {
 
   return (
     <ScrollView style={Styles_News.container}>
-      <Text style={Styles_News.title}>Tin tức</Text>
+      <Text style={Styles_News.title}> Tin tức </Text>
 
       <View style={Styles_News.container_input}>
         <Image
@@ -77,7 +98,7 @@ const Page_News = (props) => {
       </View>
 
       <FlatList
-        data={filterNews}
+        data={isLoading ? Array(5).fill({}) : filterNews}
         renderItem={renderNews}
         keyExtractor={item => item._id}
         scrollEnabled={false} />
