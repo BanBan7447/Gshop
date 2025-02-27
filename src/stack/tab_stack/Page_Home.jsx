@@ -72,8 +72,12 @@ const Page_Home = (props) => {
   const funGetCategories = async () => {
     try {
       const response = await api_getCategories();
-      setCategories(response);
 
+      const filterCategories = response.filter(category =>
+        category.name_type.includes("Grade")
+      )
+
+      setCategories(filterCategories);
       setSelectCategory(null);
     } catch (e) {
       console.log(e);

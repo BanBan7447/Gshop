@@ -15,40 +15,36 @@ const Style_Detail = StyleSheet.create({
     },
 
     card: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.Green,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        marginHorizontal: 20,
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        right: 20,
+        backgroundColor: colors.White,
+        padding: 14,
         borderRadius: 12,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5,
+        zIndex: 1000
     },
 
     text_card: {
         fontFamily: 'Inter Bold',
         color: 'white',
-        textAlign: 'center',
         fontWeight: 'bold',
-        fontFamily: 'Inter Bold',
         fontSize: 18,
+        color: colors.Green,
+        marginStart: 12
     },
 
-    cart: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        position: 'relative'
-    },
-
-    text_cart: {
-        fontFamily: 'Inter Medium',
-        fontSize: 10,
-        color: colors.White,
-        includeFontPadding: false
+    text_numberCart: {
+        fontSize: 11,
+        color: colors.White
     },
 
     numberCart: {
