@@ -1,7 +1,7 @@
-import { View, Text, Image, TouchableOpacity, ScrollView, Modal, FlatList, ActivityIndicator } from 'react-native'
+import { View, Text, Image, TouchableOpacity, ScrollView, Modal, FlatList, ActivityIndicator, Alert, ToastAndroid } from 'react-native'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 
-import { getDetailProduct, api_getDetailProduct, api_getRateByProduct } from '../../helper/ApiHelper';
+import { getDetailProduct, api_getDetailProduct, api_getRateByProduct, api_addToCart } from '../../helper/ApiHelper';
 
 import Style_Detail from '../../styles/Style_Detail';
 import colors from '../../styles/colors';
@@ -75,37 +75,69 @@ const Page_Detail = (props) => {
     // Kiểm tra và lấy url từ images
     //const imageUrl = images?.[0]?.image?.[0] ?? null;
 
-    const addToCart = () => {
-        if (!users) {
+    const addToCart = async () => {
+        // if (!users) {
+        //     navigation.navigate('Login');
+        //     return
+        // }
+
+        // console.log('>>>>>>>>>>>>>>>> Đã thêm sản phẩm');
+
+        // setCart((prevCart) => {
+        //     const newCart = prevCart ? [...prevCart] : [];
+
+        //     // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
+        //     const existingIndex = newCart.findIndex(item => item._id === id);
+        //     if (existingIndex !== -1) {
+        //         // Nếu đã có thì tăng số lượng
+        //         newCart[existingIndex].quantityCart += 1;
+        //     } else {
+        //         newCart.push({
+        //             ...product,
+        //             quantityCart: 1,
+        //             image: images[0]?.image
+        //         });
+        //     }
+
+        //     return newCart;
+        // });
+
+        console.log("📌 Bắt đầu thêm vào giỏ hàng...");
+        console.log('User thêm vào giỏ hàng: ', users._id)
+        if (!users || !users._id) {
+            console.log("⚠️ Lỗi: Người dùng chưa đăng nhập!");
             navigation.navigate('Login');
             return
-        }
+        };
 
-        console.log('>>>>>>>>>>>>>>>> Đã thêm sản phẩm')
-
-        setCart((prevCart) => {
-            const newCart = prevCart ? [...prevCart] : [];
-
-            // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
-            const existingIndex = newCart.findIndex(item => item._id === id);
-            if (existingIndex !== -1) {
-                // Nếu đã có thì tăng số lượng
-                newCart[existingIndex].quantityCart += 1;
-            } else {
-                newCart.push({
-                    ...product,
-                    quantityCart: 1,
-                    image: images[0]?.image
-                });
-            }
-
-            return newCart;
+        console.log("🛒 Gửi request thêm vào giỏ hàng với:", {
+            userId: users._id,
+            productId: product._id,
+            quantity: 1
         });
 
-        setNotification(true);
-        setTimeout(() => {
-            setNotification('');
-        }, 2000)
+        try {
+            const result = await api_addToCart(users._id, product._id, 1);
+            console.log("✅ Kết quả API:", result);
+            if (result) {
+                setNotification(true);
+                setCart([...cart, product]);
+                setTimeout(() => {
+                    setNotification('');
+                }, 1979);
+            } else {
+                console.log("❌ API trả về lỗi hoặc không thành công!");
+                Alert.alert("Lỗi", "Thêm sản phẩm vào giỏ hàng thất bại!");
+            }
+        } catch (e) {
+            console.log("🔥 Lỗi khi gọi API addToCart:", e);
+            Alert.alert("Lỗi", "Đã có lỗi xảy ra, vui lòng thử lại sau.");
+        }
+
+        // setNotification(true);
+        // setTimeout(() => {
+        //     setNotification('');
+        // }, 979)
     };
 
     // Xử lý hiển thị thứ tự ảnh sản phẩm
@@ -253,7 +285,7 @@ const Page_Detail = (props) => {
                                     { backgroundColor: isOutStock ? colors.Black : colors.Red }
                                 ]}
                                 disabled={isOutStock}
-                                onPress={() => addToCart()}>
+                                onPress={addToCart}>
 
                                 <Text style={Style_Detail.text_AddCart}>
                                     {isOutStock ? 'Sản phẩm đã hết hàng' : 'Thêm vào giỏ hàng'}

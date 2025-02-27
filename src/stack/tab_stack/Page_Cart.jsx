@@ -4,16 +4,47 @@ import React, { useContext, useEffect, useState } from 'react'
 import Style_Cart from '../../styles/Style_Cart'
 import { CartContext } from '../../context/CartContext'
 import colors from '../../styles/colors'
+import { api_getCarts } from '../../helper/ApiHelper'
+import { AppContext } from '../../context'
 
 const Page_Cart = (props) => {
   const { navigation } = props
   const { cart, setCart } = useContext(CartContext);
   const [loading, setLoading] = useState(true);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
+  //const [totalPrice, setTotalPrice] = useState(0);
   const [isCheckedAll, setIsCheckedAll] = useState(false);
+  const { users } = useContext(AppContext);
 
-  console.log('Danh sách sản phẩm có trong Cart: ', cart)
+  console.log('Danh sách sản phẩm có trong Cart: ', cart);
+
+  // Hàm lấy dữ liệu danh sách giỏ hàng
+  const getCarts = async () => {
+    if (!users?._id) {
+      console.log("⚠️ Không tìm thấy ID user, không thể lấy giỏ hàng!");
+      return;
+    };
+
+    console.log("📌 Đang gọi API lấy giỏ hàng của user:", users._id);
+    setLoading(true);
+
+    const cartData = await api_getCarts(users._id);
+
+    if (cartData) {
+      console.log("✅ Giỏ hàng nhận được từ API:", cartData);
+      setCart(cartData.items);
+    } else {
+      console.log("⚠️ Giỏ hàng trống hoặc lỗi!");
+      setCart([])
+    }
+
+    setLoading(false);
+  };
+
+  // Gọi getCarts
+  useEffect(() => {
+    getCarts();
+  }, []);
 
   // Hàm chọn || bỏ chọn sản phẩm
   const toggleSelectItems = (_id) => {
@@ -42,13 +73,13 @@ const Page_Cart = (props) => {
     setIsCheckedAll(!isCheckedAll);
   }
 
-  // Tính tổng giá trị của các sản phẩm được chọn
-  useEffect(() => {
-    const total = cart
-      .filter(item => selectedItems.includes(item._id))
-      .reduce((sum, item) => sum + item.price * item.quantityCart, 0);
-    setTotalPrice(total)
-  }, [selectedItems, cart]);
+  // // Tính tổng giá trị của các sản phẩm được chọn
+  // useEffect(() => {
+  //   const total = cart
+  //     .filter(item => selectedItems.includes(item._id))
+  //     .reduce((sum, item) => sum + item.price * item.quantityCart, 0);
+  //   setTotalPrice(total)
+  // }, [selectedItems, cart]);
 
   // Tự động chọn tất cả sản phẩm lần đầu khi vào giỏ hàng
   useEffect(() => {
@@ -130,9 +161,7 @@ const Page_Cart = (props) => {
           item.image && item.image.length > 0 && (
             <Image
               source={{ uri: item.image[1] }}
-              style={Style_Cart.img_product}
-              onLoad={() => setLoading(false)}
-              onError={() => setLoading(false)} />
+              style={Style_Cart.img_product} />
           )
         }
 
@@ -141,7 +170,7 @@ const Page_Cart = (props) => {
             style={Style_Cart.text_name}
             numberOfLines={1}
             ellipsizeMode='tail'>
-            {item.name}
+            {item.id_product?.name}
           </Text>
           <Text style={Style_Cart.text_price}>{item.price.toLocaleString('vi-VN')}đ</Text>
 
@@ -154,7 +183,7 @@ const Page_Cart = (props) => {
                 style={Style_Cart.icon_quantity} />
             </TouchableOpacity>
 
-            <Text style={Style_Cart.text_quantity}>{item.quantityCart}</Text>
+            <Text style={Style_Cart.text_quantity}>{item.quantity}</Text>
 
             <TouchableOpacity
               style={Style_Cart.btn_quantity}
@@ -184,52 +213,57 @@ const Page_Cart = (props) => {
       </Text>
 
       {
-        cart.length > 0 ? (
-          <View style={Style_Cart.container_cart}>
-            <FlatList
-              data={cart}
-              renderItem={renderCart}
-              keyExtractor={(item) => item._id.toString()}
-              showsVerticalScrollIndicator={false} />
+        loading ? (
+          <View style={Style_Cart.container_loading}>
+            <ActivityIndicator size='large' color="red" />
+          </View>
+        ) :
+          cart.length > 0 ? (
+            <View style={Style_Cart.container_cart}>
+              <FlatList
+                data={cart}
+                renderItem={renderCart}
+                keyExtractor={(item) => item._id.toString()}
+                showsVerticalScrollIndicator={false} />
 
-            <View style={Style_Cart.container_bottom}>
-              <View style={Style_Cart.container_checkAll}>
-                <View style={Style_Cart.content_checkAll}>
-                  <TouchableOpacity
-                    onPress={toggleSelectAll}
-                    style={[Style_Cart.checkBox, isCheckedAll && Style_Cart.checkBox_selected]}>
-                    {isCheckedAll &&
-                      <Image
-                        style={{ width: 12, height: 12 }}
-                        source={require('../../assets/icon/icon_tick_white.png')} />
-                    }
-                  </TouchableOpacity>
+              <View style={Style_Cart.container_bottom}>
+                <View style={Style_Cart.container_checkAll}>
+                  <View style={Style_Cart.content_checkAll}>
+                    <TouchableOpacity
+                      onPress={toggleSelectAll}
+                      style={[Style_Cart.checkBox, isCheckedAll && Style_Cart.checkBox_selected]}>
+                      {isCheckedAll &&
+                        <Image
+                          style={{ width: 12, height: 12 }}
+                          source={require('../../assets/icon/icon_tick_white.png')} />
+                      }
+                    </TouchableOpacity>
 
-                  <Text style={Style_Cart.label_checkAll}>Tất cả</Text>
+                    <Text style={Style_Cart.label_checkAll}>Tất cả</Text>
+                  </View>
+
+                  <Text style={Style_Cart.text_totalPrice}>{cart.totalPrice?.toLocaleString('vi-VN')}</Text>
                 </View>
-
-                <Text style={Style_Cart.text_totalPrice}>{totalPrice.toLocaleString('vi-VN')}</Text>
+                <TouchableOpacity style={Style_Cart.btn_payment}>
+                  <Text style={Style_Cart.text_payment}>Thanh Toán</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={Style_Cart.btn_payment}>
-                <Text style={Style_Cart.text_payment}>Thanh Toán</Text>
+            </View>
+          ) : (
+            <View style={Style_Cart.container_empty}>
+              <Image
+                source={require('../../assets/icon/icon_empty_cart.png')}
+                style={Style_Cart.img_icon_empty} />
+              <Text style={Style_Cart.title_empty}>Giỏ hàng của bạn trống</Text>
+              <Text style={Style_Cart.text_empty}>Hãy làm đầy giỏ hàng với các sản phẩm bạn yêu thích</Text>
+
+              <TouchableOpacity
+                style={Style_Cart.btn_shopping}
+                onPress={() => navigation.navigate('Tab', { screen: 'Home' })}>
+                <Text style={Style_Cart.text_shopping}>Bắt đầu mua sắm</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        ) : (
-          <View style={Style_Cart.container_empty}>
-            <Image
-              source={require('../../assets/icon/icon_empty_cart.png')}
-              style={Style_Cart.img_icon_empty} />
-            <Text style={Style_Cart.title_empty}>Giỏ hàng của bạn trống</Text>
-            <Text style={Style_Cart.text_empty}>Hãy làm đầy giỏ hàng với các sản phẩm bạn yêu thích</Text>
-
-            <TouchableOpacity
-              style={Style_Cart.btn_shopping}
-              onPress={() => navigation.navigate('Tab', { screen: 'Home' })}>
-              <Text style={Style_Cart.text_shopping}>Bắt đầu mua sắm</Text>
-            </TouchableOpacity>
-          </View>
-        )
+          )
       }
     </View>
   )
