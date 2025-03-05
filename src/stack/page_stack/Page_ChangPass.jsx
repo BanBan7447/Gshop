@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Page_Login from './Page_Login';
 import Style_ChangPass from '../../styles/Style_ChangPass';
 
@@ -7,7 +7,7 @@ const Page_ChangPass = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [hidePassword, setHidePassword] = useState("false");
-    
+
     const handleChangePassword = async () => {
         if (newPassword !== confirmPassword) {
             Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp.');
@@ -39,22 +39,34 @@ const Page_ChangPass = () => {
                 <TextInput
                     placeholder='Nhập mật khẩu mới'
                     style={Style_ChangPass.textInput}
-                    secureTextEntry
-                    value={newPassword}
-                    onChangeText={setNewPassword}
+                    secureTextEntry={!hidePassword}
+                    value={newPassword} // ✅ Sử dụng đúng state
+                    onChangeText={text => setNewPassword(text)} // ✅ Cập nhật đúng state
                 />
-                <Image style={Style_ChangPass.inputIcon} source={require('../../assets/icon/icon_show.png')} />
+                <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
+                    <Image
+                        source={hidePassword
+                            ? require('../../assets/icon/icon_show.png')
+                            : require('../../assets/icon/icon_hide.png')} // Sửa icon nếu cần
+                        style={Style_ChangPass.eyeIcon} />
+                </TouchableOpacity>
             </View>
 
             <View style={Style_ChangPass.inputContainer}>
                 <TextInput
                     placeholder='Nhập lại mật khẩu mới'
                     style={Style_ChangPass.textInput}
-                    secureTextEntry
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
+                    secureTextEntry={!hidePassword}
+                    value={confirmPassword} // ✅ Sử dụng đúng state
+                    onChangeText={text => setConfirmPassword(text)} // ✅ Cập nhật đúng state
                 />
-                <Image style={Style_ChangPass.inputIcon} source={require('../../assets/icon/icon_show.png')} />
+                <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
+                    <Image
+                        source={hidePassword
+                            ? require('../../assets/icon/icon_show.png')
+                            : require('../../assets/icon/icon_hide.png')} // Sửa icon nếu cần
+                        style={Style_ChangPass.eyeIcon} />
+                </TouchableOpacity>
             </View>
 
             <Text style={Style_ChangPass.infoText}>Mật khẩu của bạn phải bao gồm ít nhất: </Text>

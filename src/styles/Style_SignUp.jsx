@@ -14,51 +14,46 @@ const Style_SignUp = StyleSheet.create({
         marginBottom: 56,
         alignSelf: 'flex-start', // Đưa logo về góc trái
     },
-    logoText: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#FF5722',
-    },
     title: {
         fontSize: 32,
         fontWeight: 'bold',
         marginBottom: 20,
-        color: '#000000',
+        color: colors.Black,
         textAlign: 'center'
     },
     name:{
         fontSize: 16,
-        color: '#7F7F7F',
+        color: colors.Grey,
         marginBottom: 10
     },
     phone:{
         fontSize: 16,
-        color: '#7F7F7F',
+        color: colors.Grey,
         marginBottom: 10
     },
     email:{
         fontSize: 16,
-        color: '#7F7F7F',
+        color: colors.Grey,
         marginBottom: 10
     },
     welcom:{
         fontSize: 16,
-        color: '#7F7F7F',
+        color: colors.Grey,
         marginBottom: 10
     },
     passs:{
         fontSize: 16,
-        color: '#7F7F7F',
+        color: colors.Grey,
         marginBottom: 10
     },
     input: {
         width: '100%',
         height: 50,
         borderWidth: 1,
-        borderColor: '#E9F1FB',
+        borderColor: colors.Light_Blue,
         borderRadius: 16,
         paddingHorizontal: 16,
-        backgroundColor: '#E9F1FB',
+        backgroundColor: colors.Light_Blue,
         marginBottom: 16,
     },
     passwordContainer: {
@@ -78,41 +73,41 @@ const Style_SignUp = StyleSheet.create({
     },
     forgotPassword: {
         alignSelf: 'flex-end',
-        color: '#000',
+        color: colors.Black,
         marginBottom: 24,
         fontSize: 16,
     },
     loginButton: {
         width: '100%',
         height: 56,
-        backgroundColor: '#E43727',
+        backgroundColor: colors.Red,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
         marginBottom: 20,
     },
     loginButtonText: {
-        color: '#FFFFFF',
+        color: colors.White,
         fontSize: 18,
         fontWeight: 'bold',
     },
     newUserText: {
         fontSize: 16,
-        color: '#000000',
+        color: colors.Black,
         marginBottom: 8,
         textAlign: 'center'
     },
     registerButton: {
         width: '100%',
         height: 56,
-        backgroundColor: '#266FDA',
+        backgroundColor: colors.Blue,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
         padding: 10,
     },
     registerButtonText: {
-        color: '#FFFFFF',
+        color: colors.White,
         fontSize: 18,
         fontWeight: 'bold',
     },
