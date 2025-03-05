@@ -36,7 +36,7 @@ const Style_Search = StyleSheet.create({
         marginHorizontal: 20,
         paddingHorizontal: 16,
         borderRadius: 12,
-        marginTop: 16,
+        marginTop: 8,
         marginBottom: 24
     },
 

@@ -1,7 +1,7 @@
 import { View, Text, Image, TouchableOpacity, ScrollView, Modal, FlatList, ActivityIndicator, Alert, ToastAndroid } from 'react-native'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 
-import { getDetailProduct, api_getDetailProduct, api_getRateByProduct, api_addToCart } from '../../helper/ApiHelper';
+import { api_getDetailProduct, api_getRateByProduct, api_addToCart, api_getCarts, api_updateSelected } from '../../helper/ApiHelper';
 
 import Style_Detail from '../../styles/Style_Detail';
 import colors from '../../styles/colors';
@@ -76,39 +76,15 @@ const Page_Detail = (props) => {
     //const imageUrl = images?.[0]?.image?.[0] ?? null;
 
     const addToCart = async () => {
-        // if (!users) {
-        //     navigation.navigate('Login');
-        //     return
-        // }
-
-        // console.log('>>>>>>>>>>>>>>>> Đã thêm sản phẩm');
-
-        // setCart((prevCart) => {
-        //     const newCart = prevCart ? [...prevCart] : [];
-
-        //     // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
-        //     const existingIndex = newCart.findIndex(item => item._id === id);
-        //     if (existingIndex !== -1) {
-        //         // Nếu đã có thì tăng số lượng
-        //         newCart[existingIndex].quantityCart += 1;
-        //     } else {
-        //         newCart.push({
-        //             ...product,
-        //             quantityCart: 1,
-        //             image: images[0]?.image
-        //         });
-        //     }
-
-        //     return newCart;
-        // });
-
-        console.log("📌 Bắt đầu thêm vào giỏ hàng...");
-        console.log('User thêm vào giỏ hàng: ', users._id)
         if (!users || !users._id) {
             console.log("⚠️ Lỗi: Người dùng chưa đăng nhập!");
             navigation.navigate('Login');
             return
         };
+
+        if (isOutStock) {
+            ToastAndroid.show('Đã hết hàng', ToastAndroid.SHORT);
+        }
 
         console.log("🛒 Gửi request thêm vào giỏ hàng với:", {
             userId: users._id,
@@ -117,28 +93,53 @@ const Page_Detail = (props) => {
         });
 
         try {
-            const result = await api_addToCart(users._id, product._id, 1);
-            console.log("✅ Kết quả API:", result);
-            if (result) {
-                setNotification(true);
-                setCart([...cart, product]);
-                setTimeout(() => {
-                    setNotification('');
-                }, 1979);
-            } else {
-                console.log("❌ API trả về lỗi hoặc không thành công!");
-                Alert.alert("Lỗi", "Thêm sản phẩm vào giỏ hàng thất bại!");
+            // const response = await api_addToCart(users._id, product._id, 1);
+
+            // if (response) {
+            //     // setCart([...cart, {...product, quantity: 1}]);
+            //     const updatedCart = await api_getCarts(users._id);
+            //     setCart(updatedCart)
+            // }
+
+            const response = await api_addToCart(users._id, product._id, 1);
+            
+            if(response){
+                // Lấy giỏ hàng mới từ API sau khi thêm sản phẩm
+                let updateCart = await api_getCarts(users._id);
+
+                // Kiểm tra xem sản phẩm mới đã có trong giỏ hàng chưa
+                updateCart.items = updateCart.items.map(item => 
+                    item.id_product._id === product._id
+                        ? {...item, selected: true} // Đánh dấu sản phẩm này là "được chọn"
+                        : item
+                );
+
+                // Tính tổng tiền dựa vào sản phẩm đc chọn
+                const newTotalPrice = updateCart.items
+                    .filter(item => item.selected)
+                    .reduce((sum, item) => sum + item.quantity * item.id_product.price, 0);
+                
+                // Cập nhật giỏ hàng trong context
+                setCart({
+                    ...updateCart,
+                    totalPrice: newTotalPrice
+                });
+
+                // Gọi API để cập nhật `selected` trong giỏ hàng
+                console.log('✅ Cập nhật trạng thái selected trong giỏ hàng');
+                await api_updateSelected(users._id, product._id, true);
             }
+
         } catch (e) {
-            console.log("🔥 Lỗi khi gọi API addToCart:", e);
-            Alert.alert("Lỗi", "Đã có lỗi xảy ra, vui lòng thử lại sau.");
+            console.log('Lỗi khi gọi API addToCart: ', e)
         }
 
-        // setNotification(true);
-        // setTimeout(() => {
-        //     setNotification('');
-        // }, 979)
+        setNotification(true)
+        setTimeout(() => {
+            setNotification(false)
+        }, 1979)
     };
+
 
     // Xử lý hiển thị thứ tự ảnh sản phẩm
     const [currentIndex, setCurrentIndex] = useState(0); // State để theo dõi ảnh hiện tại
@@ -154,14 +155,14 @@ const Page_Detail = (props) => {
     return (
         <View style={{ flex: 1 }}>
             {
-                notification ? (
+                notification && (
                     <View style={Style_Detail.card}>
                         <Image
                             source={require('../../assets/icon/icon_check_green.png')}
                             style={{ width: 24, height: 24 }} />
                         <Text style={Style_Detail.text_card}>Đã thêm vào giỏ hàng</Text>
                     </View>
-                ) : null
+                )
             }
 
             {
@@ -187,7 +188,7 @@ const Page_Detail = (props) => {
                                     style={Style_Detail.img_icon_cart} />
 
                                 <View style={Style_Detail.numberCart}>
-                                    <Text style={Style_Detail.text_numberCart}>{cart ? cart.length : 0}</Text>
+                                    <Text style={Style_Detail.text_numberCart}>{cart?.items?.length || 0}</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>

@@ -1,5 +1,4 @@
-import { View, Text } from 'react-native'
-import React, { useState } from 'react'
+import React from 'react'
 
 import Tab_Navigation from './Tab_Navigation'
 import Page_Splash from '../stack/page_stack/Page_Splash'
@@ -7,6 +6,7 @@ import Page_Search from '../stack/page_stack/Page_Search'
 import Page_Detail from '../stack/page_stack/Page_Detail'
 import Page_Login from '../stack/page_stack/Page_Login'
 import Page_SignUp from '../stack/page_stack/Page_SingUp'
+import Page_Payment from '../stack/page_stack/Page_Payment'
 
 import Page_ChangPass from '../stack/page_stack/Page_ChangPass'
 import Page_Edit_Profile from '../stack/page_stack/Page_Edit_Profile'
@@ -34,8 +34,9 @@ const Stack_Navigation = () => {
       <Stack.Screen name='Location' component={Page_MyAddress} />
       <Stack.Screen name='ChangePass' component={Page_ChangPass} />
       <Stack.Screen name='DetailNews' component={Page_Detail_News} />
-      <Stack.Screen name='Rating' component={Page_Rating}/>
+      <Stack.Screen name='Rating' component={Page_Rating} />
       <Stack.Screen name='FQA' component={Page_FQA} />
+      <Stack.Screen name='Payment' component={Page_Payment} />
     </Stack.Navigator>
   )
 }

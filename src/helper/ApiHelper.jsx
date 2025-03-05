@@ -75,8 +75,6 @@ const api_getCategories = async () => {
     }
 }
 
-
-
 // Gọi API lấy danh sách sản phẩm
 const api_getProducts = async () => {
     try {
@@ -252,10 +250,10 @@ const api_addToCart = async (id_user, id_product, quantity) => {
             id_user, id_product, quantity
         });
 
-        if(response.status == true){
+        if (response.status == true) {
             return response.data;
         }
-    } catch(e) {
+    } catch (e) {
         console.log(e);
     }
 }
@@ -266,12 +264,84 @@ const api_getCarts = async (id_user) => {
         console.log('>>>>>>>>>>>>>>>>>> get cart');
         const response = await AxiosInstance().get(`/cart/${id_user}`);
 
-        if(response.status == true){
+        if (response.status == true) {
             return response.data;
         }
-    } catch(e) {
+    } catch (e) {
         console.log(e);
         return null
+    }
+}
+
+// Gọi API cập nhật số lượng giỏ hàng
+const api_updateQuantity = async (id_user, id_product, quantity) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> update quantity cart');
+        const response = await AxiosInstance().put('/cart/update', {
+            id_user, id_product, quantity
+        });
+
+        console.log("Response API cập nhật giỏ hàng: ", response)
+
+        if (response.status == true) {
+            return response
+        }
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+// Gọi API xóa sản phẩm khỏi giỏ hàng
+const api_deleteCart = async (id_user, id_product) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> delete cart');
+        const response = await AxiosInstance().delete('/cart/remove', {
+            data: { id_user, id_product }
+        });
+
+        console.log(`user: ${id_user} | product: ${id_product}`)
+        console.log('Response API xóa giỏ hàng: ', response);
+
+        if (response.status == true) {
+            return response.data
+        }
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+// Gọi API cập nhật selected trong giỏ hàng
+const api_updateSelected = async (id_user, id_product, selected) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> update selected cart');
+        const response = await AxiosInstance().put('/cart/update-selected', {
+            id_user, id_product, selected
+        });
+
+        console.log("Response API cập nhật selected: ", response)
+
+        if (response.status == true) {
+            return response
+        }
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+// Gọi API lấy danh sách phương thức thanh toán
+const api_getPaymentMethod = async () => {
+    try {
+        console.log('>>>>>>>>>>>>>> getProducts');
+        const response = await AxiosInstance().get('/payment_method/list');
+
+        if (response.status == true) {
+            console.log('Data Payment: ', response);
+            return response.data
+        }
+
+    } catch (e) {
+        console.log(e)
     }
 }
 
@@ -291,5 +361,9 @@ export {
     api_addReview,
     api_updateView,
     api_addToCart,
-    api_getCarts
+    api_getCarts,
+    api_updateQuantity,
+    api_deleteCart,
+    api_updateSelected,
+    api_getPaymentMethod
 }

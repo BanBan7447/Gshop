@@ -25,7 +25,7 @@ const AppProvider = (props) => {
     }, []);
 
     return (
-        <AppContext.Provider value={{ users, setUsers, }}>
+        <AppContext.Provider value={{ users, setUsers }}>
             {loading ? null : children}
         </AppContext.Provider>
     );

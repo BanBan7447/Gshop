@@ -66,14 +66,14 @@ const Page_SignUp = (props) => {
                 password: password
             };
 
-    // const onSignUp = async () => {
-    //     try {
-    //         const body = {
-    //             name,
-    //             email,
-    //             phone_number,
-    //             password
-    //         };
+            // const onSignUp = async () => {
+            //     try {
+            //         const body = {
+            //             name,
+            //             email,
+            //             phone_number,
+            //             password
+            //         };
 
             // Kiểm tra mật khẩu (ít nhất 1 chữ hoa, 1 chữ thường và 1 số)
             const checkPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -82,20 +82,20 @@ const Page_SignUp = (props) => {
                 return;
             }
 
-                    const response = await api_signUp(body);
+            const response = await api_signUp(body);
 
-                    if (response) {
-                        ToastAndroid.show('Đăng ký thành công', ToastAndroid.LONG);
+            if (response) {
+                ToastAndroid.show('Đăng ký thành công', ToastAndroid.LONG);
 
-                        // Chuyển đến màn hình đăng nhập và truyền email + password
-                        navigation.navigate('Login', { email, password });
-                    } else {
-                        Alert.alert('Đăng ký thất bại', 'Email hoặc SĐT đã tồn tại');
-                    }
-                } catch (e) {
-                    Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng ký.');
-                }
-            };
+                // Chuyển đến màn hình đăng nhập và truyền email + password
+                navigation.navigate('Login', { email, password });
+            } else {
+                Alert.alert('Đăng ký thất bại', 'Email hoặc SĐT đã tồn tại');
+            }
+        } catch (e) {
+            Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng ký.');
+        }
+    };
     //         const response = await api_signUp(body);
 
     //         if (response) {

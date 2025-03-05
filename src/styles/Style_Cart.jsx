@@ -30,6 +30,17 @@ const Style_Cart = StyleSheet.create({
     },
 
     checkBox: {
+        width: 20,
+        height: 20,
+        borderWidth: 1,
+        borderRadius: 100,
+        borderColor: colors.Black,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 16
+    },
+
+    checkBoxAll: {
         width: 24,
         height: 24,
         borderWidth: 1,
@@ -37,7 +48,7 @@ const Style_Cart = StyleSheet.create({
         borderColor: colors.Black,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 10
+        marginRight: 16
     },
 
     checkBox_selected: {
@@ -48,8 +59,7 @@ const Style_Cart = StyleSheet.create({
         width: 88,
         height: 88,
         borderRadius: 16,
-        marginRight: 12,
-        marginLeft: 8
+        marginRight: 12
     },
 
     loading_img_product: {
@@ -163,7 +173,8 @@ const Style_Cart = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         left: 0,
-        right: 0
+        right: 0,
+        backgroundColor: colors.White
     },
 
     container_checkAll: {
@@ -209,6 +220,27 @@ const Style_Cart = StyleSheet.create({
     container_loading: {
         flex: 1,
         backgroundColor: colors.White
+    },
+
+    text_name_skeleton: {
+        width: '100%',
+        height: 16,
+        borderRadius: 100,
+        marginBottom: 4
+    },
+
+    text_price_skeleton: {
+        width: '50%',
+        height: 16,
+        borderRadius: 100,
+        marginBottom: 4
+    },
+
+    text_quantity_skeleton: {
+        width: '25%',
+        height: 16,
+        borderRadius: 100,
+        marginBottom: 8
     }
 })
 
