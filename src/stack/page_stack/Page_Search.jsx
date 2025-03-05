@@ -113,13 +113,29 @@ const Page_Search = (props) => {
         setSearchText(text); // Cập nhật từ khóa tìm kiếm
 
         if (text === '') {
-            setFilterProducts(funGetAllProducts); // Nếu không có từ khóa thì giữ danh sách trống
-        } else {
-            const filter = products.filter(product =>
-                product.name.toLowerCase().includes(text.toLowerCase()) // // Lọc sản phẩm có tên chứa từ khóa
-            );
-            setFilterProducts(filter);
+            setFilterProducts(products); // Nếu không có từ khóa thì giữ danh sách trống
+            return;
         }
+
+        const lowerText = text.toLowerCase().trim();
+        const isNumber = !isNaN(text);
+
+        const filter = products.filter(product => {
+            const productName = product.name.toLowerCase();
+            const productPrice = product.price;
+            const category = categories.find(cat => cat._id == product.id_category);
+            const categoryName = category ? category.name_type.toLowerCase() : '';
+
+            const formatPrice = productPrice.toLocaleString('vi-VN'); // Định dạng giá tiền
+
+            return(
+                productName.includes(lowerText) || // Tìm tên sản phẩm
+                categoryName.includes(lowerText) || // Tìm loại sản phẩm
+                (isNumber && (productPrice <= parseFloat(text.replace(/\./g, '')) || formatPrice.includes(text))) // Tìm giá sản phẩm
+            );
+        });
+
+        setFilterProducts(filter)
     };
 
     // Hàm render Products

@@ -6,6 +6,7 @@ import Page_News from '../stack/tab_stack/Page_News'
 import Page_Cart from '../stack/tab_stack/Page_Cart'
 import Page_Notification from '../stack/tab_stack/Page_Notification'
 import Page_Profile from '../stack/tab_stack/Page_Profile'
+import Page_Payment from '../stack/page_stack/Page_Payment'
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import colors from '../styles/colors'

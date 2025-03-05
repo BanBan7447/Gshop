@@ -73,7 +73,7 @@ const Page_Profile = (props) => {
           <ProfileOption
             icon={require('../../assets/icon/icon_help.png')}
             label={'FAQ - Trợ giúp'}
-            onPress={() => navigation.navigate('Help')} />
+            onPress={() => navigation.navigate('FQA')} />
 
           <ProfileOption
             icon={require('../../assets/icon/icon_logout.png')}

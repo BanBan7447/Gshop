@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Style_FQA from '../../styles/Style_FQA';
 
-const Page_FQA = () => {
+const Page_FQA = (props) => {
+    const {navigation} = props;
     const [expandedIndex, setExpandedIndex] = useState(null);
 
     const faqItems = [
@@ -60,12 +61,14 @@ const Page_FQA = () => {
 
     return (
         <View style={Style_FQA.container}>
-            <View style={Style_FQA.header}>
+            <TouchableOpacity
+                style={Style_FQA.header}
+                onPress={() => navigation.goBack()}>
                 <Image
                     style={Style_FQA.backIcon}
                     source={require('../../assets/icon/icon_long_arrow.png')} />
                 <Text style={Style_FQA.headerTitle}>FAQ - Hỏi dáp</Text>
-            </View>
+            </TouchableOpacity>
 
             {faqItems.map((item, index) => (
                 <View key={index} style={Style_FQA.item}>
