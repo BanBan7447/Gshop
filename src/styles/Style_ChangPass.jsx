@@ -20,6 +20,13 @@ const Style_ChangPass = StyleSheet.create({
         fontWeight: 'bold',
         textAlignVertical: 'center',
     },
+    eyeIcon: {
+        width: 24,
+        height: 14,
+        position: 'absolute',
+        right: 16,
+        marginTop: -6,
+    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',

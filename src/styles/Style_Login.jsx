@@ -18,7 +18,7 @@ const Style_Login = StyleSheet.create({
         fontSize: 32,
         fontWeight: 'bold',
         marginBottom: 20,
-        color: '#000000',
+        color: colors.Black,
         textAlign: 'center'
     },
     inputGroup: {
@@ -27,17 +27,17 @@ const Style_Login = StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        color: '#7F7F7F',
+        color: colors.Grey,
         marginBottom: 8,
     },
     input: {
         width: '100%',
         height: 50,
         borderWidth: 1,
-        borderColor: '#E9F1FB',
+        borderColor: colors.Light_Blue,
         borderRadius: 16,
         paddingHorizontal: 16,
-        backgroundColor: '#E9F1FB',
+        backgroundColor: colors.Light_Blue,
     },
     passwordContainer: {
         flexDirection: 'row',
@@ -58,13 +58,13 @@ const Style_Login = StyleSheet.create({
         alignSelf: 'flex-end',
     },
     forgotPassword: {
-        color: '#000',
+        color: colors.Black,
         fontSize: 16,
     },
     loginButton: {
         width: '100%',
         height: 56,
-        backgroundColor: '#E43727',
+        backgroundColor: colors.Red,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
@@ -72,7 +72,7 @@ const Style_Login = StyleSheet.create({
         marginTop: 30
     },
     loginButtonText: {
-        color: '#FFFFFF',
+        color: colors.White,
         fontSize: 18,
         fontWeight: 'bold',
     },
@@ -82,20 +82,20 @@ const Style_Login = StyleSheet.create({
     },
     newUserText: {
         fontSize: 16,
-        color: '#000000',
+        color: colors.Black,
         marginBottom: 5,
     },
     registerButton: {
         width: 370,
         height: 56,
-        backgroundColor: '#266FDA',
+        backgroundColor: colors.Blue,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
         marginBottom: 20,
     },
     registerButtonText: {
-        color: '#FFFFFF',
+        color: colors.White,
         fontSize: 18,
         fontWeight: 'bold',
     },
