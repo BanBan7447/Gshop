@@ -14,11 +14,17 @@ const Style_Cart = StyleSheet.create({
         width: '100%'
     },
 
+    container_title: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 24
+    },
+
     title_cart: {
         fontFamily: 'Inter Bold',
         fontSize: 20,
-        color: colors.Black,
-        marginBottom: 24
+        color: colors.Black
     },
 
     container_product: {

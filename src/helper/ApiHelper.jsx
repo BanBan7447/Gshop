@@ -332,7 +332,7 @@ const api_updateSelected = async (id_user, id_product, selected) => {
 // Gọi API lấy danh sách phương thức thanh toán
 const api_getPaymentMethod = async () => {
     try {
-        console.log('>>>>>>>>>>>>>> getProducts');
+        console.log('>>>>>>>>>>>>>> get Payment Method');
         const response = await AxiosInstance().get('/payment_method/list');
 
         if (response.status == true) {
@@ -340,6 +340,36 @@ const api_getPaymentMethod = async () => {
             return response.data
         }
 
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+// Gọi API lấy danh sách địa chỉ theo id_user
+const api_getAddressUser = async (id_user) => {
+    try {
+        console.log('>>>>>>>>>>>>>> get Address User');
+        const response = await AxiosInstance().get(`/address/list/${id_user}`);
+
+        if (response.status == true) {
+            return response;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+// Gọi API thêm đơn hàng
+const api_addOrder = async (id_user, id_payment, id_address) => {
+    try {
+        console.log('>>>>>>>>>>>>>> add Order');
+        const response = await AxiosInstance().post('/order/create-order', {
+            id_user, id_payment, id_address
+        });
+
+        if (response.status == true) {
+            return response.data;
+        }
     } catch (e) {
         console.log(e)
     }
@@ -365,5 +395,7 @@ export {
     api_updateQuantity,
     api_deleteCart,
     api_updateSelected,
-    api_getPaymentMethod
+    api_getPaymentMethod,
+    api_getAddressUser,
+    api_addOrder,
 }

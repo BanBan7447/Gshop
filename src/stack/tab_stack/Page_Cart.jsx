@@ -399,9 +399,17 @@ const Page_Cart = (props) => {
 
   return (
     <View style={Style_Cart.container}>
-      <Text style={Style_Cart.title_cart}>
-        Giỏ hàng (<Text>{cart?.items?.length || 0}</Text>)
-      </Text>
+      <View style={Style_Cart.container_title}>
+        <Text style={Style_Cart.title_cart}>
+          Giỏ hàng (<Text>{cart?.items?.length || 0}</Text>)
+        </Text>
+
+        <TouchableOpacity onPress={() => navigation.navigate('MyOrder')}>
+          <Image
+            source={require('../../assets/icon/icon_history_order.png')}
+            style={{ width: 26.5, height: 24.5 }} />
+        </TouchableOpacity>
+      </View>
 
       {
         loading ? (
