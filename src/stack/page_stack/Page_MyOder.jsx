@@ -66,6 +66,15 @@ const Page_MyOder = (props) => {
             <View style={Style_MyOder.detailButton}>
                 <Text style={Style_MyOder.detailButtonText}>Chi tiết</Text>
             </View>
+                <Text style={Style_MyOder.orderTitle}>Đơn hàng {item.orderId}</Text>
+                <Text style={Style_MyOder.orderDate}>{item.date}</Text>
+            </View>
+            <Text style={Style_MyOder.orderDetail}>Số lượng sản phẩm: <Text style={Style_MyOder.boldText}>{Style_MyOder.quantity}</Text></Text>
+            <Text style={Style_MyOder.orderDetail}>Tổng tiền: <Text style={Style_MyOder.boldText}>{item.total}</Text></Text>
+            <Text style={[Style_MyOder.orderStatus, { color: item.statusColor }]}>{item.status}</Text>
+            <TouchableOpacity style={Style_MyOder.detailButton}>
+                <Text style={Style_MyOder.detailButtonText}>Chi tiết</Text>
+            </TouchableOpacity>
         </View>
     );
 
@@ -114,6 +123,35 @@ const Page_MyOder = (props) => {
                     renderItem={renderItem}
                     contentContainerStyle={Style_MyOder.listContainer} />
             </View>
+            {/* Header */}
+            <View style={Style_MyOder.header}>
+                <Image style={Style_MyOder.backIcon} source={require('../../assets/icon/icon_long_arrow.png')} />
+                <Text style={Style_MyOder.headerTitle}>Đơn hàng của tôi</Text>
+            </View>
+
+            {/* Filter Tabs */}
+            <View style={Style_MyOder.tabsContainer}>
+                <TouchableOpacity>
+                    <Text style={[Style_MyOder.tab, { color: '#E43727' }]}>Tất cả</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <Text style={Style_MyOder.tab}>Đang xử lý</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <Text style={Style_MyOder.tab}>Đang vận chuyển</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <Text style={Style_MyOder.tab}>Hoàn thành</Text>
+                </TouchableOpacity>
+            </View>
+
+            {/* Order List */}
+            <FlatList
+                data={orders}
+                keyExtractor={item => item._id.toString()}
+                renderItem={renderItem}
+                contentContainerStyle={Style_MyOder.listContainer}
+            />
         </View>
     );
 };
