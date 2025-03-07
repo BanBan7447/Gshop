@@ -20,6 +20,30 @@ const api_login = async (data) => {
         console.log(e);
     }
 }
+// Gọi API lấy tất cả oder của user
+const api_getOrders = async (id_user) => {
+    if (!id_user) {
+        console.log("ID user không hợp lệ:", id_user);
+        return [];
+    }
+
+    try {
+        console.log(`Gọi API với ID: ${id_user}`);
+        const response = await AxiosInstance().get(`order/list-order-user/${id_user}`);
+
+        console.log("Response API lấy đơn hàng: ", response);
+
+        if (response?.status == true) {
+            return response;
+        } else {
+            return [];
+        }
+    } catch (error) {
+        console.log("Lỗi khi lấy danh sách đơn hàng:", error);
+        return [];
+    }
+};
+
 
 // Gọi API đăng ký 
 const api_signUp = async (data) => {
@@ -59,6 +83,24 @@ const api_getDetailUser = async (_id) => {
         console.log(e);
     }
 }
+
+// Hàm xử lý cập nhật thông tin
+const api_updateProfile = async (email, name, phone_number) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get update profile');
+        const response = await AxiosInstance().put("user/update", {
+            email, name, phone_number
+        });
+
+        console.log("Response API cập nhật thông tin: ", response)
+
+        if (response.status == true) {
+            return response
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 // Gọi API lấy danh sách danh mục
 const api_getCategories = async () => {
@@ -349,6 +391,7 @@ export {
     api_login,
     api_signUp,
     api_getDetailUser,
+    api_updateProfile,
     api_getCategories,
     api_getProducts,
     api_getImagesProduct,
@@ -365,5 +408,6 @@ export {
     api_updateQuantity,
     api_deleteCart,
     api_updateSelected,
-    api_getPaymentMethod
+    api_getPaymentMethod,
+    api_getOrders
 }

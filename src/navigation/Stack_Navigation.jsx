@@ -5,7 +5,7 @@ import Page_Splash from '../stack/page_stack/Page_Splash'
 import Page_Search from '../stack/page_stack/Page_Search'
 import Page_Detail from '../stack/page_stack/Page_Detail'
 import Page_Login from '../stack/page_stack/Page_Login'
-import Page_SignUp from '../stack/page_stack/Page_SingUp'
+import Page_SignUp from '../stack/page_stack/Page_SignUp'
 import Page_Payment from '../stack/page_stack/Page_Payment'
 
 import Page_ChangPass from '../stack/page_stack/Page_ChangPass'
