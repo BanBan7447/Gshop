@@ -11,7 +11,7 @@ const Page_Edit_Profile = (props) => {
     const [name, setName] = useState(users?.name);
     const [email, setEmail] = useState(users?.email);
     const [phone_number, setPhone] = useState(users?.phone_number);
-    
+
     // Truyền dữ liệu cập nhật thông tin
     const handleUpdateProfile = async () => {
         if (!email || !name || !phone_number) {
@@ -21,21 +21,21 @@ const Page_Edit_Profile = (props) => {
 
         try {
             const response = await api_updateProfile(email, name, phone_number); // Truyền dữ liệu vào API
-            
+
             console.log('email: ', email)
             console.log('name: ', name)
             console.log('phone: ', phone_number)
 
             if (response?.status === true) {
                 Alert.alert("Thành công", "Cập nhật thông tin thành công!");
-                
-                 // Cập nhật lại dữ liệu trong Context để các component khác nhận giá trị mới
-            setUsers((prev) => ({
-                ...prev,
-                name: name,
-                email: email,
-                phone_number: phone_number,
-            }));
+
+                // Cập nhật lại dữ liệu trong Context để các component khác nhận giá trị mới
+                setUsers((prev) => ({
+                    ...prev,
+                    name: name,
+                    email: email,
+                    phone_number: phone_number,
+                }));
 
                 navigation.goBack(); // Quay về màn trước
             } else {
@@ -50,10 +50,12 @@ const Page_Edit_Profile = (props) => {
 
     return (
         <View style={Style_Edit_Profile.container}>
-            <View style={Style_Edit_Profile.header}>
+            <TouchableOpacity style={Style_Edit_Profile.header}
+                onPress={() => navigation.navigate('Tab', { screen: 'Profile' })}>
+
                 <Image style={Style_Edit_Profile.backIcon} source={require('../../assets/icon/icon_long_arrow.png')} />
                 <Text style={Style_Edit_Profile.headerTitle}>Chỉnh sửa thông tin</Text>
-            </View>
+            </TouchableOpacity>
             <View style={Style_Edit_Profile.profileImageContainer}>
                 <Image style={Style_Edit_Profile.profileImage} source={{ uri: 'https://bizweb.dktcdn.net/100/418/981/products/z5061600085948-565e771a2f075f0e1a7056fdd81ae20a.jpg?v=1704966316290' }} />
             </View>
