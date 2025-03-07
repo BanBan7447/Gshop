@@ -15,7 +15,7 @@ const Style_MyOder = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginLeft: 16,
-        marginBottom: 8
+        marginBottom: 8,
         marginLeft: 15
     },
     backIcon: {
@@ -50,7 +50,7 @@ const Style_MyOder = StyleSheet.create({
         borderRadius: 12,
         marginBottom: 16,
         bottom: 1,
-        color: colors.Light_Grey
+        color: colors.Light_Grey,
         color: '#AAAAAA'
     },
     orderHeader: {
