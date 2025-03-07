@@ -20,30 +20,6 @@ const api_login = async (data) => {
         console.log(e);
     }
 }
-// Gọi API lấy tất cả oder của user
-const api_getOrders = async (id_user) => {
-    if (!id_user) {
-        console.log("ID user không hợp lệ:", id_user);
-        return [];
-    }
-
-    try {
-        console.log(`Gọi API với ID: ${id_user}`);
-        const response = await AxiosInstance().get(`order/list-order-user/${id_user}`);
-
-        console.log("Response API lấy đơn hàng: ", response);
-
-        if (response?.status == true) {
-            return response;
-        } else {
-            return [];
-        }
-    } catch (error) {
-        console.log("Lỗi khi lấy danh sách đơn hàng:", error);
-        return [];
-    }
-};
-
 
 // Gọi API đăng ký 
 const api_signUp = async (data) => {
@@ -374,7 +350,7 @@ const api_updateSelected = async (id_user, id_product, selected) => {
 // Gọi API lấy danh sách phương thức thanh toán
 const api_getPaymentMethod = async () => {
     try {
-        console.log('>>>>>>>>>>>>>> getProducts');
+        console.log('>>>>>>>>>>>>>> get Payment Method');
         const response = await AxiosInstance().get('/payment_method/list');
 
         if (response.status == true) {
@@ -386,6 +362,60 @@ const api_getPaymentMethod = async () => {
         console.log(e)
     }
 }
+
+// Gọi API lấy danh sách địa chỉ theo id_user
+const api_getAddressUser = async (id_user) => {
+    try {
+        console.log('>>>>>>>>>>>>>> get Address User');
+        const response = await AxiosInstance().get(`/address/list/${id_user}`);
+
+        if (response.status == true) {
+            return response;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+// Gọi API thêm đơn hàng
+const api_addOrder = async (id_user, id_payment, id_address) => {
+    try {
+        console.log('>>>>>>>>>>>>>> add Order');
+        const response = await AxiosInstance().post('/order/create-order', {
+            id_user, id_payment, id_address
+        });
+
+        if (response.status == true) {
+            return response.data;
+        }
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+// Gọi API lấy tất cả oder của user
+const api_getOrders = async (id_user) => {
+    if (!id_user) {
+        console.log("ID user không hợp lệ:", id_user);
+        return [];
+    }
+
+    try {
+        console.log(`Gọi API với ID: ${id_user}`);
+        const response = await AxiosInstance().get(`order/list-order-user/${id_user}`);
+
+        console.log("Response API lấy đơn hàng: ", response);
+
+        if (response?.status == true) {
+            return response;
+        } else {
+            return [];
+        }
+    } catch (error) {
+        console.log("Lỗi khi lấy danh sách đơn hàng:", error);
+        return [];
+    }
+};
 
 export {
     api_login,
@@ -409,5 +439,7 @@ export {
     api_deleteCart,
     api_updateSelected,
     api_getPaymentMethod,
+    api_getAddressUser,
+    api_addOrder,
     api_getOrders
 }

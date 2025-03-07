@@ -1,10 +1,10 @@
-import { View, Text, TouchableOpacity, Image, ScrollView, FlatList } from 'react-native'
+import { View, Text, TouchableOpacity, Image, ScrollView, FlatList, ToastAndroid } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import Style_Payment from '../../styles/Style_Payment'
 import colors from '../../styles/colors'
 import { AppContext } from '../../context'
 import { CartContext } from '../../context/CartContext'
-import { api_getImagesProduct, api_getPaymentMethod } from '../../helper/ApiHelper'
+import { api_addOrder, api_getAddressUser, api_getImagesProduct, api_getPaymentMethod } from '../../helper/ApiHelper'
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
 import FastImage from 'react-native-fast-image'
 
@@ -14,7 +14,9 @@ const Page_Payment = (props) => {
     const { cart, setCart } = useContext(CartContext);
     const { selectProduct } = route.params || { selectProduct: [] };
     const [productImages, setProductImages] = useState({});
-    const [paymentMethod, setPaymentMethod] = useState(true);
+    const [paymentMethod, setPaymentMethod] = useState([]);
+    const [address, setAddress] = useState([]);
+    const [selectedPayment, setSelectedPayment] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [shippingFee, setShippingFee] = useState(29000);
 
@@ -50,15 +52,40 @@ const Page_Payment = (props) => {
         }
     }
 
-    // Hàm gọi getPaymentMethod
+    // Hàm lấy dữ liệu địa chỉ của user
+    const getAddressUser = async () => {
+        if (!users || !users._id) return;
+
+        try {
+            const response = await api_getAddressUser(users._id);
+            if (response.status == true && response.data.length > 0) {
+                setAddress(response.data[0]);
+            }
+            console.log('data địa chỉ: ', response)
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    // Hàm gọi getAddressUser
+    useEffect(() => {
+        getAddressUser();
+    }, [users]);
+
+    // Hàm gọi getPaymentMethod & getAddressUser
     useEffect(() => {
         getPaymentMethod();
     }, []);
 
+    // Hàm chọn phương thức thanh toán
+    const handleSelectPayment = (_id) => {
+        setSelectedPayment(_id);
+        console.log("Selected Payment Method ID:", _id);
+    }
+
     // Hàm render payment method
     const renderPaymentMethod = ({ item }) => {
-        const { image, name } = item;
-        const isChecked = selectedItems.includes(item._id);
+        const { _id, image, name } = item;
         return (
             <View style={Style_Payment.item_payment}>
                 <View style={{ flexDirection: 'row' }}>
@@ -69,15 +96,34 @@ const Page_Payment = (props) => {
                 </View>
 
                 <TouchableOpacity
-                    //onPress={() => toggleSelectItems(item._id)}
-                    style={[Style_Payment.checkBox, isChecked && Style_Payment.checkBox_selected]}>
-                    {isChecked &&
+                    onPress={() => handleSelectPayment(_id)}
+                    style={[Style_Payment.checkBox, selectedPayment && Style_Payment.checkBox_selected]}>
+                    {selectedPayment === _id &&
                         <Image
                             style={{ width: 12, height: 12 }}
                             source={require('../../assets/icon/icon_tick_white.png')} />
                     }
                 </TouchableOpacity>
             </View>
+        )
+    };
+
+    // Hàm render address
+    const renderAddress = () => {
+        if (!address) {
+            return (
+                <Text style={Style_Payment.text_body_1}>
+                    Địa chỉ: <Text style={Style_Payment.text_body_2}>Chưa có địa chỉ</Text>
+                </Text>
+            )
+        }
+
+        return (
+            <Text style={Style_Payment.text_body_1}>
+                Địa chỉ: <Text style={Style_Payment.text_body_2}>
+                    {address.detail}, {address.commune}, {address.district}, {address.province}
+                </Text>
+            </Text>
         )
     }
 
@@ -95,9 +141,39 @@ const Page_Payment = (props) => {
     // Tính tổng tiền
     const totalPrice = selectProduct.reduce((sum, item) => {
         return sum + item.quantity * item.id_product.price;
-    }, 0)
+    }, 0);
 
     const finalPrice = totalPrice + shippingFee;
+
+    // Hàm đặt hàng
+    const handleOrder = async () => {
+        if (!selectedPayment) {
+            ToastAndroid.show('Vui lòng chọn phương thức thanh toán', ToastAndroid.SHORT);
+            return;
+        }
+
+        if (!address) {
+            ToastAndroid.show('Vui lòng chọn địa chỉ giao hàng', ToastAndroid.SHORT);
+            return;
+        }
+
+        try {
+            console.log('user đặt hàng: ', users._id);
+            console.log('phương thức thanh toán: ', selectedPayment);
+            console.log('địa chỉ giao hàng: ', address._id);
+
+            const response = await api_addOrder(users._id, selectedPayment, address._id);
+            if (response) {
+                ToastAndroid.show('Đặt hàng thành công', ToastAndroid.SHORT);
+                navigation.navigate('Tab', { screen: 'Cart' })
+            } else {
+                Alert.alert("Lỗi", "Đặt hàng thất bại. Vui lòng thử lại");
+            }
+        } catch (e) {
+            console.log(e);
+            Alert.alert("Lỗi", "Có lỗi xảy ra khi đặt hàng");
+        }
+    }
 
     return (
         <View style={Style_Payment.container}>
@@ -128,9 +204,7 @@ const Page_Payment = (props) => {
                         SDT: <Text style={Style_Payment.text_body_2}>{users?.phone_number || 'Chưa có thông tin'}</Text>
                     </Text>
 
-                    <Text style={Style_Payment.text_body_1}>
-                        Địa chỉ: <Text style={Style_Payment.text_body_2}>Số nhà 128, đường Nguyễn Văn Linh, phường Bình Hiên, quận Hải Châu, TP. Đà Nẵng.</Text>
-                    </Text>
+                    {renderAddress()}
                 </View>
 
                 <View style={Style_Payment.container_product}>
@@ -198,14 +272,14 @@ const Page_Payment = (props) => {
                 <View style={Style_Payment.container_payment}>
                     <Text style={Style_Payment.text_title}>Chi phí thanh toán</Text>
 
-                    <View style={[Style_Payment.container_totalPrice, {marginBottom: 8}]}>
-                        <Text style={{fontSize: 16}}>Tổng tiền sản phẩm: </Text>
-                        <Text style={{fontSize: 16}}>{cart.totalPrice?.toLocaleString('vi-VN')}đ</Text>
+                    <View style={[Style_Payment.container_totalPrice, { marginBottom: 8 }]}>
+                        <Text style={{ fontSize: 16 }}>Tổng tiền sản phẩm: </Text>
+                        <Text style={{ fontSize: 16 }}>{cart.totalPrice?.toLocaleString('vi-VN')}đ</Text>
                     </View>
 
-                    <View style={[Style_Payment.container_totalPrice, {marginBottom: 8}]}>
-                        <Text style={{fontSize: 16}}>Phí vận chuyển</Text>
-                        <Text style={{fontSize: 16}}>{shippingFee.toLocaleString('vi-VN')}đ</Text>
+                    <View style={[Style_Payment.container_totalPrice, { marginBottom: 8 }]}>
+                        <Text style={{ fontSize: 16 }}>Phí vận chuyển</Text>
+                        <Text style={{ fontSize: 16 }}>{shippingFee.toLocaleString('vi-VN')}đ</Text>
                     </View>
 
                     <View style={Style_Payment.container_totalPrice}>
@@ -217,7 +291,8 @@ const Page_Payment = (props) => {
 
             <View style={Style_Payment.container_bottom}>
                 <TouchableOpacity
-                    style={Style_Payment.btn_order}>
+                    style={Style_Payment.btn_order}
+                    onPress={handleOrder}>
                     <Text style={Style_Payment.text_oder}>Đặt hàng</Text>
                 </TouchableOpacity>
             </View>
