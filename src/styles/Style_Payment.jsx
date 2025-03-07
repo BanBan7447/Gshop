@@ -46,7 +46,8 @@ const Style_Payment = StyleSheet.create({
     text_body_2: {
         fontSize: 16,
         fontFamily: 'Inter Regular',
-        color: colors.Black
+        color: colors.Black,
+        lineHeight: 24
     },
 
     btn_text: {
