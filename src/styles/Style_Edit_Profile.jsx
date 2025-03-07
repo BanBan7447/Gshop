@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
+import colors from './colors';
 
 const Style_Edit_Profile = StyleSheet.create ({
     container: {
         flex: 1,
-        padding: 24,
+        padding: 20,
+        backgroundColor: colors.White
     },
     header: {
         flexDirection: 'row',
@@ -17,14 +19,14 @@ const Style_Edit_Profile = StyleSheet.create ({
     headerTitle: {
         fontSize: 20,
         marginLeft: 18,
-        color: '#282828',
+        color: colors.Black,
     },
     profileImageContainer: {
         alignItems: 'center',
     },
     profileImage: {
         borderRadius: 100,
-        backgroundColor: '#7F7F7F',
+        backgroundColor: colors.Grey,
         width: 120,
         height: 120,
         marginTop: 25,
@@ -32,7 +34,7 @@ const Style_Edit_Profile = StyleSheet.create ({
     updateButton: {
         width: 231,
         height: 48,
-        backgroundColor: '#266FDA',
+        backgroundColor: colors.Blue,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
@@ -46,39 +48,39 @@ const Style_Edit_Profile = StyleSheet.create ({
         height: 24
     },
     updateButtonText: {
-        color: '#FFFFFF',
+        color: colors.White,
         fontSize: 16,
     },
     label: {
         fontSize: 16,
-        color: '#7F7F7F',
+        color: colors.Grey,
         marginTop: 10,
     },
     input: {
         width: '100%',
         height: 50,
         borderWidth: 1,
-        borderColor: '#E9F1FB',
+        borderColor: colors.Light_Blue,
         borderRadius: 16,
         paddingHorizontal: 16,
-        backgroundColor: '#E9F1FB',
+        backgroundColor: colors.Light_Blue,
         marginBottom: 16,
         marginTop: 9,
     },
     placeholder: {
-        color: '#000000',
+        color: colors.Black,
     },
     saveButton: {
         width: 365,
         height: 56,
-        backgroundColor: '#E43727',
+        backgroundColor: colors.Red,
         borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 10,
     },
     saveButtonText: {
-        color: '#FFFFFF',
+        color: colors.White,
         fontSize: 16,
         fontWeight: 'bold',
     },

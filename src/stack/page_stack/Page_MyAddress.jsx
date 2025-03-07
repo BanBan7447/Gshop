@@ -2,13 +2,16 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import Style_MyAddress from '../../styles/Style_MyAddress';
 
-const Page_MyAddress = () => {
+const Page_MyAddress = (props) => {
+  const { navigation } = props;
   return (
     <View style={Style_MyAddress.container}>
-      <View style={Style_MyAddress.header}>
+      <TouchableOpacity
+        style={Style_MyAddress.header}
+        onPress={() => navigation.navigate('Tab', { screen: 'Profile' })}>
         <Image style={Style_MyAddress.backIcon} source={require('../../assets/icon/icon_long_arrow.png')} />
         <Text style={Style_MyAddress.headerTitle}>Địa chỉ giao hàng</Text>
-      </View>
+      </TouchableOpacity>
       <TouchableOpacity style={Style_MyAddress.addButton}>
         <Text style={Style_MyAddress.addButtonText}>Thêm địa chỉ</Text>
       </TouchableOpacity>

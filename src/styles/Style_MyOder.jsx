@@ -1,17 +1,20 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
+import colors from './colors';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 const Style_MyOder = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: colors.White,
         paddingHorizontal: 20,
         paddingTop: 20
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 15
+        marginLeft: 16,
+        marginBottom: 8
     },
     backIcon: {
         width: 24,
@@ -20,7 +23,7 @@ const Style_MyOder = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         marginLeft: 18,
-        color: '#282828',
+        color: colors.Black,
     },
     tabsContainer: {
         flexDirection: 'row',
@@ -31,18 +34,18 @@ const Style_MyOder = StyleSheet.create({
     tab: {
         fontSize: 16,
         fontWeight: '500',
-        color: '#7F7F7F',
+        color: colors.Grey,
     },
     listContainer: {
         paddingBottom: 20,
     },
     orderContainer: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: colors.White,
         padding: 16,
         borderRadius: 12,
         marginBottom: 16,
         bottom: 1,
-        color: '#AAAAAA'
+        color: colors.Light_Grey
     },
     orderHeader: {
         flexDirection: 'row',
@@ -50,40 +53,74 @@ const Style_MyOder = StyleSheet.create({
         marginBottom: 8,
     },
     orderTitle: {
-        fontSize: 18,
-        color: '#000000'
+        width: '50%',
+        fontSize: 20,
+        fontFamily: 'Inter Bold',
+        color: colors.Black
     },
     orderDate: {
-        fontSize: 12,
-        color: '#000000',
+        fontSize: 16,
+        color: colors.Black,
     },
     orderDetail: {
         fontSize: 16,
         marginBottom: 4,
+        color: colors.Grey
     },
     boldText: {
-        fontWeight: 'bold',
+        fontFamily: 'Inter Bold',
+        color: colors.Black
     },
     orderStatus: {
         fontSize: 16,
         marginTop: 4,
     },
+
     detailButton: {
         position: 'absolute',
         right: 16,
-        bottom: 10,
-        backgroundColor: '#E43727',
+        bottom: 20,
+        backgroundColor: colors.Red,
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 10,
-        width: 87,
-        height: 44,
+        justifyContent: 'center',
         alignItems: 'center'
     },
     detailButtonText: {
-        color: '#FFFFFF',
+        color:  colors.White,
+        fontSize: 16,
+        fontFamily: 'Inter Bold',
+    },
+    filterContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginVertical: 10,
+    },
+    
+    filterButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+        backgroundColor: colors.Light_Blue,
+        marginRight: 16
+    },
+    
+    filterButtonActive: {
+        backgroundColor: colors.Red,
+    },
+    
+    filterText: {
+        color: colors.Black,
+        fontWeight: 'bold',
         fontSize: 16,
     },
+    
+    filterTextActive: {
+        color: 'white',
+        fontSize: 16,
+    },
+    
 });
 
 export default Style_MyOder;
