@@ -1,10 +1,14 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
+import colors from './colors';
 
 const Style_MyAddress = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 24,
+        padding: 20,
+        backgroundColor: colors.White,
+        paddingHorizontal: 20,
+        paddingTop: 20
       },
       header: {
         flexDirection: 'row',
@@ -19,7 +23,7 @@ const Style_MyAddress = StyleSheet.create({
         height: 28,
         fontSize: 20,
         marginLeft: 18,
-        color: '#282828',
+        color: colors.Black,
       },
       addButton: {
         width: '100%',
