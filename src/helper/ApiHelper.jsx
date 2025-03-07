@@ -20,30 +20,6 @@ const api_login = async (data) => {
         console.log(e);
     }
 }
-// Gọi API lấy tất cả oder của user
-const api_getOrders = async (id_user) => {
-    if (!id_user) {
-        console.log("ID user không hợp lệ:", id_user);
-        return [];
-    }
-
-    try {
-        console.log(`Gọi API với ID: ${id_user}`);
-        const response = await AxiosInstance().get(`order/list-order-user/${id_user}`);
-
-        console.log("Response API lấy đơn hàng: ", response);
-
-        if (response?.status == true) {
-            return response;
-        } else {
-            return [];
-        }
-    } catch (error) {
-        console.log("Lỗi khi lấy danh sách đơn hàng:", error);
-        return [];
-    }
-};
-
 
 // Gọi API đăng ký 
 const api_signUp = async (data) => {
@@ -417,6 +393,30 @@ const api_addOrder = async (id_user, id_payment, id_address) => {
     }
 }
 
+// Gọi API lấy tất cả oder của user
+const api_getOrders = async (id_user) => {
+    if (!id_user) {
+        console.log("ID user không hợp lệ:", id_user);
+        return [];
+    }
+
+    try {
+        console.log(`Gọi API với ID: ${id_user}`);
+        const response = await AxiosInstance().get(`order/list-order-user/${id_user}`);
+
+        console.log("Response API lấy đơn hàng: ", response);
+
+        if (response?.status == true) {
+            return response;
+        } else {
+            return [];
+        }
+    } catch (error) {
+        console.log("Lỗi khi lấy danh sách đơn hàng:", error);
+        return [];
+    }
+};
+
 export {
     api_login,
     api_signUp,
@@ -441,4 +441,5 @@ export {
     api_getPaymentMethod,
     api_getAddressUser,
     api_addOrder,
+    api_getOrders
 }
