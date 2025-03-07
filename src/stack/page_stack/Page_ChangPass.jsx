@@ -83,9 +83,11 @@ const Page_ChangPass = () => {
                 <Text style={Style_ChangPass.listText}>1 ký tự đặc biệt (Ví dụ: # ? ! $ & @)</Text>
             </View>
 
-            <TouchableOpacity style={Style_ChangPass.saveButton} onPress={handleChangePassword}>
-                <Text style={Style_ChangPass.saveButtonText}>Lưu mật khẩu mới</Text>
-            </TouchableOpacity>
+            <View style={Style_ChangPass.container_bottom}>
+                <TouchableOpacity style={Style_ChangPass.saveButton} onPress={handleChangePassword}>
+                    <Text style={Style_ChangPass.saveButtonText}>Lưu mật khẩu mới</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
