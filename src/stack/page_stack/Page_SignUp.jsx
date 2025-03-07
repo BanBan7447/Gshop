@@ -11,10 +11,10 @@ const Page_SignUp = (props) => {
     const { navigation } = props;
     const { users, setUsers } = useContext(AppContext);
 
-    const [name, setName] = useState("Khang");
-    const [email, setEmail] = useState("khangmojito1996@gmail.com");
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
     const [phone_number, setPhone_number] = useState("");
-    const [password, setPassword] = useState("Khang1111@");
+    const [password, setPassword] = useState("");
 
     const [hidePassword, setHidePassword] = useState(false);
 
