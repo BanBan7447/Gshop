@@ -417,6 +417,70 @@ const api_getOrders = async (id_user) => {
     }
 };
 
+// Gọi API lấy danh sách chi tiết đơn hàng theo id_order
+const api_getDetailOrder = async (id_order) => {
+    try {
+        console.log('>>>>>>>>>>>>>> get Detail Order');
+        const response = await AxiosInstance().get(`/detail_order/list-by-order/${id_order}`);
+
+        if (response.status == true) {
+            console.log('Data detail Order: ', response);
+            return response
+        }
+    } catch (e) {
+        console.log(e);
+    }
+};
+
+// Gọi API lấy chi tiết địa chỉ theo id_address
+const api_getDetailAddress = async (id_address) => {
+    try {
+        console.log('>>>>>>>>>>>>>> get Detail Address');
+        const response = await AxiosInstance().get(`/address/detail/${id_address}`);
+
+        if (response.status == true) {
+            return response;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+};
+
+// Gọi API lấy chi tiết phương thức thanh toán theo id_payment
+const api_getDetailPayment = async (id_payment) => {
+    try {
+        console.log('>>>>>>>>>>>>>> get Detail Payment');
+        const response = await AxiosInstance().get(`/payment_method/detail/${id_payment}`)
+
+        if (response.status == true) {
+            return response
+        }
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+// API update Image người dùng
+const api_uploadAvatar = async (userId, imageUri) => {
+    try {
+        const formData = new FormData();
+        formData.append("image", {
+            uri: imageUri,
+            name: `avatar_${userId}.${imageUri.split(".").pop()}`,
+            type: "image/jpeg",
+        });
+
+        const axiosInstance = AxiosInstance();
+        const response = await axiosInstance.post(`/users/create-avatar/${userId}`, formData);
+
+        return response.data;
+    } catch (error) {
+        console.error("Lỗi upload avatar:", error);
+        return { status: false, message: error.message };
+    }
+};
+
+
 export {
     api_login,
     api_signUp,
@@ -441,5 +505,9 @@ export {
     api_getPaymentMethod,
     api_getAddressUser,
     api_addOrder,
-    api_getOrders
+    api_getOrders,
+    api_getDetailAddress,
+    api_getDetailOrder,
+    api_getDetailPayment,
+    api_uploadAvatar,
 }

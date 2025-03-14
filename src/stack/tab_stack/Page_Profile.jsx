@@ -39,9 +39,9 @@ const Page_Profile = (props) => {
         <View>
           <View style={Style_Profile.container_info}>
             <Image
-              //source={{uri: users.avatar ? users.avatar : 'https://i.pinimg.com/736x/fd/1f/34/fd1f347ffac0a91e0ecd38c306b1ce37.jpg'}}
-              source={{ uri: 'https://i.pinimg.com/736x/fd/1f/34/fd1f347ffac0a91e0ecd38c306b1ce37.jpg' }}
-              style={Style_Profile.avatar} />
+              source={{ uri: users?.avatar || 'https://i.pinimg.com/736x/fd/1f/34/fd1f347ffac0a91e0ecd38c306b1ce37.jpg' }}
+              style={Style_Profile.avatar}
+            />
 
             <View>
               <Text style={Style_Profile.title_name}>{users.name}</Text>
@@ -64,7 +64,7 @@ const Page_Profile = (props) => {
             icon={require('../../assets/icon/icon_location.png')}
             label={'Địa chỉ giao hàng'}
             onPress={() => navigation.navigate('Location')} />
-          
+
           <ProfileOption
             icon={require('../../assets/icon/icon_security.png')}
             label={'Bảo mật'}

@@ -146,6 +146,21 @@ const Style_MyOder = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 16,
     },
+    loading: {
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center'
+    },
+    emptyContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 20,
+    },
+    emptyText: {
+        fontSize: 16,
+        color: colors.Grey,
+        fontStyle: 'italic',
+    },
 });
 
 export default Style_MyOder;

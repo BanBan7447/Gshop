@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import Page_Login from './Page_Login';
 import Style_ChangPass from '../../styles/Style_ChangPass';
 
-const Page_ChangPass = () => {
+const Page_ChangPass = (props) => {
+    const { navigation, route } = props;
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [hidePassword, setHidePassword] = useState("false");
@@ -29,10 +30,12 @@ const Page_ChangPass = () => {
 
     return (
         <View style={Style_ChangPass.container}>
-            <View style={Style_ChangPass.header}>
+            <TouchableOpacity
+                style={Style_ChangPass.header}
+                onPress={() => navigation.goBack()}>
                 <Image style={Style_ChangPass.backIcon} source={require('../../assets/icon/icon_long_arrow.png')} />
                 <Text style={Style_ChangPass.headerTitle}>Bảo mật</Text>
-            </View>
+            </TouchableOpacity>
             <Text style={Style_ChangPass.title}>Thay đổi mật khẩu</Text>
 
             <View style={Style_ChangPass.inputContainer}>
