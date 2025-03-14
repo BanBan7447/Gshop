@@ -50,7 +50,9 @@ const Page_MyOder = (props) => {
 
 
     const renderItem = ({ item }) => (
-        <View style={Style_MyOder.orderContainer}>
+        <TouchableOpacity
+            onPress={() => navigation.navigate('DetailOrder', { order: item, user: users })}
+            style={Style_MyOder.orderContainer}>
             <View style={Style_MyOder.orderHeader}>
                 <Text style={Style_MyOder.orderTitle} numberOfLines={1} ellipsizeMode='tail'>
                     #{item._id}
@@ -66,15 +68,19 @@ const Page_MyOder = (props) => {
             <View style={Style_MyOder.detailButton}>
                 <Text style={Style_MyOder.detailButtonText}>Chi tiết</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 
     if (loading) {
-        return <ActivityIndicator size="large" color={colors.Red} />;
+        return (
+            <View style={Style_MyOder.loading}>
+                <ActivityIndicator size="large" color={colors.Red} />
+            </View>
+        );
     }
 
     return (
-        <View style={Style_MyOder.container}>
+        <ScrollView style={Style_MyOder.container}>
             <View>
                 {/* Header */}
                 <TouchableOpacity
@@ -112,9 +118,23 @@ const Page_MyOder = (props) => {
                     data={filteredOrders}
                     keyExtractor={item => item._id.toString()}
                     renderItem={renderItem}
-                    contentContainerStyle={Style_MyOder.listContainer} />
+                    contentContainerStyle={Style_MyOder.listContainer}
+                    scrollEnabled={false} />
             </View>
-        </View>
+            {filteredOrders.length === 0 ? (
+                <View style={Style_MyOder.emptyContainer}>
+                    <Text style={Style_MyOder.emptyText}>Không có đơn hàng</Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={filteredOrders}
+                    keyExtractor={item => item._id.toString()}
+                    renderItem={renderItem}
+                    contentContainerStyle={Style_MyOder.listContainer}
+                    scrollEnabled={false}
+                />
+            )}
+        </ScrollView>
     );
 };
 

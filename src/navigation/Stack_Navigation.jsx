@@ -15,7 +15,7 @@ import Page_MyOder from '../stack/page_stack/Page_MyOder'
 import Page_Detail_News from '../stack/page_stack/Page_Detail_News'
 import Page_Rating from '../stack/page_stack/Page_Rating'
 import Page_FQA from '../stack/page_stack/Page_FQA'
-
+import Page_Detail_Order from '../stack/page_stack/Page_Detail_Order'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 const Stack = createNativeStackNavigator();
@@ -36,7 +36,8 @@ const Stack_Navigation = () => {
       <Stack.Screen name='DetailNews' component={Page_Detail_News} />
       <Stack.Screen name='Rating' component={Page_Rating} />
       <Stack.Screen name='FQA' component={Page_FQA} />
-      <Stack.Screen name='Payment' component={Page_Payment} />
+      <Stack.Screen name='Payment' component={Page_Payment}/>
+      <Stack.Screen name='DetailOrder' component={Page_Detail_Order}/>
     </Stack.Navigator>
   )
 }
