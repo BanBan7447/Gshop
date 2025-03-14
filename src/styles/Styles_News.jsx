@@ -61,7 +61,7 @@ const Styles_News = StyleSheet.create({
         textAlign: 'right',
         fontFamily: 'Inter Regular',
         color: colors.Grey,
-        fontSize: 12
+        fontSize: 14
     }
 })
 

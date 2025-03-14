@@ -4,7 +4,8 @@ import colors from './colors'
 
 const Style_Detail_News = StyleSheet.create({
     container: {
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        backgroundColor: colors.White
     },
 
     navigation: {
