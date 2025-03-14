@@ -9,7 +9,6 @@ import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
 
 const Page_News = (props) => {
   const { navigation } = props;
-
   const [news, setNews] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -32,8 +31,9 @@ const Page_News = (props) => {
   }, [])
 
   const renderNews = ({ item }) => {
-    const { images, title, date, _id } = item;
+    const { thumbnail, title, date, _id } = item;
     const isLoadingRender = !item;
+    console.log('Ảnh thumbnail: ', thumbnail);
 
     return (
       <TouchableOpacity
@@ -51,7 +51,7 @@ const Page_News = (props) => {
           ) : (
             <View>
               <Image
-                source={{ uri: images[0] }}
+                source={{ uri: thumbnail }}
                 style={Styles_News.thumbnails_news} />
               <Text
                 style={Styles_News.title_news}
