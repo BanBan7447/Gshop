@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-native-masked-view/masked-view": "^0.3.2",
     "@react-navigation/bottom-tabs": "^7.2.1",
@@ -18,8 +19,8 @@
     "axios": "^1.8.3",
     "install": "^0.13.0",
     "npm": "^11.2.0",
-    "react": "18.3.1",
-    "react-native": "0.76.5",
+  
+ 
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-fast-image": "^8.6.3",
     "react-native-hmac": "^0.1.1",
@@ -30,6 +31,8 @@
     "react-native-skeleton-placeholder": "^5.2.4",
     "react-native-toast-notifications": "^3.4.0",
     "react-native-webview": "^13.13.4"
+    "react": "^18.3.1",
+    "react-native": "^0.77.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

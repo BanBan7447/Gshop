@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, Image, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Để lấy id_user
 import { api_getOrders } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
 import Style_MyOder from '../../styles/Style_MyOder';
 import colors from '../../styles/colors';
+import PushNotification from 'react-native-push-notification';
 
 const Page_MyOder = (props) => {
     const { navigation } = props;
@@ -12,6 +13,64 @@ const Page_MyOder = (props) => {
     const [loading, setLoading] = useState(true);
     const [selectedStatus, setSelectedStatus] = useState('Tất cả'); // Trạng thái lọc
     const { users } = useContext(AppContext);
+    const prevOrdersRef = useRef([]);
+
+    useEffect(() => {
+        // Tạo Channel để đảm bảo thông báo hoạt động trên android
+        PushNotification.createChannel(
+            {
+                channelId: 'order-channel',
+                channelName: 'Order Notifications',
+                importance: 4,
+                vibrate: true
+            },
+            (created) => console.log(`Channel created: ${created}`)
+        )
+    }, []);
+
+    const sendNotification = (order) => {
+        PushNotification.localNotification({
+            channelId: 'order-channel',
+            title: 'Cập nhật đơn hàng',
+            message: `Đơn hàng #${order._id} đã chuyển sang trạng thái: ${order.status}`,
+            vibrate: true,
+            playSound: true,
+            soundName: 'default'
+        })
+    }
+
+
+    useEffect(() => {
+        if (!users || !users._id) return;
+
+        const alertOrders = async () => {
+            try {
+                const response = await api_getOrders(users._id);
+                if (response.status) {
+                    const newOrders = response.data;
+
+                    // Kiểm tra xem đơn hàng nào thay đổi để thông báo
+                    newOrders.forEach((newOrder) => {
+                        const oldOrder = prevOrdersRef.current.find(order => order._id === newOrder._id);
+                        if (oldOrder && oldOrder.status !== newOrder.status) {
+                            sendNotification(newOrder);
+                        }
+                    })
+
+                    // Cập nhật state và useRef
+                    setOrders(newOrders);
+                    prevOrdersRef.current = newOrders;
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        };
+
+        alertOrders();
+        const interval = setInterval(alertOrders, 2000);
+        return () => clearInterval(interval)
+
+    }, [users])
 
     useEffect(() => {
         const fetchOrders = async () => {
