@@ -96,6 +96,10 @@ const Style_Detail_Order = StyleSheet.create({
     centerText: {
         textAlign: 'center',
         paddingVertical: 5
+    },
+    textRating: {
+        fontSize: 16,
+        fontFamily: 'Inter Bold'
     }
 })
 
