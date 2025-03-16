@@ -26,7 +26,7 @@ import FastImage from 'react-native-fast-image';
 import {hmacSHA256} from 'react-native-hmac';
 import axios from 'axios';
 import WebView from 'react-native-webview';
-import Style_Detail from '../../styles/Style_Detail';
+import {useToast} from 'react-native-toast-notifications';
 
 const clientID = '523baaf6-60a1-455a-9676-fd005f76e7f5';
 const apiKey = '53a1c476-71c3-4c4c-aebc-58764ed56b58';
@@ -45,7 +45,7 @@ const Page_Payment = props => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [shippingFee, setShippingFee] = useState(29000);
   const [paymentLink, setPaymentLink] = useState('');
-  const [notification, setNotification] = useState(false);
+  const toast = useToast();
 
   // Hàm lấy ảnh cho sản phẩm
   const getProductImages = async () => {
@@ -232,6 +232,17 @@ const Page_Payment = props => {
       });
   };
 
+  const showToast = () => {
+    toast.show('Đặt hàng thành công!', {
+      type: 'success',
+      position: 'bottom',
+      duration: 2500,
+      animationType: 'fade',
+      style: {backgroundColor: 'red', borderRadius: 10},
+      textStyle: {color: 'white', fontSize: 16},
+    });
+  };
+
   // Hàm đặt hàng
   const handleOrder = async () => {
     if (!selectedPayment) {
@@ -262,8 +273,7 @@ const Page_Payment = props => {
         address._id,
       );
       if (response) {
-        setNotification(true);
-        // ToastAndroid.show('Đặt hàng thành công', ToastAndroid.SHORT);
+        showToast();
         navigation.navigate('Tab', {screen: 'Cart'});
       } else {
         Alert.alert('Lỗi', 'Đặt hàng thất bại. Vui lòng thử lại');
@@ -285,9 +295,10 @@ const Page_Payment = props => {
         selectedPayment,
         address._id,
       );
+
       setTimeout(() => {
         setPaymentLink('');
-        setNotification(true);
+        showToast();
         navigation.navigate('Tab', {screen: 'Cart'});
       }, 5000);
     } else if (url.includes('/cancel')) {
@@ -442,17 +453,6 @@ const Page_Payment = props => {
           />
         </View>
       ) : null}
-
-      {/* thông báo thành công */}
-      {notification && (
-        <View style={Style_Detail.card}>
-          <Image
-            source={require('../../assets/icon/icon_check_green.png')}
-            style={{width: 24, height: 24}}
-          />
-          <Text style={Style_Detail.text_card}>Đặt hàng thành công</Text>
-        </View>
-      )}
     </View>
   );
 };

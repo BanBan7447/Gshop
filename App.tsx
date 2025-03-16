@@ -5,9 +5,11 @@ import Stack_Navigation from './src/navigation/Stack_Navigation'
 import { NavigationContainer } from '@react-navigation/native'
 import { AppProvider } from './src/context'
 import { CartProvider } from './src/context/CartContext'
+import { ToastProvider } from 'react-native-toast-notifications'
 
 const App = () => {
   return (
+    <ToastProvider>
     <AppProvider>
       <CartProvider>
         <NavigationContainer>
@@ -17,6 +19,7 @@ const App = () => {
         </NavigationContainer>
       </CartProvider>
     </AppProvider>
+    </ToastProvider>
   )
 }
 
