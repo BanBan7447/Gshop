@@ -3,11 +3,6 @@ import React, { useContext, useState, useEffect } from 'react';
 import Style_Edit_Profile from '../../styles/Style_Edit_Profile';
 import { api_updateProfile, api_uploadAvatar } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
-import { Axios } from 'axios';
-import AxiosInstance from '../../helper/AxiosInstance';
-
-
-
 
 const Page_Edit_Profile = (props) => {
     const { navigation } = props
@@ -19,7 +14,9 @@ const Page_Edit_Profile = (props) => {
     const [phone_number, setPhone] = useState(users?.phone_number);
 
     const [imageUri, setImageUri] = useState(null);
-    const [avatar, setAvatar] = useState(users?.avatar || null);
+
+    const [avatar, setAvatar] = useState(users.avatar);
+    const [loading, setLoading] = useState(false);
 
     // Truyền dữ liệu cập nhật thông tin
     const handleUpdateProfile = async () => {
@@ -56,115 +53,65 @@ const Page_Edit_Profile = (props) => {
         }
     };
 
-
-    // // Hàm chọn ảnh từ thư viện
+    // Hàm xử lý upload avatar
     // const handleChoosePhoto = () => {
-    //     const options = {
-    //         mediaType: 'photo',
-    //         quality: 1,
-    //     };
-    //     launchImageLibrary(options, (response) => {
-    //         if (response.didCancel) {
-    //             console.log("Người dùng đã hủy chọn ảnh");
-    //         } else if (response.errorMessage) {
-    //             console.error("Lỗi chọn ảnh:", response.errorMessage);
-    //         } else {
-    //             setAvatar(response.assets[0].uri);
-    //             handleUploadAvatar(response.assets[0].uri); // Tự động tải ảnh lên sau khi chọn
+    //     launchImageLibrary({ mediaType: 'photo' }, async (response) => {
+    //         if (response.didCancel) return;
+    //         if (response.errorMessage) {
+    //             Alert.alert("Lỗi", "Không thể choinj ảnh!");
+    //             return;
+    //         }
+
+    //         const uri = response.assets[0].uri;
+    //         setImageUri(uri);
+
+    //         try {
+    //             // Gọi API upload avatar
+    //             const uploadResponse = await api_uploadAvatar(users._id, uri);
+    //             console.log("Upload Response:", uploadResponse); // In toàn bộ dữ liệu API trả về để debug
+
+    //             if (uploadResponse?.status) {
+    //                 const newAvatarUrl = uploadResponse.data.avatar;
+    //                 setAvatar(newAvatarUrl);
+    //                 setUsers((prev) => ({ ...prev, avatar: newAvatarUrl }));
+
+    //                 Alert.alert("Thành công", "Cập nhật ảnh đại diện thành công!");
+    //             } else {
+    //                 Alert.alert("Lỗi", "Cập nhật ảnh thất bại! " + (uploadResponse.message || ""));
+    //             }
+    //         } catch (error) {
+    //             console.error("Lỗi khi upload avatar:", error);
+    //             Alert.alert("Lỗi", "Không thể upload ảnh. Vui lòng thử lại!");
     //         }
     //     });
     // };
 
-    // // Hàm tải ảnh lên server
-    // const handleUploadAvatar = async (imageUri) => {
-    //     if (!imageUri) {
-    //         Alert.alert("Lỗi", "Vui lòng chọn ảnh trước khi tải lên!");
-    //         return;
-    //     }
-
-    //     try {
-    //         const response = await api_uploadAvatar(users.id, { uri: imageUri });
-
-    //         if (response?.status === true) {
-    //             Alert.alert("Thành công", "Cập nhật ảnh đại diện thành công!");
-    //             setUsers((prev) => ({ ...prev, avatar: response.avatar_url }));
-    //         } else {
-    //             Alert.alert("Lỗi", "Cập nhật ảnh thất bại, vui lòng thử lại!");
-    //         }
-    //     } catch (error) {
-    //         console.log("Lỗi tải ảnh:", error);
-    //         Alert.alert("Lỗi", "Đã có lỗi xảy ra!");
-    //     }
-    // };
-
-    // const pickImage = () => {
-    //     const options = {
-    //         mediaType: "photo",
-    //         quality: 1,
-    //     };
-
-    //     launchImageLibrary(options, (response) => {
-    //         if (response.didCancel) {
-    //             console.log("Người dùng đã hủy chọn ảnh");
-    //         } else if (response.errorMessage) {
-    //             console.error("Lỗi chọn ảnh:", response.errorMessage);
-    //         } else {
-    //             setImageUri(response.assets[0].uri);
-    //         }
-    //     });
-    // };
-
-    // const handleUpload = async () => {
-    //     if (imageUri) {
-    //         const response = await uploadAvatar(userId, imageUri);
-    //         console.log("Kết quả upload:", response);
-    //     }
-    // };
-
-    // Gọi API lấy avatar mới sau khi cập nhật
-    const fetchAvatar = async () => {
-        try {
-            const axiosInstance = AxiosInstance(); // Gọi hàm AxiosInstance đúng cách
-            const response = await axiosInstance.get(`/get-user/${userId}`);
-            if (response.data.status && response.data.data.avatar) {
-                setImageUri(response.data.data.avatar);
-            }
-        } catch (error) {
-            console.error("Lỗi lấy avatar:", error);
-        }
-    };
-
-    const pickAndUploadImage = () => {
-        const options = { mediaType: "photo", quality: 1 };
+    const handleChoosePhoto = () => {
+        const options = {
+            mediaType: 'photo',
+            quality: 1,
+        };
 
         launchImageLibrary(options, async (response) => {
-            if (response.didCancel) {
-                console.log("Người dùng đã hủy chọn ảnh");
-            } else if (response.errorMessage) {
-                console.error("Lỗi chọn ảnh:", response.errorMessage);
-            } else {
-                const uri = response.assets[0].uri;
-                setImageUri(uri);
+            if (response.didCancel) return;
+            if (response.errorMessage) {
+                Alert.alert('Lỗi: ' + response.errorMessage);
+                return;
+            }
 
-                // Gửi ảnh lên server
-                const uploadResponse = await api_uploadAvatar(userId, imageUri);
-                console.log("Kết quả upload:", uploadResponse);
-
-                if (uploadResponse.status) {
-                    Alert.alert("Thành công", "Ảnh đại diện đã được cập nhật!");
-                    fetchAvatar(); // Gọi API lấy avatar mới sau khi upload thành công
+            if (response.assets && response.assets.length > 0) {
+                const imageUri = response.assets[0].uri;
+                setLoading(true);
+                const result = await api_uploadAvatar(users._id, imageUri);
+                if (result.status) {
+                    setAvatar(result.data.avatar);
                 } else {
-                    Alert.alert("Lỗi", "Không thể tải lên ảnh đại diện.");
+                    Alert('Upload thất bại: ' + result.message);
                 }
+                setLoading(false);
             }
         });
     };
-
-    // Lấy avatar ban đầu khi component được mount
-    useEffect(() => {
-        fetchAvatar();
-    }, []);
-
 
     return (
         <View style={Style_Edit_Profile.container}>
@@ -179,11 +126,14 @@ const Page_Edit_Profile = (props) => {
                         style={Style_Edit_Profile.profileImage}
                         source={{ uri: 'https://bizweb.dktcdn.net/100/418/981/products/z5061600085948-565e771a2f075f0e1a7056fdd81ae20a.jpg?v=1704966316290' }} /> */}
 
-                {imageUri && <Image source={{ uri: imageUri }} style={Style_Edit_Profile.profileImage} />}
+                <Image
+                    source={avatar ? { uri: avatar } : require('../../assets/icon/icon_deafult_profile.png')}
+                    style={Style_Edit_Profile.profileImage}
+                />
             </View>
             <TouchableOpacity
                 style={Style_Edit_Profile.updateButton}
-                onPress={pickAndUploadImage} // Khi nhấn vào, chọn ảnh từ thư viện
+                onPress={handleChoosePhoto}
             >
                 <Image style={Style_Edit_Profile.uploadIcon} source={require('../../assets/icon/icon_upload_white.png')} />
                 <Text style={Style_Edit_Profile.updateButtonText}>Cập nhật ảnh đại diện</Text>

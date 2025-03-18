@@ -241,7 +241,10 @@ const Page_Detail_Order = (props) => {
                                 numberOfLines={2}>
                                 {product.name}
                             </Text>
-                            <Text style={{ fontSize: 18, color: colors.Red }}>{product.unit_price}</Text>
+                            <Text style={{ fontSize: 18, color: colors.Red }}>
+                                {Number(product.unit_price).toLocaleString("vi-VN")}
+                            </Text>
+
                             <Text style={{ fontSize: 16 }}>x{product.order_quantity}</Text>
                         </View>
                     </View>
