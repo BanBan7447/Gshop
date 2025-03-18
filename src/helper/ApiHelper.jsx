@@ -246,6 +246,24 @@ const api_addReview = async (star, content, id_user, id_product) => {
     }
 }
 
+// Gọi API chỉnh sửa đánh giá
+const api_editReview = async (_id, star, content, id_user, id_product) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get Edit Review');
+        const response = await AxiosInstance().put(`/rating/edit?_id=${_id}`, {
+            star, content, id_user, id_product
+        });
+
+        console.log('Phản hồi từ server:', response);
+
+        if (response.status == true) {
+            return response;
+        }
+    } catch (e) {
+        console.log('Lỗi khi thêm đánh giá:', e);
+    }
+}
+
 // Gọi API cập nhật view của sản phẩm
 const api_updateView = async (id) => {
     try {
@@ -469,7 +487,6 @@ const api_uploadAvatar = async (id_user, imageUri) => {
 };
 
 
-
 export {
     api_login,
     api_signUp,
@@ -485,6 +502,7 @@ export {
     api_getRateByProduct,
     api_changePassword,
     api_addReview,
+    api_editReview,
     api_updateView,
     api_addToCart,
     api_getCarts,

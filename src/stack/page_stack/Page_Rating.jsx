@@ -247,13 +247,13 @@ const Page_Rating = (props) => {
 
             </ScrollView>
 
-            <View style={Style_Rating.container_bottom}>
+            {/* <View style={Style_Rating.container_bottom}>
               <TouchableOpacity
                 style={Style_Rating.btn_Rating}
                 onPress={handleRatingPress}>
                 <Text style={Style_Rating.text_btnRating}>Đánh giá</Text>
               </TouchableOpacity>
-            </View>
+            </View> */}
           </View>
         )
       }
