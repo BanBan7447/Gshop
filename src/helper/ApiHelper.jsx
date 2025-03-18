@@ -461,24 +461,13 @@ const api_getDetailPayment = async (id_payment) => {
 }
 
 // API update Image người dùng
-const api_uploadAvatar = async (userId, imageUri) => {
-    try {
-        const formData = new FormData();
-        formData.append("image", {
-            uri: imageUri,
-            name: `avatar_${userId}.${imageUri.split(".").pop()}`,
-            type: "image/jpeg",
-        });
+const api_uploadAvatar = async (id_user, imageUri) => {
+    console.log('user: ', id_user);
+    console.log('image: ', imageUri);
 
-        const axiosInstance = AxiosInstance();
-        const response = await axiosInstance.post(`/users/create-avatar/${userId}`, formData);
-
-        return response.data;
-    } catch (error) {
-        console.error("Lỗi upload avatar:", error);
-        return { status: false, message: error.message };
-    }
+    
 };
+
 
 
 export {
