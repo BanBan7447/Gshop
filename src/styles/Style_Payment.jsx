@@ -141,7 +141,8 @@ const Style_Payment = StyleSheet.create({
     item_payment: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginTop: 8
     },
 
     text_name_paymentMethod: {
