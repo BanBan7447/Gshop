@@ -102,15 +102,15 @@ const Page_Detail = (props) => {
             // }
 
             const response = await api_addToCart(users._id, product._id, 1);
-            
-            if(response){
+
+            if (response) {
                 // Lấy giỏ hàng mới từ API sau khi thêm sản phẩm
                 let updateCart = await api_getCarts(users._id);
 
                 // Kiểm tra xem sản phẩm mới đã có trong giỏ hàng chưa
-                updateCart.items = updateCart.items.map(item => 
+                updateCart.items = updateCart.items.map(item =>
                     item.id_product._id === product._id
-                        ? {...item, selected: true} // Đánh dấu sản phẩm này là "được chọn"
+                        ? { ...item, selected: true } // Đánh dấu sản phẩm này là "được chọn"
                         : item
                 );
 
@@ -118,7 +118,7 @@ const Page_Detail = (props) => {
                 const newTotalPrice = updateCart.items
                     .filter(item => item.selected)
                     .reduce((sum, item) => sum + item.quantity * item.id_product.price, 0);
-                
+
                 // Cập nhật giỏ hàng trong context
                 setCart({
                     ...updateCart,

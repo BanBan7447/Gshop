@@ -1,4 +1,6 @@
+import { Platform } from "react-native";
 import AxiosInstance from "./AxiosInstance";
+import { launchImageLibrary } from "react-native-image-picker";
 
 // Gọi API đăng nhập
 const api_login = async (data) => {
@@ -243,6 +245,67 @@ const api_addReview = async (star, content, id_user, id_product) => {
         }
     } catch (e) {
         console.log('❌ Lỗi khi thêm đánh giá:', e);
+    }
+}
+
+// Gọi API upload image rating
+const BASE_URL = "https://gshopbackend.onrender.com/rating";
+const api_uploadImage = async (id_rating, images) => {
+    try {
+        let formData = new FormData();
+
+        images.forEach((image, index) => {
+            formData.append("image", {
+                uri: Platform.OS === "ios" ? image.uri.replace("file://", "") : image.uri,
+                name: `image_${index}.jpg`,
+                type: "image/jpeg",
+            });
+        });
+
+        const response = await fetch(`${BASE_URL}/upload?id_rating=${id_rating}`, {
+            method: "POST",
+            // headers: {
+            //     "Content-Type": "multipart/form-data",
+            // },
+            body: formData,
+        });
+
+        console.log("📥 Response status:", response.status);
+        console.log("📥 Response headers:", response.headers);
+
+        if (!response.ok) {
+            throw new Error(`Lỗi HTTP: ${response.status}`);
+        }
+
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Phản hồi từ server không phải JSON");
+        }
+
+        const result = await response.json();
+        console.log("📥 Response JSON:", result);
+        return result;
+    } catch (error) {
+        console.error("Lỗi khi upload ảnh:", error);
+        return { status: false, message: error.message };
+    }
+}
+
+// Gọi API xóa 1 hoặc nhiều ảnh
+const api_deleteImage = async (id_rating, imaUrlsRemove) => {
+    try {
+        if (!id_rating || !Array.isArray(imaUrlsRemove) || imaUrlsRemove.length === 0) {
+            throw new Error("Dữ liệu đầu vào không hợp lệ");
+        }
+
+        const response = await AxiosInstance().delete("/rating/delete-image/", {
+            params: { id_rating },
+            data: { imaUrlsRemove },
+        });
+
+        return response.data;
+    } catch (e) {
+        console.log("Lỗi xóa ảnh", e);
     }
 }
 
@@ -502,6 +565,8 @@ export {
     api_getRateByProduct,
     api_changePassword,
     api_addReview,
+    api_uploadImage,
+    api_deleteImage,
     api_editReview,
     api_updateView,
     api_addToCart,

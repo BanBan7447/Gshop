@@ -97,6 +97,7 @@ const Page_Rating = (props) => {
 
     return (
       <View style={Style_Rating.container_customer}>
+
         <View style={Style_Rating.contain_name_date}>
           <Text style={Style_Rating.name_customer}>{userNames[item.id_user]}</Text>
           <Text>{item.date}</Text>
@@ -104,6 +105,22 @@ const Page_Rating = (props) => {
 
         {renderStars(item.star)}
         <Text style={Style_Rating.content_rating}>{item.content}</Text>
+
+        {
+          item.images && item.images.length > 0 && (
+            <FlatList
+              data={item.images}
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={3}
+              scrollEnabled={false}
+              renderItem={({ item }) => (
+                <Image
+                  source={{ uri: item }}
+                  style={Style_Rating.img_rating}
+                  resizeMode="cover" />
+              )} />
+          )
+        }
       </View>
     )
   }
@@ -205,11 +222,11 @@ const Page_Rating = (props) => {
 
               <Text style={Style_Rating.text_noRating}>Chưa có đánh giá nào</Text>
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={Style_Rating.btn_empty_Rating}
                 onPress={handleRatingPress}>
                 <Text style={Style_Rating.text_btnRating}>Hãy đánh giá sản phẩm</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
         ) : (
