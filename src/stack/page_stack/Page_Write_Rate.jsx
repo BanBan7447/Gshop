@@ -34,7 +34,7 @@ const Page_Write_Rate = (props) => {
   const pickImages = () => {
     const options = {
       mediaType: "photo",
-      selectionLimit: 10,
+      selectionLimit: 9,
       quality: 1
     };
 
@@ -50,127 +50,177 @@ const Page_Write_Rate = (props) => {
           type: item.type,
         }));
 
-        setImagesRating([...imagesRating, ...selectedImages]);
+        console.log("Ảnh được chọn:", selectedImages.map(img => img.name));
+
+        setImagesRating((prevImages) => {
+          // Loại bỏ ảnh trùng lặp, so sánh bằng name
+          const uniqueImages = [
+            ...prevImages,
+            ...selectedImages.filter(
+              (newImage) => !prevImages.some((img) => img.name === newImage.name)
+            ),
+          ];
+
+          // Log danh sách ảnh sau khi cập nhật
+          console.log("Danh sách ảnh sau khi cập nhật:", uniqueImages.map(img => img.uri));
+
+          // Cảnh báo khi số ảnh chọn vượt 9
+          if (uniqueImages.length > 9) {
+            Alert.alert("Thông báo", "Bạn chỉ được chọn tối đa 9 ảnh");
+            return prevImages;
+          };
+
+          return uniqueImages; // Cập nhật danh sách ảnh không trùng lặp
+        })
       }
     });
   };
 
   // Hàm up ảnh lên back end
-  const uploadImages = async () => {
-    // Lọc ra ảnh chưa upload, chỉ up ảnh mới
-    const newImages = imagesRating.filter(img => !uploadedImages.includes(img.uri));
+  // const uploadImages = async () => {
+  //   // Lọc ra ảnh chưa upload, chỉ up ảnh mới
+  //   const newImages = imagesRating.filter(img => !uploadedImages.includes(img.uri));
 
-    if (newImages.length === 0) {
-      Alert.alert('Vui lòng chọn ít nhất một ảnh để tải lên.');
-      return;
-    }
+  //   if (newImages.length === 0) {
+  //     Alert.alert('Vui lòng chọn ít nhất một ảnh để tải lên.');
+  //     return;
+  //   }
 
-    setLoading(true);
+  //   setLoading(true);
 
-    try {
-      const id_rating = userReview ? userReview._id : null;
-      if (!id_rating) {
-        Alert.alert('Không tìm thấy ID đánh giá.');
-        setLoading(false);
-        return;
-      }
+  //   try {
+  //     const id_rating = userReview ? userReview._id : null;
+  //     if (!id_rating) {
+  //       Alert.alert('Không tìm thấy ID đánh giá.');
+  //       setLoading(false);
+  //       return;
+  //     }
 
-      const result = await api_uploadImage(id_rating, newImages);
+  //     const result = await api_uploadImage(id_rating, newImages);
 
-      if (result.status) {
-        ToastAndroid.show("Upload thành công", ToastAndroid.SHORT);
-        // Cập nhật danh sách ảnh đã upload
-        setUploadedImages([...uploadedImages, ...newImages.map(img => img.uri)]);
-      } else {
-        Alert.alert(`Lỗi: ${result.message}`);
-      }
-    } catch (error) {
-      console.error('Lỗi khi upload ảnh:', error);
-      Alert.alert('Có lỗi xảy ra khi tải ảnh.');
-    }
+  //     if (result.status) {
+  //       ToastAndroid.show("Upload thành công", ToastAndroid.SHORT);
+  //       // Cập nhật danh sách ảnh đã upload
+  //       setUploadedImages([...uploadedImages, ...newImages.map(img => img.uri)]);
+  //     } else {
+  //       Alert.alert(`Lỗi: ${result.message}`);
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi khi upload ảnh:', error);
+  //     Alert.alert('Có lỗi xảy ra khi tải ảnh.');
+  //   }
 
-    setLoading(false);
-  };
+  //   setLoading(false);
+  // };
 
   const deleteImage = async (imageUri) => {
-    try {
-      setLoading(true);
+    setImagesRating((prevImages) => prevImages.filter(img => img.uri !== imageUri && img !== imageUri));
+  };
 
-      // Nếu ảnh chưa upload (ảnh local), chỉ cần xóa khỏi state
-      if (!imageUri.startsWith("http")) {
-        setImagesRating((prevImages) => prevImages.filter((img) => img !== imageUri));
-        setLoading(false);
-        return;
-      }
-
-      // Gọi hàm API helper để xóa ảnh trên server
-      const result = await api_deleteImage(userReview._id, [imageUri]);
-
-      if (result.status) {
-        // Cập nhật lại danh sách ảnh sau khi xóa thành công
-        setImagesRating(result.data.images);
-      } else {
-        Alert.alert("Lỗi", result.mess);
-      }
-    } catch (error) {
-      Alert.alert("Lỗi", "Không thể xóa ảnh. Vui lòng thử lại.");
-    } finally {
-      setLoading(false);
-    }
+  const deleteAllImages = () => {
+    setImagesRating([]);
   };
 
   // Hàm gửi đánh giá
+  // const addReview = async () => {
+  //   if (star === 0 || content.trim() === '') {
+  //     Alert.alert("Vui lòng chọn số sao và nhập nội dung đánh giá");
+  //     return;
+  //   };
+
+  //   setLoading(true);
+  //   try {
+  //     const response = await api_addReview(star, content, user._id, product._id);
+  //     console.log("Dữ liệu đánh giá trả về: ", response)
+
+  //     if (response) {
+  //       ToastAndroid.show("Cảm ơn bạn đã góp ý", ToastAndroid.SHORT);
+  //     } else {
+  //       ToastAndroid.show("Vui lòng thử lại sau", ToastAndroid.SHORT);
+  //     }
+  //   } catch (e) {
+  //     console.log("Lỗi khi đánh giá: ", e);
+  //     Alert.alert("Lỗi khi đánh giá");
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // };
+
+  // Hàm gửi đánh giá kèm ảnh
   const addReview = async () => {
     if (star === 0 || content.trim() === '') {
-      Alert.alert("Vui lòng chọn số sao và nhập nội dung đánh giá");
+      Alert.alert("Thông báo", "Vui lòng chọn số sao và nhập nội dung đánh giá");
       return;
     };
 
     setLoading(true);
     try {
+      // Gửi đánh giá
       const response = await api_addReview(star, content, user._id, product._id);
-      console.log("Dữ liệu đánh giá trả về: ", response)
+      console.log("Dữ liệu đánh giá trả về: ", response);
 
-      if (response) {
-        ToastAndroid.show("Cảm ơn bạn đã góp ý", ToastAndroid.SHORT);
-      } else {
-        ToastAndroid.show("Vui lòng thử lại sau", ToastAndroid.SHORT);
-      }
-    } catch (e) {
-      console.log("Lỗi khi đánh giá: ", e);
-      Alert.alert("Lỗi khi đánh giá");
-    } finally {
-      setLoading(false)
-    }
-  };
+      if (!response) {
+        Alert.alert("Vui lòng thử lại sau");
+        setLoading(false);
+        return;
+      };
 
-  // Hàm chỉnh sửa đánh giá
-  const editReview = async () => {
-    if (star === 0 || content.trim() === '') {
-      Alert.alert("Vui lòng chọn số sao và nhập nội dung đánh giá");
-      return;
-    };
+      ToastAndroid.show("Cảm ơn bạn đã góp ý", ToastAndroid.show);
+      navigation.navigate("Rating", { product });
 
-    try {
-      if (!userReview || !userReview._id) {
-        Alert.alert("Không tìm thấy đánh giá để chỉnh sửa");
+      // Upload ảnh
+      // Lấy ID đánh giá
+      const id_rating = response.data._id;
+      console.log("ID của đánh giá mới nhất: ", id_rating);
+      if (!id_rating) {
+        console.log("Không lấy được ID đánh giá, bỏ qua bước upload ảnh");
         return;
       }
 
-      const response = await api_editReview(userReview._id, star, content, user._id, product._id);
-      console.log("Dữ liệu phản hồi từ server cập nhật đánh giá: ", response);
-
-      if (response) {
-        ToastAndroid.show("Đánh giá đã được cập nhật", ToastAndroid.SHORT);
-        navigation.goBack(); // Quay lại trang trước
+      // Nếu có ảnh thì tiến hành upload
+      if (imagesRating.length > 0) {
+        console.log("Bắt đầu upload ảnh với ID đánh giá:", id_rating);
+        console.log("Danh sách ảnh cần upload:", imagesRating);
+        const uploadResponse = await api_uploadImage(id_rating, imagesRating);
+        console.log("Kết quả upload ảnh:", uploadResponse);
       } else {
-        ToastAndroid.show("Cập nhật đánh giá thất bại, vui lòng thử lại", ToastAndroid.SHORT);
+        console.log("Lỗi không upload ảnh được");
       }
     } catch (e) {
-      console.log("Lỗi khi đánh giá: ", e);
-      Alert.alert("Lỗi khi đánh giá");
+      console.log("Lỗi gửi đánh giá", e);
+      Alert.alert("Có lỗi xảy ra", "Vui lòng thử lại sau");
+    } finally {
+      setLoading(false);
     }
-  };
+  }
+
+  // Hàm chỉnh sửa đánh giá
+  // const editReview = async () => {
+  //   if (star === 0 || content.trim() === '') {
+  //     Alert.alert("Vui lòng chọn số sao và nhập nội dung đánh giá");
+  //     return;
+  //   };
+
+  //   try {
+  //     if (!userReview || !userReview._id) {
+  //       Alert.alert("Không tìm thấy đánh giá để chỉnh sửa");
+  //       return;
+  //     }
+
+  //     const response = await api_editReview(userReview._id, star, content, user._id, product._id);
+  //     console.log("Dữ liệu phản hồi từ server cập nhật đánh giá: ", response);
+
+  //     if (response) {
+  //       ToastAndroid.show("Đánh giá đã được cập nhật", ToastAndroid.SHORT);
+  //       navigation.goBack(); // Quay lại trang trước
+  //     } else {
+  //       ToastAndroid.show("Cập nhật đánh giá thất bại, vui lòng thử lại", ToastAndroid.SHORT);
+  //     }
+  //   } catch (e) {
+  //     console.log("Lỗi khi đánh giá: ", e);
+  //     Alert.alert("Lỗi khi đánh giá");
+  //   }
+  // };
 
   return (
     <ScrollView style={Style_Write_Rate.container}>
@@ -250,7 +300,6 @@ const Page_Write_Rate = (props) => {
             contentContainerStyle={{ marginVertical: 16 }}
             renderItem={({ item }) => {
               const imageUri = item.uri ? item.uri : item;
-              const isUploaded = imageUri.startsWith("http");
               console.log("Image URI: ", imageUri);
 
               return (
@@ -275,37 +324,19 @@ const Page_Write_Rate = (props) => {
 
       {
         imagesRating.length > 0 && (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={deleteAllImages}>
             <Text style={Style_Write_Rate.text_deleteAll}>Xóa tất cả ảnh</Text>
           </TouchableOpacity>
         )
       }
 
       <View style={Style_Write_Rate.container_bottom}>
-        {
-          userReview ? (
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <TouchableOpacity
-                onPress={uploadImages}
-                style={[Style_Write_Rate.btn_review, { backgroundColor: colors.Blue }]}>
-                <Text style={Style_Write_Rate.text_review}>Upload ảnh</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={editReview}
-                style={[Style_Write_Rate.btn_review, { backgroundColor: colors.Red }]}>
-                <Text style={Style_Write_Rate.text_review}>Chỉnh sửa</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <TouchableOpacity
-              onPress={addReview}
-              disabled={loading}
-              style={[Style_Write_Rate.btn_review, { backgroundColor: colors.Red }]}>
-              <Text style={Style_Write_Rate.text_review}>{loading ? 'Đang tải lên...' : 'Gửi đánh giá'}</Text>
-            </TouchableOpacity>
-          )
-        }
+        <TouchableOpacity
+          onPress={addReview}
+          disabled={loading}
+          style={[Style_Write_Rate.btn_review, { backgroundColor: colors.Red }]}>
+          <Text style={Style_Write_Rate.text_review}>{loading ? 'Đang tải lên...' : 'Gửi đánh giá'}</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   )

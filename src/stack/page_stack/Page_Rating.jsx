@@ -10,20 +10,14 @@ import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
 const Page_Rating = (props) => {
   const { navigation } = props;
   const route = useRoute();
-  const { totalRate, product, images } = route.params;
-  const [averageRate, setAverageRate] = useState(totalRate);
+  const { product } = route.params;
   const [userNames, setUserNames] = useState({});
-  const [modelDialog, setModelDialog] = useState(false);
-  const [star, setStar] = useState(0);
-  const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
   const { users, setUsers } = useContext(AppContext);
-
-  // Kiểm tra nếu images có dữ liệu hợp lệ thì lấy ảnh đầu tiên
-  const firstImage = images?.[0]?.image?.[1] || null;
-
-  const [reviews, setReviews] = useState(route.params.reviews);
-  const starText = ["Rất tệ", "Tệ", "Ổn", "Tốt", "Rất tốt"];
+  //const [reviews, setReviews] = useState(route.params.reviews);
+  const [ratings, setRatings] = useState([]);
+  const [totalRate, setTotalRate] = useState(0);
+  const [averageRate, setAverageRate] = useState(totalRate);
+  const [loading, setLoading] = useState(true);
 
   // Hàm lấy thông tin user theo ID
   const getUserName = async (userdId) => {
@@ -42,10 +36,10 @@ const Page_Rating = (props) => {
 
   // Gọi getUserName
   useEffect(() => {
-    reviews.forEach((review) => {
+    ratings.forEach((review) => {
       getUserName(review.id_user);
     });
-  }, [reviews]);
+  }, [ratings]);
 
   // Hàm hiển thị sao đánh giá
   const renderStars = (rating) => {
@@ -63,6 +57,27 @@ const Page_Rating = (props) => {
     }
     return <View style={{ flexDirection: 'row' }}>{stars}</View>
   }
+
+  // Hàm lấy dữ liệu đánh giá
+  const getRatings = async () => {
+    try {
+      const reviews = await api_getRateByProduct(product._id);
+      if (reviews && reviews.length > 0) {
+        const totalPoints = reviews.reduce((sum, review) => sum + review.star, 0);
+        const avarageRating = totalPoints / reviews.length;
+        setTotalRate(avarageRating.toFixed(1));
+        setRatings(reviews);
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getRatings();
+  }, []);
 
   // Hàm render đánh giá
   const renderRating = ({ item }) => {
@@ -85,7 +100,7 @@ const Page_Rating = (props) => {
               }
             </View>
 
-            <View style={{ marginTop: 8 }}>
+            <View style={{ marginTop: 24 }}>
               <View style={Style_Rating.body_1_skeleton} />
               <View style={Style_Rating.body_2_skeleton} />
             </View>
@@ -116,22 +131,13 @@ const Page_Rating = (props) => {
               renderItem={({ item }) => (
                 <Image
                   source={{ uri: item }}
-                  style={Style_Rating.img_rating}
+                  style={Style_Rating.img_rating_1}
                   resizeMode="cover" />
               )} />
           )
         }
       </View>
     )
-  }
-
-  // Hàm kiểm tra user đăng nhập chưa
-  const handleRatingPress = () => {
-    if (!users) {
-      navigation.navigate('Login')
-    } else {
-      setModelDialog(true)
-    }
   }
 
   // Hàm tính trung bình điểm đánh giá
@@ -146,64 +152,17 @@ const Page_Rating = (props) => {
 
   // Gọi calculateAverageRate khi danh sách thay đổi
   useEffect(() => {
-    setAverageRate(calculateAverageRate(reviews));
-  }, [reviews]);
-
-  // Hàm gửi đánh giá
-  const submitReview = async () => {
-    if (!content.trim()) {
-      Alert.alert('Lỗi đánh giá', 'Vui lòng nhập nội dung đánh giá');
-      return;
-    }
-
-    if (star === 0) {
-      Alert.alert('Lỗi đánh giá', 'Vui lòng chọn số sao');
-    }
-
-    setLoading(true);
-
-    // Gọi & truyền data vào api
-    try {
-      const response = await api_addReview(star, content, users._id, product._id);
-      setLoading(false);
-
-      console.log('📌 Kết quả trả về từ api_addReview:', response);
-
-      if (response.status === true) {
-        ToastAndroid.show('Thêm đánh giá thành công', ToastAndroid.SHORT);
-        setModelDialog(false);
-        setContent('');
-        setStar(5);
-
-        // Cập nhật danh sách reviews
-        const newReview = {
-          id_user: users._id,
-          date: new Date().toLocaleDateString("en-GB"),
-          star,
-          content
-        };
-
-        // setReviews((prevReviews) => [newReviews, ...prevReviews]); // Thêm đánh giá mới nhất vào đầu danh sách
-        const updatedReviews = [newReview, ...reviews];
-        setReviews(updatedReviews);
-        setAverageRate(calculateAverageRate(updatedReviews));
-
-      } else {
-        ToastAndroid.show('Thêm đánh giá thất bại', ToastAndroid.SHORT);
-        console.log('❗ API trả về không đúng mong đợi:', response);
-      }
-    } catch (e) {
-      setLoading(false);
-      ToastAndroid.show('Lỗi kết nối thử lại sau', ToastAndroid.SHORT);
-      console.error('❌ Lỗi khi gửi đánh giá:', error);
-    }
-
-  }
+    setAverageRate(calculateAverageRate(ratings));
+  }, [ratings]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.White }}>
       {
-        reviews.length === 0 ? (
+        loading ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size='large' color={colors.Red} />
+          </View>
+        ) : ratings.length === 0 ? (
           <View style={{ flex: 1, backgroundColor: colors.White }}>
             <TouchableOpacity
               style={Style_Rating.navigation}
@@ -221,12 +180,6 @@ const Page_Rating = (props) => {
                 style={{ width: 104, height: 100 }} />
 
               <Text style={Style_Rating.text_noRating}>Chưa có đánh giá nào</Text>
-
-              {/* <TouchableOpacity
-                style={Style_Rating.btn_empty_Rating}
-                onPress={handleRatingPress}>
-                <Text style={Style_Rating.text_btnRating}>Hãy đánh giá sản phẩm</Text>
-              </TouchableOpacity> */}
             </View>
           </View>
         ) : (
@@ -247,7 +200,7 @@ const Page_Rating = (props) => {
               </Text>
 
               <View style={Style_Rating.container_rating}>
-                <Text style={Style_Rating.text_rating}>{reviews.length} Đánh giá</Text>
+                <Text style={Style_Rating.text_rating}>{ratings.length} Đánh giá</Text>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Image
@@ -258,87 +211,13 @@ const Page_Rating = (props) => {
               </View>
 
               <FlatList
-                data={reviews}
+                data={ratings}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={renderRating} />
-
             </ScrollView>
-
-            {/* <View style={Style_Rating.container_bottom}>
-              <TouchableOpacity
-                style={Style_Rating.btn_Rating}
-                onPress={handleRatingPress}>
-                <Text style={Style_Rating.text_btnRating}>Đánh giá</Text>
-              </TouchableOpacity>
-            </View> */}
           </View>
         )
       }
-
-      <Modal visible={modelDialog} transparent animationType='slide'>
-        <View style={Style_Rating.container_model}>
-          <View style={Style_Rating.content_model}>
-            <Text style={Style_Rating.title_model}>Đánh giá sản phẩm</Text>
-
-            {
-              firstImage && (
-                <Image
-                  source={{ uri: firstImage }}
-                  style={Style_Rating.img_model} />
-              )
-            }
-
-            <Text style={Style_Rating.name_model}>{product.name}</Text>
-
-            <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-              {
-                [1, 2, 3, 4, 5].map((num) => (
-                  <View key={num} style={{ alignItems: "center", marginHorizontal: 5 }}>
-                    <TouchableOpacity onPress={() => setStar(num)}>
-                      <Image
-                        source={
-                          num <= star
-                            ? require('../../assets/icon/icon_star.png')
-                            : require('../../assets/icon/icon_star_black.jpg')
-                        }
-                        style={Style_Rating.star_model} />
-                    </TouchableOpacity>
-
-                    <Text style={Style_Rating.star_text}>
-                      {starText[num - 1]}
-                    </Text>
-                  </View>
-                ))
-              }
-            </View>
-
-            <Text style={Style_Rating.label_text_input}>Mời bạn chia sẻ</Text>
-            <TextInput
-              style={Style_Rating.text_input}
-              multiline
-              value={content}
-              onChangeText={setContent} />
-
-            <View style={Style_Rating.contaner_btn}>
-              <TouchableOpacity
-                style={Style_Rating.btn_submit}
-                onPress={(submitReview)}
-                disabled={loading}>
-                <Text style={Style_Rating.text_submit_cancel}>
-                  {loading ? 'Đang gửi...' : 'Gửi đánh giá'}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={Style_Rating.btn_cancel}
-                onPress={() => setModelDialog(false)}>
-                <Text style={Style_Rating.text_submit_cancel}>Hủy</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
     </View>
   )
 }

@@ -178,11 +178,18 @@ const Page_Detail_Order = (props) => {
                             <View style={{ alignItems: 'flex-end' }}>
                                 {
                                     isUserRated ? (
-                                        <TouchableOpacity onPress={() =>
-                                            navigation.navigate('WriteRate',
-                                                { product, user, productImage, userReview })}>
+                                        // <TouchableOpacity onPress={() =>
+                                        //     navigation.navigate('WriteRate',
+                                        //         { product, user, productImage, userReview })}>
+                                        //     <Text style={[Style_Detail_Order.textRating, { color: colors.Blue }]}>
+                                        //         Chỉnh sửa đánh giá
+                                        //     </Text>
+                                        // </TouchableOpacity>
+
+                                        <TouchableOpacity
+                                            onPress={() => navigation.navigate("Rating", {product})}>
                                             <Text style={[Style_Detail_Order.textRating, { color: colors.Blue }]}>
-                                                Chỉnh sửa đánh giá
+                                                Cảm ơn bạn đã góp ý
                                             </Text>
                                         </TouchableOpacity>
                                     ) : (

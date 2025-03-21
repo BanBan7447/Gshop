@@ -95,6 +95,15 @@ const Style_Rating = StyleSheet.create({
         borderRadius: 12
     },
 
+    img_rating_1: {
+        width: '30%',
+        aspectRatio: 1,
+        overflow: 'hidden',
+        borderRadius: 12,
+        marginRight: 6,
+        marginBottom: 6
+    },
+
     img_rating: {
         width: '100%',
         aspectRatio: 1,
