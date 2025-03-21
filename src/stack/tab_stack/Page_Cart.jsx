@@ -257,7 +257,7 @@ const Page_Cart = (props) => {
     }
 
     setLoadingTotal(false);
-  }
+  };
 
   // Hàm xóa sản phẩm
   const removeItem = async (_id) => {

@@ -26,7 +26,7 @@ const Page_Detail_Order = (props) => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [loading, setLoading] = useState(false);
     const [productImages, setProductImages] = useState({});
-    const [ratedProducts, setRatedProducts] = useState([])
+    const [ratedProducts, setRatedProducts] = useState([]);
 
     const [modelDialog, setModelDialog] = useState(false);
     const [star, setStar] = useState(0);
@@ -34,125 +34,47 @@ const Page_Detail_Order = (props) => {
     const starText = ["Rất tệ", "Tệ", "Ổn", "Tốt", "Rất tốt"];
     const [reviewedProducts, setReviewProducts] = useState([]);
 
-    // Hàm mở modal
-    // const openModalDialog = async (product) => {
-    //     setSelectedProduct(product);
-
-    //     try {
-    //         const storedReviews = await AsyncStorage.getItem('reviewsData');
-    //         if (storedReviews) {
-    //             const reviewsData = JSON.parse(storedReviews);
-    //             if (reviewsData[product._id]) {
-    //                 setStar(reviewsData[product._id].star);
-    //                 setContent(reviewsData[product._id].content);
-    //             } else {
-    //                 setStar(0);
-    //                 setContent('');
-    //             }
-    //         }
-    //     } catch (e) {
-    //         console.log("Lỗi khi lấy đánh giá cũ:", e);
-    //         setStar(0);
-    //         setContent('');
-    //     }
-
-    //     setModelDialog(true);
-    // }
-
-    // useEffect(() => {
-    //     const loadReviewedProducts = async () => {
-    //         try {
-    //             const storedReviews = await AsyncStorage.getItem("reviewedProducts");
-    //             if (storedReviews) {
-    //                 setReviewProducts(JSON.parse(storedReviews));
-    //             }
-    //         } catch (e) {
-    //             console.log("Lỗi khi tải đánh giá:", e);
-    //         }
-    //     };
-
-    //     loadReviewedProducts();
-    // }, [])
-
-    // // Hàm gửi đánh giá
-    // const submitReview = async (productId) => {
-    //     if (!content.trim()) {
-    //         Alert.alert('Lỗi đánh giá', 'Vui lòng nhập nội dung đánh giá');
-    //         return;
-    //     }
-
-    //     if (star === 0) {
-    //         Alert.alert('Lỗi đánh giá', 'Vui lòng chọn số sao');
-    //     }
-
-    //     setLoading(true);
-
-    //     // Gọi & truyền data vào api
-    //     try {
-    //         // const response = await api_addReview(star, content, user._id, selectedProduct._id);
-    //         // if (response.status === true) {
-    //         //     ToastAndroid.show("Cảm ơn bạn đã góp ý", ToastAndroid.SHORT);
-    //         //     setModelDialog(false);
-    //         //     setContent('');
-    //         //     setStar(0);
-
-    //         //     // Cập nhật danh sách đã đánh giá
-    //         //     const updatedReview = [...reviewedProducts, selectedProduct._id]
-    //         //     setReviewProducts(updatedReview);
-
-    //         //     // Lưu đánh giá cũ vào AsyncStorage
-    //         //     const storedReviews = await AsyncStorage.getItem('reviewsData');
-    //         //     let reviewsData = storedReviews ? JSON.parse(storedReviews) : {};
-    //         //     reviewsData[selectedProduct._id] = { star, content };
-    //         //     await AsyncStorage.setItem('reviewsData', JSON.stringify(reviewsData));
-
-    //         //     // await AsyncStorage.setItem('reviewedProducts', JSON.stringify(updatedReview))
-    //         // }
-
-    //         let response;
-    //         if (reviewedProducts.includes(selectedProduct._id)) {
-    //             // Nếu đã đánh giá trước đó, gọi API chỉnh sửa
-    //             response = await api_editReview(selectedProduct._id, star, content, user._id, selectedProduct._id);
-    //         } else {
-    //             // Nếu chưa có đánh giá, gọi API thêm mới
-    //             response = await api_addReview(star, content, user._id, selectedProduct._id);
-    //         }
-
-    //         if (response.status === true) {
-    //             ToastAndroid.show("Cập nhật đánh giá thành công", ToastAndroid.SHORT);
-    //             setModelDialog('');
-    //             setContent('');
-    //             setStar(0);
-
-    //             // Cập nhật danh sách đã đánh giá
-    //             const updatedReview = [...new Set([...reviewedProducts, selectedProduct._id])];
-    //             setReviewProducts(updatedReview);
-
-    //             // Lưu đánh giá cũ vào AsyncStorage
-    //             const storedReviews = await AsyncStorage.getItem('reviewsData');
-    //             let reviewsData = storedReviews ? JSON.parse(storedReviews) : {};
-    //             reviewsData[selectedProduct._id] = { star, content };
-    //             await AsyncStorage.setItem('reviewsData', JSON.stringify(reviewsData));
-    //         }
-    //     } catch (e) {
-    //         console.log(e);
-    //     } finally {
-    //         setLoading(false)
-    //     }
-    // }
+    const [userReviews, setUserReviews] = useState({});
 
     useEffect(() => {
         const getRatedProducts = async () => {
             try {
-                const ratedList = await Promise.all(
+                // const ratedList = await Promise.all(
+                //     products.map(async (product) => {
+                //         const ratings = await api_getRateByProduct(product._id);
+                //         const userReview = ratings.find(rating => rating.id_user === user._id);
+
+                //         // Log đánh giá của user hiện tại nếu có
+                //         if (userReview) {
+                //             console.log(`📝 Đánh giá của user ${user._id} cho sản phẩm ${product._id}:`, userReview);
+                //         }
+
+                //         // const userRated = ratings.some(rating => rating.id_user === user._id);
+                //         return userReview ? product._id : null;
+                //     })
+                // );
+
+                // // Lọc bỏ những giá trị null và cập nhật state
+                // setRatedProducts(ratedList.filter(id => id !== null));
+
+                const ratedList = [];
+                const reviews = {}; // Lưu đánh giá của user hiện tại
+
+                await Promise.all(
                     products.map(async (product) => {
                         const ratings = await api_getRateByProduct(product._id);
-                        return ratings.length > 0 ? product._id : null;
+
+                        // Lọc ra đánh giá của user hiện tại
+                        const userReview = ratings.find(rating => rating.id_user === user._id);
+                        if (userReview) {
+                            ratedList.push(product._id);
+                            reviews[product._id] = userReview; // Lưu đánh giá
+                        }
                     })
                 );
 
-                // Lọc bỏ những giá trị null và cập nhật state
-                setRatedProducts(ratedList.filter(id => id !== null));
+                setRatedProducts(ratedList);
+                setUserReviews(reviews); // Cập nhật state đánh giá của user
             } catch (e) {
                 console.log('Lỗi khi lấy danh sách đánh giá:', e);
             }
@@ -189,6 +111,7 @@ const Page_Detail_Order = (props) => {
             console.log("Lỗi khi lấy thông tin sản phẩm:", e);
         }
     }
+
     useEffect(() => {
         console.log("🔄 productImages đã cập nhật: ", productImages);
     }, [productImages]);
@@ -221,8 +144,9 @@ const Page_Detail_Order = (props) => {
                 ? productImage[0].image[1]
                 : 'https://via.placeholder.com/300';
 
-            // Kiểm tra xem sản phẩm đã được đánh giá chưa
-            const isRated = ratedProducts.includes(product._id);
+            // Kiểm tra xem user đã đánh giá chưa
+            const isUserRated = ratedProducts.includes(product._id);
+            const userReview = userReviews[product._id]; // Lấy đánh giá của user hiện tại
 
             console.log(`Render ảnh cho sản phẩm ${product._id}:`, imageUrl);
             return (
@@ -250,12 +174,18 @@ const Page_Detail_Order = (props) => {
                         order.status === "Đã giao" && (
                             <View style={{ alignItems: 'flex-end' }}>
                                 {
-                                    isRated ? (
-                                        <Text style={[Style_Detail_Order.textRating, { color: colors.Blue }]}>
-                                            Cảm ơn bạn đã góp ý
-                                        </Text>
+                                    isUserRated ? (
+                                        <TouchableOpacity onPress={() =>
+                                            navigation.navigate('WriteRate',
+                                                { product, user, productImage, userReview })}>
+                                            <Text style={[Style_Detail_Order.textRating, { color: colors.Blue }]}>
+                                                Chỉnh sửa đánh giá
+                                            </Text>
+                                        </TouchableOpacity>
                                     ) : (
-                                        <TouchableOpacity onPress={() => navigation.navigate('WriteRate')}>
+                                        <TouchableOpacity onPress={() =>
+                                            navigation.navigate('WriteRate',
+                                                { product, user, productImage })}>
                                             <Text style={[Style_Detail_Order.textRating, { color: colors.Red }]}>
                                                 Đánh giá
                                             </Text>
@@ -370,7 +300,9 @@ const Page_Detail_Order = (props) => {
                 <Text style={{ fontSize: 16, color: colors.Black, marginTop: 10 }}>{user.phone_number}</Text>
                 {renderAddress()}
             </View>
+
             {renderProductOrder()}
+
             <Text style={{ fontSize: 20, color: colors.Black, marginTop: 10 }}>Thanh toán</Text>
             {
                 paymentMethod ? (

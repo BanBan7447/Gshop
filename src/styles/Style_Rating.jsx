@@ -24,7 +24,7 @@ const Style_Rating = StyleSheet.create({
         fontSize: 20
     },
 
-    container_loading:{
+    container_loading: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -64,6 +64,7 @@ const Style_Rating = StyleSheet.create({
     },
 
     container_customer: {
+        flex: 1,
         gap: 8,
         marginBottom: 24
     },
@@ -84,6 +85,31 @@ const Style_Rating = StyleSheet.create({
         fontFamily: 'Inter Regular',
         color: colors.Black,
         fontSize: 14
+    },
+
+    container_image: {
+        position: 'relative',
+        margin: 6,
+        overflow: 'hidden',
+        width: '30%',
+        borderRadius: 12
+    },
+
+    img_rating: {
+        width: '100%',
+        aspectRatio: 1,
+    },
+
+    btn_delete: {
+        position: "absolute",
+        top: 5,
+        right: 5,
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        borderRadius: 12,
+        width: 24,
+        height: 24,
+        alignItems: "center",
+        justifyContent: "center",
     },
 
     container_empty: {
@@ -199,7 +225,7 @@ const Style_Rating = StyleSheet.create({
         marginBottom: 16
     },
 
-    contaner_btn:{
+    contaner_btn: {
         flexDirection: 'row',
         justifyContent: 'space-between'
     },
