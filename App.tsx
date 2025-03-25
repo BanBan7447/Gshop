@@ -10,15 +10,15 @@ import { ToastProvider } from 'react-native-toast-notifications'
 const App = () => {
   return (
     <ToastProvider>
-    <AppProvider>
-      <CartProvider>
-        <NavigationContainer>
-          <View style={style_app.container}>
-            <Stack_Navigation />
-          </View>
-        </NavigationContainer>
-      </CartProvider>
-    </AppProvider>
+      <AppProvider>
+        <CartProvider>
+          <NavigationContainer>
+            <View style={style_app.container}>
+              <Stack_Navigation />
+            </View>
+          </NavigationContainer>
+        </CartProvider>
+      </AppProvider>
     </ToastProvider>
   )
 }

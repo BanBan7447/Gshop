@@ -17,8 +17,14 @@ import Page_Detail_News from '../stack/page_stack/Page_Detail_News'
 import Page_Rating from '../stack/page_stack/Page_Rating'
 import Page_FQA from '../stack/page_stack/Page_FQA'
 import Page_Detail_Order from '../stack/page_stack/Page_Detail_Order'
+import Page_Add_Address from '../stack/page_stack/Page_Add_Address'
+import Page_Edit_Address from '../stack/page_stack/Page_Edit_Address'
+
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+
+
+
 const Stack = createNativeStackNavigator();
 
 const Stack_Navigation = () => {
@@ -40,6 +46,8 @@ const Stack_Navigation = () => {
       <Stack.Screen name='Payment' component={Page_Payment} />
       <Stack.Screen name='DetailOrder' component={Page_Detail_Order} />
       <Stack.Screen name='WriteRate' component={Page_Write_Rate} />
+      <Stack.Screen name='AddAddress' component={Page_Add_Address} />
+      <Stack.Screen name='EditAddress' component={Page_Edit_Address} />
     </Stack.Navigator>
   )
 }

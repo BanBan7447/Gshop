@@ -1,117 +1,86 @@
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ToastAndroid } from 'react-native';
 import React, { useContext, useState, useEffect } from 'react';
 import Style_Edit_Profile from '../../styles/Style_Edit_Profile';
 import { api_updateProfile, api_uploadAvatar } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 const Page_Edit_Profile = (props) => {
     const { navigation } = props
-    const { users, setUsers } = useContext(AppContext); // Thêm setUsers để cập nhật context
-    const { launchImageLibrary } = require('react-native-image-picker');
-
+    const { users, setUsers } = useContext(AppContext);
     const [name, setName] = useState(users?.name);
     const [email, setEmail] = useState(users?.email);
     const [phone_number, setPhone] = useState(users?.phone_number);
 
-    const [imageUri, setImageUri] = useState(null);
-
-    const [avatar, setAvatar] = useState(users.avatar);
+    const [avatar, setAvatar] = useState(users?.avatar);
     const [loading, setLoading] = useState(false);
 
-    // Truyền dữ liệu cập nhật thông tin
-    const handleUpdateProfile = async () => {
-        if (!email || !name || !phone_number) {
-            Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin!");
-            return;
-        }
-
-        try {
-            const response = await api_updateProfile(email, name, phone_number); // Truyền dữ liệu vào API
-
-            console.log('email: ', email)
-            console.log('name: ', name)
-            console.log('phone: ', phone_number)
-
-            if (response?.status === true) {
-                Alert.alert("Thành công", "Cập nhật thông tin thành công!");
-
-                // Cập nhật lại dữ liệu trong Context để các component khác nhận giá trị mới
-                setUsers((prev) => ({
-                    ...prev,
-                    name: name,
-                    email: email,
-                    phone_number: phone_number,
-                }));
-
-                navigation.goBack(); // Quay về màn trước
-            } else {
-                Alert.alert("Lỗi", "Cập nhật thất bại, vui lòng thử lại!");
-            }
-        } catch (error) {
-            console.log("Lỗi cập nhật thông tin:", error);
-            Alert.alert("Lỗi", "Đã có lỗi xảy ra!");
-        }
-    };
-
-    // Hàm xử lý upload avatar
-    // const handleChoosePhoto = () => {
-    //     launchImageLibrary({ mediaType: 'photo' }, async (response) => {
-    //         if (response.didCancel) return;
-    //         if (response.errorMessage) {
-    //             Alert.alert("Lỗi", "Không thể choinj ảnh!");
-    //             return;
-    //         }
-
-    //         const uri = response.assets[0].uri;
-    //         setImageUri(uri);
-
-    //         try {
-    //             // Gọi API upload avatar
-    //             const uploadResponse = await api_uploadAvatar(users._id, uri);
-    //             console.log("Upload Response:", uploadResponse); // In toàn bộ dữ liệu API trả về để debug
-
-    //             if (uploadResponse?.status) {
-    //                 const newAvatarUrl = uploadResponse.data.avatar;
-    //                 setAvatar(newAvatarUrl);
-    //                 setUsers((prev) => ({ ...prev, avatar: newAvatarUrl }));
-
-    //                 Alert.alert("Thành công", "Cập nhật ảnh đại diện thành công!");
-    //             } else {
-    //                 Alert.alert("Lỗi", "Cập nhật ảnh thất bại! " + (uploadResponse.message || ""));
-    //             }
-    //         } catch (error) {
-    //             console.error("Lỗi khi upload avatar:", error);
-    //             Alert.alert("Lỗi", "Không thể upload ảnh. Vui lòng thử lại!");
-    //         }
-    //     });
-    // };
-
-    const handleChoosePhoto = () => {
+    // Chọn ảnh từ thư viện
+    const pickAvatar = () => {
         const options = {
-            mediaType: 'photo',
+            mediaType: "photo",
+            maxWidth: 1024,
+            maxHeight: 1024,
             quality: 1,
         };
 
-        launchImageLibrary(options, async (response) => {
-            if (response.didCancel) return;
-            if (response.errorMessage) {
-                Alert.alert('Lỗi: ' + response.errorMessage);
-                return;
+    launchImageLibrary(options, (response) => {
+            if (response.didCancel) {
+                console.log("Người dùng đã hủy chọn ảnh");
+            } else if (response.errorMessage) {
+                console.log("Lỗi khi chọn ảnh: ", response.errorMessage);
+            } else {
+                const image = response.assets[0].uri;
+                setAvatar(image);
             }
-
-            if (response.assets && response.assets.length > 0) {
-                const imageUri = response.assets[0].uri;
-                setLoading(true);
-                const result = await api_uploadAvatar(users._id, imageUri);
-                if (result.status) {
-                    setAvatar(result.data.avatar);
-                } else {
-                    Alert('Upload thất bại: ' + result.message);
-                }
-                setLoading(false);
-            }
-        });
+        })
     };
+
+    // Cập nhật thông tin user
+    const updateProfile = async () => {
+        setLoading(true);
+
+        try {
+            // Gọi API cập nhật thông tin người dùng
+            const profileResponse = await api_updateProfile(email, name, phone_number);
+            console.log("Cập nhật thông tin: ", profileResponse);
+
+            if (profileResponse?.status !== true) {
+                throw new Error("Cập nhật thông tin thất bại");
+            };
+
+            let newAvatar = users.avatar;
+
+            // Nếu có ảnh thì upload ảnh
+            if (avatar && avatar !== users.avatar) {
+                const avatarResponse = await api_uploadAvatar(users._id, avatar);
+                console.log("Upload ảnh avatar: ", avatarResponse);
+
+                if (!avatarResponse?.status) {
+                    throw new Error("Tải ảnh thất bại");
+                };
+
+                newAvatar = avatarResponse.data.avatar;
+            };
+
+            // Cập nhật dữ liệu
+            setUsers((prev) => ({
+                ...prev,
+                name,
+                email,
+                phone_number,
+                avatar: newAvatar,
+            }));
+
+            ToastAndroid.show("Cập nhật thành công", ToastAndroid.SHORT);
+            navigation.goBack();
+        } catch (e) {
+            console.log("Lỗi:", e);
+            Alert.alert("Lỗi", e.message || "Đã có lỗi xảy ra!");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <View style={Style_Edit_Profile.container}>
@@ -122,19 +91,12 @@ const Page_Edit_Profile = (props) => {
                 <Text style={Style_Edit_Profile.headerTitle}>Chỉnh sửa thông tin</Text>
             </TouchableOpacity>
             <View style={Style_Edit_Profile.profileImageContainer}>
-                {/* <Image
-                        style={Style_Edit_Profile.profileImage}
-                        source={{ uri: 'https://bizweb.dktcdn.net/100/418/981/products/z5061600085948-565e771a2f075f0e1a7056fdd81ae20a.jpg?v=1704966316290' }} /> */}
-
-                <Image
-                    source={avatar ? { uri: avatar } : require('../../assets/icon/icon_deafult_profile.png')}
-                    style={Style_Edit_Profile.profileImage}
-                />
+                <Image source={avatar ? { uri: avatar } : require("../../assets/icon/icon_deafult_profile.png")}
+                    style={Style_Edit_Profile.profileImage} />
             </View>
             <TouchableOpacity
                 style={Style_Edit_Profile.updateButton}
-                onPress={handleChoosePhoto}
-            >
+                onPress={pickAvatar}>
                 <Image style={Style_Edit_Profile.uploadIcon} source={require('../../assets/icon/icon_upload_white.png')} />
                 <Text style={Style_Edit_Profile.updateButtonText}>Cập nhật ảnh đại diện</Text>
             </TouchableOpacity>
@@ -173,8 +135,9 @@ const Page_Edit_Profile = (props) => {
 
             <TouchableOpacity
                 style={Style_Edit_Profile.saveButton}
-                onPress={handleUpdateProfile}>
-                <Text style={Style_Edit_Profile.saveButtonText}>Lưu</Text>
+                onPress={updateProfile}
+                disabled={loading}>
+                <Text style={Style_Edit_Profile.saveButtonText}>Cập nhật</Text>
             </TouchableOpacity>
         </View>
     );
