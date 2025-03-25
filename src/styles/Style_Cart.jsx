@@ -117,11 +117,18 @@ const Style_Cart = StyleSheet.create({
         alignItems: 'center'
     },
 
-    text_quantity: {
-        fontFamily: 'Inter SemiBold',
+    text_quantity_input: {
+        fontFamily: 'Inter Bold',
+        height: 28,
+        textAlign: 'center',
+        borderWidth: 1,
+        borderColor: colors.Light_Grey,
+        borderRadius: 6,
+        fontSize: 14,
         color: colors.Black,
-        marginHorizontal: 16,
-        letterSpacing: 1
+        backgroundColor: colors.White,
+        paddingVertical: 2,
+        marginHorizontal: 8
     },
 
     btn_delete: {
