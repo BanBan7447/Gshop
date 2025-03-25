@@ -33,13 +33,14 @@ const Page_Profile = (props) => {
       </TouchableOpacity>
     )
   }
+
   return (
     <View style={Style_Profile.container}>
       {users ? (
         <View>
           <View style={Style_Profile.container_info}>
             <Image
-              source={{ uri: users?.avatar || 'https://i.pinimg.com/736x/fd/1f/34/fd1f347ffac0a91e0ecd38c306b1ce37.jpg' }}
+              source={{ uri: users.avatar}}
               style={Style_Profile.avatar}
             />
 

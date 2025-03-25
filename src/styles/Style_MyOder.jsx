@@ -7,7 +7,6 @@ const Style_MyOder = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.White,
-        backgroundColor: 'white',
         paddingHorizontal: 20,
         paddingTop: 20
     },
@@ -60,19 +59,14 @@ const Style_MyOder = StyleSheet.create({
     },
     orderTitle: {
         width: '50%',
-        fontSize: 20,
+        fontSize: 18,
         fontFamily: 'Inter Bold',
         color: colors.Black
     },
     orderDate: {
+        marginTop: 4,
         fontSize: 16,
         color: colors.Black,
-        fontSize: 18,
-        color: '#000000'
-    },
-    orderDate: {
-        fontSize: 12,
-        color: '#000000',
     },
     orderDetail: {
         fontSize: 16,
@@ -92,14 +86,8 @@ const Style_MyOder = StyleSheet.create({
     },
     detailButton: {
         position: 'absolute',
-        right: 16,
-        bottom: 20,
         backgroundColor: colors.Red,
-        paddingVertical: 8,
-        paddingHorizontal: 16,
         borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center'
     },
     detailButtonText: {
         color:  colors.White,
@@ -134,13 +122,13 @@ const Style_MyOder = StyleSheet.create({
         position: 'absolute',
         right: 16,
         bottom: 10,
-        backgroundColor: '#E43727',
+        backgroundColor: colors.Red,
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 10,
         width: 87,
         height: 44,
-        alignItems: 'center'
+        alignItems: 'center',
     },
     detailButtonText: {
         color: '#FFFFFF',

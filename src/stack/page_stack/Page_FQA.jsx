@@ -8,24 +8,27 @@ const Page_FQA = (props) => {
 
     const faqItems = [
         {
-            question: 'Gunpla có những loại nào ?',
+            question: 'Gundam là gì?',
             answer: [
-                'HG - High Grade: Dễ lắp ráp, dành cho người mới.',
-                'MG - Master Grade: Chi tiết hơn, có khung xương.',
-                'RG - Real Grade: Nhỏ gọn nhưng chi tiết cao.',
-                'PG - Perfect Grade: Lớn, chi tiết nhiều, giá cao.'
+                'Gundam là một thương hiệu nhượng quyền nổi tiếng của Nhật Bản, xoay quanh các loạt phim hoạt hình, mô hình và truyện tranh về những cỗ máy chiến đấu khổng lồ (mecha) gọi là Mobile Suit',
+                'Được tạo ra bởi Sunrise và đạo diễn Yoshiyuki Tomino, bắt đầu với bộ anime Mobile Suit Gundam (1979).',
+                'Đây là một trong những thương hiệu mecha có ảnh hưởng nhất mọi thời đại.'
             ]
         },
         {
             question: 'Sự khác biệt giữa Gundam & Gunpla ?',
             answer: [
                 'Gundam là tên của series, còn Gunpla là mô hình lắp ráp.',
+        
             ]
         },
         {
             question: 'Gunpla có những loại nào?',
             answer: [
-                'Có nhiều loại như HG, MG, RG, PG...',
+                'HG - High Grade: Dễ lắp ráp, dành cho người mới.',
+                'MG - Master Grade: Chi tiết hơn, có khung xương.',
+                'RG - Real Grade: Nhỏ gọn nhưng chi tiết cao.',
+                'PG - Perfect Grade: Lớn, chi tiết nhiều, giá cao.',
             ]
         },
         {
@@ -40,12 +43,20 @@ const Page_FQA = (props) => {
             question: 'Làm sao để chọn bộ Gunpla phù hợp \ncho người mới ?',
             answer: [
                 'Nên chọn HG hoặc RG có độ khó thấp.',
+                'Muốn thử mẫu nhỏ gọn, nhanh lắp? → SD Gundam.',
+                'Tránh MG, PG và mẫu có quá nhiều chi tiết rườm rà.',
+                'Chuẩn bị dụng cụ cơ bản để dễ lắp hơn.'
             ]
         },
         {
             question: 'Bảo quản Gunpla thế nào để tránh \nhỏng ?',
             answer: [
                 'Tránh ánh nắng trực tiếp, bụi bẩn, và va đập mạnh.',
+                'Sử dụng tủ kính hoặc hộp mica',
+                'Vệ sinh thường xuyên',
+                'Nếu dán decal, nên phủ Top Coat (sơn bảo vệ) để tránh bong tróc.',
+                'Tránh nhiệt độ cao & độ ẩm để ngăn ố vàng.',
+                'Không tạo dáng quá căng, tránh làm lỏng hoặc gãy khớp.'
             ]
         }
     ];
