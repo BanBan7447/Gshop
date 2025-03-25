@@ -21,7 +21,7 @@ const Style_FQA = StyleSheet.create({
         fontSize: 18,
         marginLeft: 10,
         textAlignVertical: 'center',
-        color: '#282828',
+        color: colors.Black,
     },
     backButton: {
         marginRight: 16,
@@ -51,6 +51,8 @@ const Style_FQA = StyleSheet.create({
     answerText: {
         fontSize: 15,
         color: '#282828',
+        lineHeight: 20,
+        textAlign: "justify",
 
     }
 });

@@ -97,6 +97,8 @@ const Page_MyOder = (props) => {
                 return colors.Orange; // Màu vàng cam
             case 'Đã giao':
                 return colors.Green; // Màu xanh lá
+            case 'Đang giao hàng':
+                return colors.Red; // Màu đỏ
             default:
                 return colors.Grey; // Màu mặc định nếu không xác định
         }
@@ -117,17 +119,22 @@ const Page_MyOder = (props) => {
                 </Text>
                 <Text style={Style_MyOder.orderDate}>{item.date}</Text>
             </View>
-            <Text style={Style_MyOder.orderDetail}>
-                Tổng tiền: <Text style={Style_MyOder.boldText}>{item.total_price.toLocaleString('vi-VN')}đ</Text>
-            </Text>
-            <Text style={[Style_MyOder.orderStatus, { color: getStatusColor(item.status) }]}>
-                {item.status}
-            </Text>
-            <View style={Style_MyOder.detailButton}>
-                <Text style={Style_MyOder.detailButtonText}>Chi tiết</Text>
+            <View>
+                <Text style={Style_MyOder.orderDetail}>
+                    Tổng tiền: <Text style={Style_MyOder.boldText}>{item.total_price.toLocaleString('vi-VN')}đ</Text>
+                </Text>
+                <Text style={[Style_MyOder.orderStatus, { color: getStatusColor(item.status) }]}>
+                    {item.status}
+                </Text>
+                <View style={{marginRight: -18}}> 
+                    <TouchableOpacity style={[Style_MyOder.detailButton]}>
+                        <Text style={Style_MyOder.detailButtonText}>Chi tiết</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </TouchableOpacity>
     );
+
 
     if (loading) {
         return (

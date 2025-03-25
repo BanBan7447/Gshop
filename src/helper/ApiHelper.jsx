@@ -46,7 +46,20 @@ const api_signUp = async (data) => {
         console.log(e);
         return false
     }
-}
+};
+
+// Gọi API đổi mật khẩu
+const api_changePassword = async (data) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> Gọi API đổi mật khẩu');
+        const response = await AxiosInstance().put('/user/changPass', data);
+        return response.data;
+        
+    } catch (error) {
+        console.error('Lỗi đổi mật khẩu:', error);
+        return null;
+    }
+};
 
 // Gọi API lấy thông tin chi tiết của user
 const api_getDetailUser = async (_id) => {
@@ -208,27 +221,6 @@ const api_getRateByProduct = async (id_product) => {
     }
 }
 
-// Gọi API đổi mật khẩu
-const api_changePassword = async (userId, newPassword, confirmPassword) => {
-    try {
-        const response = await AxiosInstance().put('/user/changPass', {
-            userId,
-            newPassword,
-            confirmPassword,
-        });
-
-        if (response.status === 200) {
-            console.log('Đổi mật khẩu thành công:', response.data);
-            return response.data;
-        } else {
-            console.error('Lỗi khi đổi mật khẩu:', response.data);
-            throw new Error(response.data.message || 'Có lỗi xảy ra');
-        }
-    } catch (error) {
-        console.error('Lỗi khi gọi API:', error);
-        throw error;
-    }
-};
 
 // Gọi API thêm đánh giá
 const api_addReview = async (star, content, id_user, id_product) => {
@@ -539,15 +531,140 @@ const api_getDetailPayment = async (id_payment) => {
 }
 
 // API update Image người dùng
+const BASE_URL_2 = "https://gshopbackend.onrender.com/user";
 const api_uploadAvatar = async (id_user, imageUri) => {
-    console.log('user: ', id_user);
-    console.log('image: ', imageUri);
+    try {
+        console.log('user: ', id_user);
+        console.log('image: ', imageUri);
+        let formData = new FormData();
+
+        formData.append("image", {
+            uri: Platform.OS === "ios" ? imageUri.replace("file://", "") : imageUri,
+            name: `avatar_${id_user}.jpg`,
+            type: "image/jpeg",
+        });
+
+        const response = await fetch(`${BASE_URL_2}/create-avatar/${id_user}`, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Lỗi HTTP: ${response.status}`);
+        }
+
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Phản hồi từ server không phải JSON");
+        }
+
+        const result = await response.json();
+        console.log("Dữ liệu ảnh avatar trả về:", result);
+        return result;
+    } catch (error) {
+        console.error("Lỗi khi upload ảnh avatar:", error);
+        return { status: false, message: error.message };
+    }
 };
 
+
+// Lấy danh sách địa chỉ theo id_user
+const api_getAddressList = async (id_user) => {
+    try {
+        const response = await AxiosInstance().get(`address/list/${id_user}`);
+        console.log("API response:", response.data); // Kiểm tra dữ liệu trả về từ API
+
+        // Kiểm tra nếu response trả về trực tiếp là một mảng
+        if (Array.isArray(response.data)) {
+            return response.data;
+        } 
+        
+        // Nếu response.data.data là một mảng, trả về nó
+        if (response.data.status === true && Array.isArray(response.data.data)) {
+            return response.data.data;
+        } 
+        
+        console.error("Lỗi: API không trả về danh sách hợp lệ!", response.data);
+        return [];
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách địa chỉ:", error);
+        return [];
+    }
+};
+
+// API thêm địa chỉ
+const api_addAddress = async (detail, commune, district, province, id_user) => {
+    try {
+        const response = await AxiosInstance().post('address/create', {
+            detail,
+            commune,
+            district,
+            province,
+            id_user
+        });
+
+        console.log("API response:", response);
+        
+        // Kiểm tra nếu API trả về status thành công
+        if (response.status === true) {
+            return response.data;
+        }
+
+        console.error("Lỗi: Không thể thêm địa chỉ!", response);
+        return null;
+    } catch (error) {
+        console.error("Lỗi khi thêm địa chỉ:", error);
+        return null;
+    }
+};
+
+// API cập nhật địa chỉ
+ const api_updateAddress = async (id, detail, commune, district, province, id_user) => {
+    try {
+        const response = await AxiosInstance().put(`address/update/${id}`, {
+            detail,
+            commune,
+            district,
+            province,
+            id_user
+        });
+
+        console.log("API response:", response);
+
+        // Kiểm tra nếu API trả về status thành công
+        if (response.status === true) {
+            return response.data;
+        }
+
+        console.error("Lỗi: Không thể cập nhật địa chỉ!", response);
+        return null;
+    } catch (error) {
+        console.error("Lỗi khi cập nhật địa chỉ:", error);
+        return null;
+    }
+};
+// API xóa địa chỉ
+const api_deleteAddress = async (id) => {
+    try {
+        const response = await AxiosInstance().delete(`address/delete/${id}`);
+        console.log("API response:", response);
+
+        if (response.status === true) {
+            return true;
+        }
+
+        console.error("Lỗi: Không thể xóa địa chỉ!", response);
+        return false;
+    } catch (error) {
+        console.error("Lỗi khi xóa địa chỉ:", error);
+        return false;
+    }
+};
 
 export {
     api_login,
     api_signUp,
+    api_changePassword,
     api_getDetailUser,
     api_updateProfile,
     api_getCategories,
@@ -558,7 +675,6 @@ export {
     api_getNews,
     api_getDetailNews,
     api_getRateByProduct,
-    api_changePassword,
     api_addReview,
     api_uploadImage,
     api_deleteImage,
@@ -577,4 +693,8 @@ export {
     api_getDetailOrder,
     api_getDetailPayment,
     api_uploadAvatar,
+    api_getAddressList,
+    api_updateAddress,
+    api_addAddress,
+    api_deleteAddress, 
 }

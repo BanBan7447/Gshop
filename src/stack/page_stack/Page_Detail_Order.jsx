@@ -159,14 +159,14 @@ const Page_Detail_Order = (props) => {
                             }}
                             style={{ width: 100, height: 100, borderRadius: 20 }}
                             resizeMode={FastImage.resizeMode.cover} />
-                        <View style={{ justifyContent: 'space-between', marginLeft: 10 }}>
-                            <Text
+                        <View style={{ justifyContent: 'center', marginLeft: 10, marginTop: -10}}>
+                            <Text  
                                 style={{ fontSize: 16, fontFamily: 'Inter Bold', marginTop: 10, maxWidth: 200 }}
                                 numberOfLines={2}>
                                 {product.name}
                             </Text>
                             <Text style={{ fontSize: 18, color: colors.Red }}>
-                                {Number(product.unit_price).toLocaleString("vi-VN")}
+                                {Number(product.unit_price).toLocaleString("vi-VN")}đ
                             </Text>
 
                             <Text style={{ fontSize: 16 }}>x{product.order_quantity}</Text>
