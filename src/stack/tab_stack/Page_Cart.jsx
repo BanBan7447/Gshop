@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid, ActivityIndicator, KeyboardAvoidingView } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid, ActivityIndicator, KeyboardAvoidingView, TextInput } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 
 import Style_Cart from '../../styles/Style_Cart'
@@ -186,11 +186,18 @@ const Page_Cart = (props) => {
       );
 
       // Danh sách sản phẩm đã chọn
+      const selectedItems = newItems
+        .filter(item => item.selected)
+        .map(item => item._id);
+      const isAllSelected = newItems.every(item => item.selected);
+
+      // Tính tổng tiền chỉ với sản phẩm đã chọn
       const newTotalPrice = newItems
         .filter(item => item.selected)
         .reduce((sum, item) => sum + item.quantity * item.id_product.price, 0);
 
       setSelectedItems(selectedItems);
+      setIsCheckedAll(isAllSelected);
 
       return {
         ...prevCart,
@@ -198,6 +205,11 @@ const Page_Cart = (props) => {
         totalPrice: newTotalPrice
       };
     });
+
+    // Nếu sản phẩm chưa được chọn trước đó, gọi API cập nhật selected
+    if (!findProduct.selected) {
+      await api_updateSelected(cart.id_user, findProduct.id_product._id, true);
+    }
 
     setLoadingTotal(false);
   };
@@ -236,6 +248,7 @@ const Page_Cart = (props) => {
       const selectedItems = newItems
         .filter(item => item.selected)
         .map(item => item._id);
+      const isAllSelected = newItems.every(item => item.selected);
 
       // Tính tổng tiền chỉ với sản phẩm đã chọn
       const newTotalPrice = newItems
@@ -243,6 +256,7 @@ const Page_Cart = (props) => {
         .reduce((sum, item) => sum + item.quantity * item.id_product.price, 0);
 
       setSelectedItems(selectedItems);
+      setIsCheckedAll(isAllSelected);
 
       return {
         ...prevCart,
@@ -331,6 +345,53 @@ const Page_Cart = (props) => {
     const ImageData = productImages?.[item.id_product?._id]?.[0]?.image?.[1];
     const loadingImage = !ImageData;
 
+    const inputChangeQuantity = async (text) => {
+      const findProduct = cart.items.find(cartItem => cartItem._id === item._id);
+      if (!findProduct) return;
+
+      let inputQuantity = parseInt(text) || 1;
+      if (inputQuantity < 1) inputQuantity = 1;
+      if (inputQuantity > findProduct.id_product.quantity) {
+        inputQuantity = findProduct.id_product.quantity;
+        ToastAndroid.show("Sản phẩm đã hết hàng", ToastAndroid.SHORT);
+      }
+
+      setLoadingTotal(true);
+
+      await api_updateQuantity(cart.id_user, item.id_product._id, inputQuantity);
+
+      setCart(prevCart => {
+        const newItems = prevCart.items.map(cartItems =>
+          cartItems._id === item._id ? { ...cartItems, quantity: inputQuantity, selected: true } : cartItems
+        );
+
+        const selectedItems = newItems
+          .filter(cartItem => cartItem.selected)
+          .map(cartItem => cartItem._id);
+        const isAllSelected = newItems.every(cartItem => cartItem.selected);
+
+        const newTotalPrice = newItems
+          .filter(cartItem => cartItem.selected)
+          .reduce((sum, item) => sum + item.quantity * item.id_product.price, 0);
+
+        setSelectedItems(selectedItems);
+        setIsCheckedAll(isAllSelected)
+
+        return {
+          ...prevCart,
+          items: newItems,
+          totalPrice: newTotalPrice
+        }
+      });
+
+      // Nếu sản phẩm chưa được chọn trước đó, gọi API cập nhật selected
+      if(!findProduct.selected){
+        await api_updateSelected(cart.id_user, findProduct.id_product._id, true)
+      }
+
+      setLoadingTotal(false);
+    }
+
     return (
       <View style={Style_Cart.container_product}>
         <TouchableOpacity
@@ -374,7 +435,13 @@ const Page_Cart = (props) => {
                 style={Style_Cart.icon_quantity} />
             </TouchableOpacity>
 
-            <Text style={Style_Cart.text_quantity}>{item.quantity}</Text>
+            <TextInput
+              style={Style_Cart.text_quantity_input}
+              keyboardType='numeric'
+              value={String(item.quantity)}
+              onChangeText={inputChangeQuantity} />
+
+            {/* <Text style={Style_Cart.text_quantity}>{item.quantity}</Text> */}
 
             <TouchableOpacity
               style={Style_Cart.btn_quantity}

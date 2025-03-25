@@ -270,9 +270,6 @@ const api_uploadImage = async (id_rating, images) => {
             body: formData,
         });
 
-        console.log("📥 Response status:", response.status);
-        console.log("📥 Response headers:", response.headers);
-
         if (!response.ok) {
             throw new Error(`Lỗi HTTP: ${response.status}`);
         }
@@ -283,10 +280,10 @@ const api_uploadImage = async (id_rating, images) => {
         }
 
         const result = await response.json();
-        console.log("📥 Response JSON:", result);
+        console.log("Dữ liệu ảnh đánh giá trả về:", result);
         return result;
     } catch (error) {
-        console.error("Lỗi khi upload ảnh:", error);
+        console.error("Lỗi khi upload ảnh đánh giá:", error);
         return { status: false, message: error.message };
     }
 }
@@ -545,8 +542,6 @@ const api_getDetailPayment = async (id_payment) => {
 const api_uploadAvatar = async (id_user, imageUri) => {
     console.log('user: ', id_user);
     console.log('image: ', imageUri);
-
-    
 };
 
 
