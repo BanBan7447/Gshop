@@ -95,7 +95,13 @@ const Style_Cart = StyleSheet.create({
         fontFamily: 'Inter SemiBold',
         fontSize: 18,
         color: colors.Red,
-        marginBottom: 10
+        marginBottom: 8
+    },
+
+    text_status: {
+        fontFamily: 'Inter Medium',
+        fontSize: 16,
+        color: colors.Red
     },
 
     container_quantity: {

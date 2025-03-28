@@ -47,6 +47,8 @@ const Page_MyOder = (props) => {
                 const response = await api_getOrders(users._id);
                 if (response.status) {
                     const newOrders = response.data;
+                    console.log("Danh sách đơn hàng trước khi sắp xếp: ", response.data);
+                    newOrders.sort((a, b) => new Date(b.date.split('/').reverse().json('-')) - new Date(a.date.split('/').reverse().json('-')));
 
                     // Kiểm tra xem đơn hàng nào thay đổi để thông báo
                     newOrders.forEach((newOrder) => {
@@ -103,10 +105,15 @@ const Page_MyOder = (props) => {
                 return colors.Grey; // Màu mặc định nếu không xác định
         }
     };
+
     // Lọc đơn hàng theo trạng thái được chọn
     const filteredOrders = selectedStatus === 'Tất cả'
         ? orders
         : orders.filter(orders => orders.status === selectedStatus);
+    filteredOrders.sort((a, b) => new Date(b.date.split('/').reverse().join('-')) - new Date(a.date.split('/').reverse().join('-')));
+
+    console.log("Danh sách đơn hàng trước sau khi sắp xếp: ", filteredOrders);
+    orders.forEach(order => console.log(order.date, new Date(order.date)));
 
 
     const renderItem = ({ item }) => (
@@ -126,7 +133,7 @@ const Page_MyOder = (props) => {
                 <Text style={[Style_MyOder.orderStatus, { color: getStatusColor(item.status) }]}>
                     {item.status}
                 </Text>
-                <View style={{marginRight: -18}}> 
+                <View style={{ marginRight: -18 }}>
                     <TouchableOpacity style={[Style_MyOder.detailButton]}>
                         <Text style={Style_MyOder.detailButtonText}>Chi tiết</Text>
                     </TouchableOpacity>

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid, ActivityIndicator, KeyboardAvoidingView, TextInput } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid, ActivityIndicator, KeyboardAvoidingView, TextInput, Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 
 import Style_Cart from '../../styles/Style_Cart'
@@ -48,8 +48,18 @@ const Page_Cart = (props) => {
       // Xử lý danh sách sản phẩm để thuộc tính `selected` được giữ nguyên
       const newItems = cartData.items.map(item => ({
         ...item,
-        selected: item.selected ?? false,
+        selected: item.status === 'Còn hàng' ? item.selected ?? false : false
       }));
+
+      // Lọc ra những sản phẩm bị bỏ chọn so với dữ liệu API
+      const itemsToUpdate = newItems.filter(
+        item => item.selected === false && cartData.items.some(i => i._id === item._id && i.selected)
+      );
+
+      // Nếu có sản phẩm bị bỏ chọn, gọi API cập nhật trạng thái selected
+      itemsToUpdate.forEach(async item => {
+        await api_updateSelected(users._id, item.id_product._id, false);
+      });
 
       // Cập nhật danh sách sản phẩm đã chọn
       const selectedItems = newItems.filter(item => item.selected).map(item => item._id);
@@ -58,7 +68,10 @@ const Page_Cart = (props) => {
       const newCart = {
         id_user: users._id,
         items: cartData.items || [],
-        totalPrice: cartData.totalPrice || 0,
+        // totalPrice: cartData.totalPrice || 0,
+        totalPrice: newItems
+          .filter(item => item.selected) // Chỉ tính sản phẩm được mua
+          .reduce((sum, item) => sum + item.quantity * item.id_product.price, 0)
       };
 
       setCart(newCart)
@@ -226,7 +239,8 @@ const Page_Cart = (props) => {
 
     // Kiểm tra số lượng
     if (newQuantity > findProduct.id_product.quantity) {
-      ToastAndroid.show('Sản phẩm đã hết hàng', ToastAndroid.SHORT);
+      //ToastAndroid.show('Đã đạt đến giới hạn', ToastAndroid.SHORT);
+      Alert.alert("Rất tiếc", "Bạn đã đạt đến giới hạn tồn kho của sản phẩm");
       return;
     }
 
@@ -385,7 +399,7 @@ const Page_Cart = (props) => {
       });
 
       // Nếu sản phẩm chưa được chọn trước đó, gọi API cập nhật selected
-      if(!findProduct.selected){
+      if (!findProduct.selected) {
         await api_updateSelected(cart.id_user, findProduct.id_product._id, true)
       }
 
@@ -464,6 +478,62 @@ const Page_Cart = (props) => {
     )
   }
 
+  const renderUnavailableCart = ({ item }) => {
+    const isChecked = selectedItems.includes(item._id);
+    return (
+      <View style={[Style_Cart.container_product]}>
+        {/* <View
+          onPress={() => toggleSelectItems(item._id)}
+          style={[Style_Cart.checkBox, { borderColor: colors.Grey }]}>
+        </View> */}
+
+        <TouchableOpacity
+          onPress={() => toggleSelectItems(item._id)}
+          style={[Style_Cart.checkBox, isChecked && Style_Cart.checkBox_selected]}>
+          {isChecked &&
+            <Image
+              style={{ width: 12, height: 12 }}
+              source={require('../../assets/icon/icon_tick_white.png')} />
+          }
+        </TouchableOpacity>
+
+        <FastImage
+          source={{ uri: productImages?.[item.id_product?._id]?.[0]?.image?.[1] }}
+          style={[Style_Cart.img_product, { opacity: 0.5 }]}
+          resizeMode={FastImage.resizeMode.cover} />
+
+        <View style={Style_Cart.container_info}>
+          <Text style={[Style_Cart.text_name, { opacity: 0.5 }]}
+            numberOfLines={1}
+            ellipsizeMode='tail'>
+            {item.id_product?.name}
+          </Text>
+          <Text style={[Style_Cart.text_price, { opacity: 0.5 }]}>
+            {item.id_product?.price?.toLocaleString('vi-VN')}đ
+          </Text>
+          <Text style={Style_Cart.text_status}>{item.status}</Text>
+        </View>
+
+        {/* Nút xóa sản phẩm */}
+        <TouchableOpacity
+          style={Style_Cart.btn_delete}
+          onPress={() => removeItem(item._id)}>
+          <Image
+            source={require('../../assets/icon/icon_x_black.png')}
+            style={Style_Cart.icon_quantity}
+          />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const availableItems = cart?.items?.filter(item => item.status === "Còn hàng");
+  const unavailableItems = cart?.items?.filter(item => item.status !== "Còn hàng");
+
+  const totalPrice = availableItems?.reduce(
+    (sum, item) => sum + item.quantity * item.id_product.price, 0
+  );
+
   return (
     <View style={Style_Cart.container}>
       <View style={Style_Cart.container_title}>
@@ -486,12 +556,32 @@ const Page_Cart = (props) => {
         ) :
           cart && cart.items && cart.items.length > 0 ? (
             <View style={Style_Cart.container_cart}>
-              <FlatList
+              {/* <FlatList
                 data={cart.items || []}
                 renderItem={renderCart}
                 keyExtractor={(item) => item._id.toString()}
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 120 }} />
+                contentContainerStyle={{ paddingBottom: 120 }} /> */}
+
+              {availableItems.length > 0 && (
+                <View>
+                  <FlatList
+                    data={availableItems}
+                    renderItem={renderCart}
+                    keyExtractor={(item) => item._id.toString()}
+                    showsVerticalScrollIndicator={false} />
+                </View>
+              )}
+
+              {unavailableItems.length > 0 && (
+                <View>
+                  <FlatList
+                    data={unavailableItems}
+                    renderItem={renderUnavailableCart}
+                    keyExtractor={(item) => item._id.toString()}
+                    showsVerticalScrollIndicator={false} />
+                </View>
+              )}
 
               <View style={Style_Cart.container_bottom}>
                 <View style={Style_Cart.container_checkAll}>
@@ -514,6 +604,7 @@ const Page_Cart = (props) => {
                       <ActivityIndicator size="small" color="red" />
                     ) : (
                       `${cart.totalPrice?.toLocaleString('vi-VN')}đ`
+                      // `${totalPrice?.toLocaleString('vi-VN')}đ`
                     )}
                   </Text>
                 </View>

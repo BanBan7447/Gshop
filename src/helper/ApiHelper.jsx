@@ -75,6 +75,9 @@ const api_getUserInfo = async (user_id) => {
     try {
         const response = await AxiosInstance().get(`/user/${user_id}`);
         return response;
+        console.log('>>>>>>>>>>>>>>>>>> Gọi API đổi mật khẩu');
+        const response = await AxiosInstance().put('/user/changPass', data);
+        return response.data;
     } catch (error) {
         console.error("Lỗi lấy thông tin người dùng:", error);
         return null;
@@ -600,7 +603,6 @@ const api_uploadAvatar = async (id_user, imageUri) => {
     }
 };
 
-
 // Lấy danh sách địa chỉ theo id_user
 const api_getAddressList = async (id_user) => {
     try {
@@ -610,13 +612,13 @@ const api_getAddressList = async (id_user) => {
         // Kiểm tra nếu response trả về trực tiếp là một mảng
         if (Array.isArray(response.data)) {
             return response.data;
-        } 
-        
+        }
+
         // Nếu response.data.data là một mảng, trả về nó
         if (response.data.status === true && Array.isArray(response.data.data)) {
             return response.data.data;
-        } 
-        
+        }
+
         console.error("Lỗi: API không trả về danh sách hợp lệ!", response.data);
         return [];
     } catch (error) {
@@ -637,7 +639,7 @@ const api_addAddress = async (detail, commune, district, province, id_user) => {
         });
 
         console.log("API response:", response);
-        
+
         // Kiểm tra nếu API trả về status thành công
         if (response.status === true) {
             return response.data;
@@ -652,7 +654,7 @@ const api_addAddress = async (detail, commune, district, province, id_user) => {
 };
 
 // API cập nhật địa chỉ
- const api_updateAddress = async (id, detail, commune, district, province, id_user) => {
+const api_updateAddress = async (id, detail, commune, district, province, id_user) => {
     try {
         const response = await AxiosInstance().put(`address/update/${id}`, {
             detail,
@@ -676,6 +678,7 @@ const api_addAddress = async (detail, commune, district, province, id_user) => {
         return null;
     }
 };
+
 // API xóa địa chỉ
 const api_deleteAddress = async (id) => {
     try {
@@ -693,6 +696,21 @@ const api_deleteAddress = async (id) => {
         return false;
     }
 };
+
+// API cập nhật thuộc tính selected
+const api_updateAddressSelected = async (id_user, id_address, selected) => {
+    try {
+        const response = await AxiosInstance().put('/address/update-selected', {
+            id_user, id_address, selected
+        });
+
+        if (response.status == true) {
+            return response
+        }
+    } catch (e) {
+        console.log("Lỗi cập nhật selected của địa chỉ", e);
+    }
+}
 
 export {
     api_login,
@@ -732,4 +750,6 @@ export {
     api_addAddress,
     api_deleteAddress, 
     api_loginUser
+    api_deleteAddress,
+    api_updateAddressSelected
 }
