@@ -125,8 +125,8 @@ const Page_Login = ({ navigation, route }) => {
                         onPress={() => setHidePassword(!hidePassword)}
                     >
                         <Image
-                            source={hidePassword
-                                ? require('../../assets/icon/icon_show.png')
+                             source={hidePassword
+                                ? require('../../assets/icon/icon_hide.png')
                                 : require('../../assets/icon/icon_show.png')}
                             style={Style_Login.eyeIcon} />
                     </TouchableOpacity>

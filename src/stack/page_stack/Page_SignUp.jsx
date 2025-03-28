@@ -1,11 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, ToastAndroid, Alert, ScrollView } from 'react-native';
 import Style_SignUp from '../../styles/Style_SignUp';
-
 import { api_signUp } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
-
-AppContext
 
 const Page_SignUp = (props) => {
     const { navigation } = props;
@@ -156,8 +153,8 @@ const Page_SignUp = (props) => {
                     <TouchableOpacity
                         onPress={() => setHidePassword(!hidePassword)}>
                         <Image
-                            source={hidePassword
-                                ? require('../../assets/icon/icon_show.png')
+                             source={hidePassword
+                                ? require('../../assets/icon/icon_hide.png')
                                 : require('../../assets/icon/icon_show.png')}
                             style={Style_SignUp.eyeIcon} />
                     </TouchableOpacity>

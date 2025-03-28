@@ -48,16 +48,52 @@ const api_signUp = async (data) => {
     }
 };
 
-// Gọi API đổi mật khẩu
+// API đổi mật khẩu
 const api_changePassword = async (data) => {
     try {
+        const { userId, email, newPassword } = data;
+        const body = {
+            user_id: userId,
+            email: email,
+            newPassword: newPassword
+        };
+
+        const response = await AxiosInstance().put('/user/changPass', body);
+
+        if (response.status === true) {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.log('Lỗi đổi mật khẩu:', error);
+        return { status: false, message: 'Đổi mật khẩu thất bại' };
+    }
+};
+
+// API lấy thông tin người dùng
+const api_getUserInfo = async (user_id) => {
+    try {
+        const response = await AxiosInstance().get(`/user/${user_id}`);
+        return response;
         console.log('>>>>>>>>>>>>>>>>>> Gọi API đổi mật khẩu');
         const response = await AxiosInstance().put('/user/changPass', data);
         return response.data;
-
     } catch (error) {
-        console.error('Lỗi đổi mật khẩu:', error);
+        console.error("Lỗi lấy thông tin người dùng:", error);
         return null;
+    }
+};
+const api_loginUser = async (email_phone, password) => {
+    try {
+        const response = await AxiosInstance().post('/user/login', { email: email_phone, password });
+
+        if (response.status) {
+            await AsyncStorage.setItem('userEmail', response.data.email);
+            await AsyncStorage.setItem('userId', response.data.user_id);
+            return response;
+        }
+    } catch (error) {
+        console.error("Lỗi đăng nhập:", error);
     }
 };
 
@@ -680,6 +716,7 @@ export {
     api_login,
     api_signUp,
     api_changePassword,
+    api_getUserInfo,
     api_getDetailUser,
     api_updateProfile,
     api_getCategories,
@@ -711,6 +748,8 @@ export {
     api_getAddressList,
     api_updateAddress,
     api_addAddress,
+    api_deleteAddress, 
+    api_loginUser
     api_deleteAddress,
     api_updateAddressSelected
 }
