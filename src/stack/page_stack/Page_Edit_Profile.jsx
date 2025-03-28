@@ -4,6 +4,7 @@ import Style_Edit_Profile from '../../styles/Style_Edit_Profile';
 import { api_updateProfile, api_uploadAvatar } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
 import { launchImageLibrary } from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Page_Edit_Profile = (props) => {
     const { navigation } = props
@@ -64,13 +65,25 @@ const Page_Edit_Profile = (props) => {
             };
 
             // Cập nhật dữ liệu
-            setUsers((prev) => ({
-                ...prev,
+            const updateUser = {
+                ...users,
                 name,
                 email,
                 phone_number,
                 avatar: newAvatar,
-            }));
+            }
+            setUsers(updateUser);
+
+            // setUsers((prev) => ({
+            //     ...prev,
+            //     name,
+            //     email,
+            //     phone_number,
+            //     avatar: newAvatar,
+            // }));
+
+            // Lưu vào AsyncStorage
+            await AsyncStorage.setItem('userInfo', JSON.stringify(updateUser))
 
             ToastAndroid.show("Cập nhật thành công", ToastAndroid.SHORT);
             navigation.goBack();

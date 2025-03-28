@@ -7,7 +7,6 @@ import colors from '../../styles/colors';
 
 const Page_Profile = (props) => {
   const { navigation } = props;
-
   const { users, setUsers } = useContext(AppContext); // Lay thong tin nguoi dung tu Context
 
   //Ham dang xuat

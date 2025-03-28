@@ -72,9 +72,6 @@ const Page_Detail = (props) => {
         funGetRating();
     }, [id]);
 
-    // Kiểm tra và lấy url từ images
-    //const imageUrl = images?.[0]?.image?.[0] ?? null;
-
     const addToCart = async () => {
         if (!users || !users._id) {
             console.log("⚠️ Lỗi: Người dùng chưa đăng nhập!");
@@ -93,14 +90,6 @@ const Page_Detail = (props) => {
         });
 
         try {
-            // const response = await api_addToCart(users._id, product._id, 1);
-
-            // if (response) {
-            //     // setCart([...cart, {...product, quantity: 1}]);
-            //     const updatedCart = await api_getCarts(users._id);
-            //     setCart(updatedCart)
-            // }
-
             const response = await api_addToCart(users._id, product._id, 1);
 
             if (response) {
@@ -126,7 +115,7 @@ const Page_Detail = (props) => {
                 });
 
                 // Gọi API để cập nhật `selected` trong giỏ hàng
-                console.log('✅ Cập nhật trạng thái selected trong giỏ hàng');
+                console.log('Cập nhật trạng thái selected trong giỏ hàng');
                 await api_updateSelected(users._id, product._id, true);
             }
 

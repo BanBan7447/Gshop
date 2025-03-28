@@ -20,11 +20,7 @@ import Page_Detail_Order from '../stack/page_stack/Page_Detail_Order'
 import Page_Add_Address from '../stack/page_stack/Page_Add_Address'
 import Page_Edit_Address from '../stack/page_stack/Page_Edit_Address'
 
-
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-
-
-
 const Stack = createNativeStackNavigator();
 
 const Stack_Navigation = () => {
