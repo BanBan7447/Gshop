@@ -6,6 +6,7 @@ const Style_ChangPass = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
+        backgroundColor: colors.White
     },
     header: {
         flexDirection: 'row',

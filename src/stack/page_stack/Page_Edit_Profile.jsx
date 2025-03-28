@@ -24,7 +24,7 @@ const Page_Edit_Profile = (props) => {
             quality: 1,
         };
 
-    launchImageLibrary(options, (response) => {
+        launchImageLibrary(options, (response) => {
             if (response.didCancel) {
                 console.log("Người dùng đã hủy chọn ảnh");
             } else if (response.errorMessage) {
@@ -91,8 +91,18 @@ const Page_Edit_Profile = (props) => {
                 <Text style={Style_Edit_Profile.headerTitle}>Chỉnh sửa thông tin</Text>
             </TouchableOpacity>
             <View style={Style_Edit_Profile.profileImageContainer}>
-                <Image source={avatar ? { uri: avatar } : require("../../assets/icon/icon_deafult_profile.png")}
-                    style={Style_Edit_Profile.profileImage} />
+                {/* <Image source={avatar ? { uri: avatar } : require("../../assets/icon/icon_deafult_profile.png")}
+                    style={Style_Edit_Profile.profileImage} /> */}
+
+                <Image
+                    source={
+                        avatar && (avatar.startsWith("https") || avatar.startsWith("file") || avatar.startsWith("content"))
+                            ? { uri: avatar }
+                            : require("../../assets/icon/icon_deafult_profile.png")
+                    }
+                    style={Style_Edit_Profile.profileImage}
+                />
+
             </View>
             <TouchableOpacity
                 style={Style_Edit_Profile.updateButton}

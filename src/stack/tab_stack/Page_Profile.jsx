@@ -39,8 +39,11 @@ const Page_Profile = (props) => {
       {users ? (
         <View>
           <View style={Style_Profile.container_info}>
-            <Image
-              source={{ uri: users.avatar}}
+            <Image source={
+              users.avatar?.startsWith("https")
+              ? {uri: users.avatar}
+              : require("../../assets/icon/icon_deafult_profile.png")
+            }
               style={Style_Profile.avatar}
             />
 
