@@ -45,6 +45,9 @@ const Style_MyAddress = StyleSheet.create({
         width: '100%',
         marginTop: 20,
       },
+      selectedAddress: {
+        backgroundColor: colors.Blue
+      },
       iconLocation: {
         borderRadius: 100,
         backgroundColor: '#E9F1FB',

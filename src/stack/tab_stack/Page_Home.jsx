@@ -282,8 +282,8 @@ const Page_Home = (props) => {
           loadingRender ? (
             <SkeletonPlaceholder>
               <View style={Style_Home.name_skeleton} />
-              <View style={Style_Home.type_product_skeleton}/>
-              <View style={Style_Home.price_product_skeleton}/>
+              <View style={Style_Home.type_product_skeleton} />
+              <View style={Style_Home.price_product_skeleton} />
             </SkeletonPlaceholder>
           ) : (
             <View>
