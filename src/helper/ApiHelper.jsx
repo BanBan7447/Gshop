@@ -51,9 +51,9 @@ const api_signUp = async (data) => {
 // API đổi mật khẩu
 const api_changePassword = async (data) => {
     try {
-        const { userId, email, newPassword } = data;
+        const { user_id, email, newPassword } = data;
         const body = {
-            user_id: userId,
+            user_id: user_id,
             email: email,
             newPassword: newPassword
         };
@@ -61,7 +61,7 @@ const api_changePassword = async (data) => {
         const response = await AxiosInstance().put('/user/changPass', body);
 
         if (response.status === true) {
-            return true;
+            return response;
         }
         return false;
     } catch (error) {
@@ -75,14 +75,12 @@ const api_getUserInfo = async (user_id) => {
     try {
         const response = await AxiosInstance().get(`/user/${user_id}`);
         return response;
-        console.log('>>>>>>>>>>>>>>>>>> Gọi API đổi mật khẩu');
-        const response = await AxiosInstance().put('/user/changPass', data);
-        return response.data;
     } catch (error) {
         console.error("Lỗi lấy thông tin người dùng:", error);
         return null;
     }
 };
+
 const api_loginUser = async (email_phone, password) => {
     try {
         const response = await AxiosInstance().post('/user/login', { email: email_phone, password });
@@ -484,11 +482,11 @@ const api_getAddressUser = async (id_user) => {
 }
 
 // Gọi API thêm đơn hàng
-const api_addOrder = async (id_user, id_payment, id_address) => {
+const api_addOrder = async (id_user, id_payment, name, phone, address) => {
     try {
         console.log('>>>>>>>>>>>>>> add Order');
         const response = await AxiosInstance().post('/order/create-order', {
-            id_user, id_payment, id_address
+            id_user, id_payment, name, phone, address
         });
 
         if (response.status == true) {
@@ -748,8 +746,7 @@ export {
     api_getAddressList,
     api_updateAddress,
     api_addAddress,
-    api_deleteAddress, 
-    api_loginUser
+    api_loginUser,
     api_deleteAddress,
     api_updateAddressSelected
 }

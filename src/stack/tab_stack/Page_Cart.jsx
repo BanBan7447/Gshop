@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid, ActivityIndicator, KeyboardAvoidingView, TextInput, Alert } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid, ActivityIndicator, KeyboardAvoidingView, TextInput, Alert, ScrollView } from 'react-native'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 
 import Style_Cart from '../../styles/Style_Cart'
 import { CartContext } from '../../context/CartContext'
@@ -8,6 +8,7 @@ import { api_deleteCart, api_getCarts, api_updateQuantity, api_getImagesProduct,
 import { AppContext } from '../../context'
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
 import FastImage from 'react-native-fast-image'
+import { useFocusEffect } from '@react-navigation/native';
 
 const Page_Cart = (props) => {
   const { navigation } = props
@@ -29,64 +30,66 @@ const Page_Cart = (props) => {
     }
   }
 
-  // Hàm lấy dữ liệu danh sách giỏ hàng
   const getCarts = async () => {
     if (!users?._id) {
-      console.log("⚠️ Không tìm thấy ID user, không thể lấy giỏ hàng!");
+      console.log("Không tìm thấy ID user, không thể lấy giỏ hàng!");
       setLoading(false);
       return;
     };
 
-    console.log("📌 Đang gọi API lấy giỏ hàng của user:", users._id);
+    console.log("Đang gọi API lấy giỏ hàng của user:", users._id);
     setLoading(true);
 
     const cartData = await api_getCarts(users._id);
 
     if (cartData) {
-      console.log("✅ Giỏ hàng nhận được từ API:", cartData);
+      console.log("Giỏ hàng nhận được từ API:", cartData);
 
-      // Xử lý danh sách sản phẩm để thuộc tính `selected` được giữ nguyên
+      // Chỉ giữ selected: true nếu sản phẩm còn hàng
       const newItems = cartData.items.map(item => ({
         ...item,
         selected: item.status === 'Còn hàng' ? item.selected ?? false : false
       }));
 
-      // Lọc ra những sản phẩm bị bỏ chọn so với dữ liệu API
-      const itemsToUpdate = newItems.filter(
-        item => item.selected === false && cartData.items.some(i => i._id === item._id && i.selected)
-      );
-
-      // Nếu có sản phẩm bị bỏ chọn, gọi API cập nhật trạng thái selected
-      itemsToUpdate.forEach(async item => {
-        await api_updateSelected(users._id, item.id_product._id, false);
-      });
-
       // Cập nhật danh sách sản phẩm đã chọn
-      const selectedItems = newItems.filter(item => item.selected).map(item => item._id);
+      const selectedItems = newItems
+        .filter(item => item.selected)
+        .map(item => item._id);
 
-      // Gán dữ liệu vào state
       const newCart = {
         id_user: users._id,
-        items: cartData.items || [],
-        // totalPrice: cartData.totalPrice || 0,
+        items: newItems,
         totalPrice: newItems
-          .filter(item => item.selected) // Chỉ tính sản phẩm được mua
+          .filter(item => item.selected)
           .reduce((sum, item) => sum + item.quantity * item.id_product.price, 0)
       };
 
-      setCart(newCart)
-
+      setCart(newCart);
       setSelectedItems(selectedItems);
       setIsCheckedAll(selectedItems.length === newItems.length);
 
-      console.log("📌 Dữ liệu setCart:", newCart);
+      console.log("Dữ liệu setCart:", newCart);
     } else {
-      console.log("⚠️ Giỏ hàng trống hoặc lỗi!");
-      setCart({ items: [], totalPrice: 0 })
+      console.log("Giỏ hàng trống hoặc lỗi!");
+      setCart({ items: [], totalPrice: 0 });
     }
 
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (cart?.items?.length > 0) {
+      const selected = cart.items.filter(item => item.selected).map(item => item._id);
+      setSelectedItems(selected);
+      setIsCheckedAll(selected.length === cart.items.length);
+    }
+  }, [cart.items]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getCarts(); // Gọi lại API khi vào trang Cart
+    }, [users])
+  );
 
   // Gọi getCarts
   useEffect(() => {
@@ -99,22 +102,19 @@ const Page_Cart = (props) => {
     getCarts(); // Nếu có user, lấy lại giỏ hàng
   }, [users]);
 
-  // Hàm chọn || bỏ chọn sản phẩm
   const toggleSelectItems = async (_id) => {
     if (!users?._id) return;
 
-    // Biến tạm để lưu trạng thái mới && ID sản phẩm
-    let updatedSelected = false;
-    let updatedProductId = '';
-
     setCart(prevCart => {
       const newItems = prevCart.items.map(item => {
-        if (item._id === _id) {
-          updatedSelected = !item.selected; // Lưu trạng thái mới
-          updatedProductId = item.id_product._id.toString(); // Lưu ID sản phẩm
-          return { ...item, selected: updatedSelected };
+        // Nếu sản phẩm hết hàng hoặc ngừng kinh doanh, không thể chọn
+        if (item._id === _id && item.status !== 'Còn hàng') {
+          return item;
         }
-        return item;
+
+        return item._id === _id
+          ? { ...item, selected: !item.selected }
+          : item;
       });
 
       const selectItems = newItems.filter(item => item.selected).map(item => item._id);
@@ -133,32 +133,36 @@ const Page_Cart = (props) => {
       };
     });
 
-    console.log("User ID:", users._id);
-    console.log("Product ID:", updatedProductId);
-    console.log("New selected state:", updatedSelected);
-
-    // Gọi API với giá trị đã cập nhật
-    await api_updateSelected(users._id, updatedProductId, updatedSelected);
+    const updatedProduct = cart.items.find(item => item._id === _id);
+    if (updatedProduct?.status === 'Còn hàng') {
+      await api_updateSelected(users._id, updatedProduct.id_product._id, !updatedProduct.selected);
+    }
   };
 
-  // Hàm chọn || bỏ chọn tất cả sản phẩm
   const toggleSelectAll = async () => {
-    if (!users?._id || !cart.items.length) return;
-
-    const newSelectedState = !isCheckedAll;
+    if (!users?._id) return;
 
     setCart(prevCart => {
+      // Xác định trạng thái mới của "Chọn tất cả"
+      const newIsCheckedAll = !isCheckedAll;
+
+      // Cập nhật danh sách sản phẩm
       const newItems = prevCart.items.map(item => ({
         ...item,
-        selected: newSelectedState
+        selected: item.status === 'Còn hàng' ? newIsCheckedAll : false
       }));
 
-      const selectedItems = newSelectedState ? newItems.map(item => item._id) : [];
-      const newTotalPrice = newSelectedState
-        ? newItems.reduce((sum, item) => sum + item.quantity * item.id_product.price, 0)
-        : 0;
+      // Lọc ra những sản phẩm có thể chọn
+      const selectedItems = newItems
+        .filter(item => item.selected)
+        .map(item => item._id);
 
-      setIsCheckedAll(newSelectedState);
+      // Tính tổng giá trị giỏ hàng với các sản phẩm được chọn
+      const newTotalPrice = newItems
+        .filter(item => item.selected)
+        .reduce((sum, item) => sum + item.quantity * item.id_product.price, 0);
+
+      setIsCheckedAll(newIsCheckedAll);
       setSelectedItems(selectedItems);
 
       return {
@@ -168,9 +172,23 @@ const Page_Cart = (props) => {
       };
     });
 
-    // Gọi API cập nhật trạng thái tất cả sản phẩm
-    await api_updateSelected(users._id, null, newSelectedState);
+    // Gửi API cập nhật trạng thái đã chọn chỉ với các sản phẩm còn hàng
+    const updatableItems = cart.items.filter(item => item.status === 'Còn hàng');
+    for (const item of updatableItems) {
+      await api_updateSelected(users._id, item.id_product._id, !isCheckedAll);
+    }
   };
+
+  useEffect(() => {
+    // Lọc ra các sản phẩm có thể chọn (Còn hàng)
+    const availableItems = cart?.items?.filter(item => item.status === 'Còn hàng');
+
+    // Kiểm tra xem tất cả sản phẩm có thể chọn có được chọn không
+    const newIsCheckedAll = availableItems?.length > 0 && availableItems.every(item => selectedItems.includes(item._id));
+
+    // Cập nhật trạng thái của nút chọn tất cả
+    setIsCheckedAll(newIsCheckedAll);
+  }, [selectedItems, cart.items]); // Theo dõi thay đổi của selectedItems và cart.items
 
   // Hàm giảm số lượng
   const minusItem = async (_id) => {
@@ -508,7 +526,7 @@ const Page_Cart = (props) => {
             ellipsizeMode='tail'>
             {item.id_product?.name}
           </Text>
-          <Text style={[Style_Cart.text_price, { opacity: 0.5 }]}>
+          <Text style={[Style_Cart.text_price, { opacity: 0.5, color: colors.Grey }]}>
             {item.id_product?.price?.toLocaleString('vi-VN')}đ
           </Text>
           <Text style={Style_Cart.text_status}>{item.status}</Text>
@@ -529,10 +547,6 @@ const Page_Cart = (props) => {
 
   const availableItems = cart?.items?.filter(item => item.status === "Còn hàng");
   const unavailableItems = cart?.items?.filter(item => item.status !== "Còn hàng");
-
-  const totalPrice = availableItems?.reduce(
-    (sum, item) => sum + item.quantity * item.id_product.price, 0
-  );
 
   return (
     <View style={Style_Cart.container}>
@@ -556,32 +570,28 @@ const Page_Cart = (props) => {
         ) :
           cart && cart.items && cart.items.length > 0 ? (
             <View style={Style_Cart.container_cart}>
-              {/* <FlatList
-                data={cart.items || []}
-                renderItem={renderCart}
-                keyExtractor={(item) => item._id.toString()}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 120 }} /> */}
 
-              {availableItems.length > 0 && (
-                <View>
-                  <FlatList
-                    data={availableItems}
-                    renderItem={renderCart}
-                    keyExtractor={(item) => item._id.toString()}
-                    showsVerticalScrollIndicator={false} />
-                </View>
-              )}
+              <ScrollView style={{ marginBottom: 120 }} showsVerticalScrollIndicator={false}>
+                {availableItems.length > 0 && (
+                  <View>
+                    <FlatList
+                      data={availableItems}
+                      renderItem={renderCart}
+                      keyExtractor={(item) => item._id.toString()}
+                      showsVerticalScrollIndicator={false} />
+                  </View>
+                )}
 
-              {unavailableItems.length > 0 && (
-                <View>
-                  <FlatList
-                    data={unavailableItems}
-                    renderItem={renderUnavailableCart}
-                    keyExtractor={(item) => item._id.toString()}
-                    showsVerticalScrollIndicator={false} />
-                </View>
-              )}
+                {unavailableItems.length > 0 && (
+                  <View>
+                    <FlatList
+                      data={unavailableItems}
+                      renderItem={renderUnavailableCart}
+                      keyExtractor={(item) => item._id.toString()}
+                      showsVerticalScrollIndicator={false} />
+                  </View>
+                )}
+              </ScrollView>
 
               <View style={Style_Cart.container_bottom}>
                 <View style={Style_Cart.container_checkAll}>

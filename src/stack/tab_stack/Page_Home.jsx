@@ -243,7 +243,7 @@ const Page_Home = (props) => {
     const categoryName = category ? category.name_type : "Không xác định";
 
     const formatPrice = price.toLocaleString('vi-VN'); // Định dạng giá tiền
-    const isOutStock = status === 'Hết hàng'; // Kiểm tra nếu sản phẩm hết hàng
+    const isOutStock = ''; // Kiểm tra nếu sản phẩm hết hàng
     if (!isActive) return null; // Ngừng kinh doanh thì không hiển thị
 
     const loadingRender = !productData;
@@ -270,7 +270,7 @@ const Page_Home = (props) => {
           }
 
           {
-            isOutStock && (
+            item.quantity <= 0 && (
               <View style={Style_Home.label_outStock}>
                 <Text style={Style_Home.text_outStock}>Đã hết hàng</Text>
               </View>

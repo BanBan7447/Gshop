@@ -6,21 +6,9 @@ import colors from '../../styles/colors';
 import { AppContext } from '../../context';
 
 const Page_ChangPass = ({ navigation, route }) => {
-    const [email, setEmail] = useState(users?.email);
-    const [userId, setUserId] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [hidePassword, setHidePassword] = useState(true);
     const { users, setUsers } = useContext(AppContext);
-
-
-    // Lấy thông tin email và userId từ props hoặc AsyncStorage (tuỳ cách bạn lưu trữ)
-    useEffect(() => {
-        if (route.params?.email && route.params?.userId) {
-            setEmail(route.params.email);
-            setUserId(route.params.userId);
-            ToastAndroid.show(`Email: ${route.params.email}`, ToastAndroid.SHORT);
-        }
-    }, [route.params]);
 
     // Hàm kiểm tra mật khẩu có hợp lệ không
     const isPasswordValid = (password) => {
@@ -35,16 +23,27 @@ const Page_ChangPass = ({ navigation, route }) => {
     // Hàm đổi mật khẩu
     const handleChangePassword = async () => {
         if (!isPasswordValid(newPassword)) {
-            Alert.alert('Lỗi', 'Mật khẩu chưa đáp ứng đủ yêu cầu.');
+            Alert.alert("Lỗi", "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái, số và ký tự đặc biệt.");
             return;
         }
 
-        const response = await api_changePassword(userId, email, newPassword);
-        if (response.status) {
-            ToastAndroid.show('Đổi mật khẩu thành công!', ToastAndroid.SHORT);
-            navigation.goBack();
-        } else {
-            Alert.alert('Lỗi', response.message);
+        try {
+            const response = await api_changePassword({
+                user_id: users?._id,
+                email: users?.email,
+                newPassword: newPassword
+            });
+
+            if (response.status) {
+                Alert.alert("Thành công", "Mật khẩu đã được thay đổi!", [
+                    { text: "OK", onPress: () => navigation.goBack() }
+                ]);
+            } else {
+                Alert.alert("Thất bại", response.message || "Đổi mật khẩu không thành công, vui lòng thử lại.");
+            }
+        } catch (error) {
+            console.log("Lỗi đổi mật khẩu:", error);
+            Alert.alert("Lỗi", "Có lỗi xảy ra, vui lòng thử lại sau.");
         }
     };
 

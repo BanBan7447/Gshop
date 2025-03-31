@@ -159,8 +159,8 @@ const Page_Detail_Order = (props) => {
                             }}
                             style={{ width: 100, height: 100, borderRadius: 20 }}
                             resizeMode={FastImage.resizeMode.cover} />
-                        <View style={{ justifyContent: 'center', marginLeft: 10, marginTop: -10}}>
-                            <Text  
+                        <View style={{ justifyContent: 'center', marginLeft: 10, marginTop: -10 }}>
+                            <Text
                                 style={{ fontSize: 16, fontFamily: 'Inter Bold', marginTop: 10, maxWidth: 200 }}
                                 numberOfLines={2}>
                                 {product.name}
@@ -187,7 +187,7 @@ const Page_Detail_Order = (props) => {
                                         // </TouchableOpacity>
 
                                         <TouchableOpacity
-                                            onPress={() => navigation.navigate("Rating", {product})}>
+                                            onPress={() => navigation.navigate("Rating", { product })}>
                                             <Text style={[Style_Detail_Order.textRating, { color: colors.Blue }]}>
                                                 Cảm ơn bạn đã góp ý
                                             </Text>
@@ -305,15 +305,25 @@ const Page_Detail_Order = (props) => {
             </View>
 
             <View style={{ flexDirection: 'column' }}>
-                <Text style={{ fontSize: 20, color: colors.Black, fontFamily: 'Inter Bold' }}>Người nhận</Text>
-                <Text style={{ fontSize: 16, color: colors.Black, marginTop: 10 }}>{user.name}</Text>
-                <Text style={{ fontSize: 16, color: colors.Black, marginTop: 10 }}>{user.phone_number}</Text>
-                {renderAddress()}
+                <Text style={Style_Detail_Order.user_title}>Người nhận</Text>
+
+                <Text style={[Style_Detail_Order.user_info, { color: colors.Grey }]}>
+                    Họ tên: <Text style={Style_Detail_Order.user_info}>{order.name}</Text>
+                </Text>
+
+                <Text style={[Style_Detail_Order.user_info, { color: colors.Grey }]}>
+                    Số điện thoại: <Text style={Style_Detail_Order.user_info}>{order.phone}</Text>
+                </Text>
+
+                <Text style={[Style_Detail_Order.user_info, { color: colors.Grey }]}>
+                    Địa chỉ: <Text style={Style_Detail_Order.user_info}>{order.address}</Text>
+                </Text>
             </View>
 
+            <Text style={[Style_Detail_Order.user_title, { marginTop: 16 }]}>Sản phẩm</Text>
             {renderProductOrder()}
 
-            <Text style={{ fontSize: 20, color: colors.Black, marginTop: 10 }}>Thanh toán</Text>
+            <Text style={[Style_Detail_Order.user_title, { marginTop: 16 }]}>Thanh toán</Text>
             {
                 paymentMethod ? (
                     <View style={Style_Detail_Order.row}>
@@ -337,7 +347,7 @@ const Page_Detail_Order = (props) => {
 
             <View style={Style_Detail_Order.row}>
                 <Text style={{ fontSize: 18, color: colors.Black }}>Tổng tiền:</Text>
-                <Text style={{ fontSize: 18, color: colors.Black }}>{order.total_price.toLocaleString('vi-VN')}đ</Text>
+                <Text style={{ fontSize: 18, color: colors.Black, marginBottom: 16 }}>{order.total_price.toLocaleString('vi-VN')}đ</Text>
             </View>
 
             {/* <Modal visible={modelDialog} transparent animationType='slide'>
