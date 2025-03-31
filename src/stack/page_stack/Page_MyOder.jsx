@@ -48,7 +48,7 @@ const Page_MyOder = (props) => {
                 if (response.status) {
                     const newOrders = response.data;
                     console.log("Danh sách đơn hàng trước khi sắp xếp: ", response.data);
-                    newOrders.sort((a, b) => new Date(b.date.split('/').reverse().json('-')) - new Date(a.date.split('/').reverse().json('-')));
+                    //newOrders.sort((a, b) => new Date(b.date.split('/').reverse().json('-')) - new Date(a.date.split('/').reverse().json('-')));
 
                     // Kiểm tra xem đơn hàng nào thay đổi để thông báo
                     newOrders.forEach((newOrder) => {
@@ -110,7 +110,14 @@ const Page_MyOder = (props) => {
     const filteredOrders = selectedStatus === 'Tất cả'
         ? orders
         : orders.filter(orders => orders.status === selectedStatus);
-    filteredOrders.sort((a, b) => new Date(b.date.split('/').reverse().join('-')) - new Date(a.date.split('/').reverse().join('-')));
+    filteredOrders.sort((a, b) => {
+        const dateTimeA = new Date(a.date.split('/').reverse().join('-') + 'T' + a.time);
+        const dateTimeB = new Date(b.date.split('/').reverse().join('-') + 'T' + b.time);
+        return dateTimeB - dateTimeA;
+    });
+    
+
+    //new Date(b.date.split('/').reverse().join('-')) - new Date(a.date.split('/').reverse().join('-'))
 
     console.log("Danh sách đơn hàng trước sau khi sắp xếp: ", filteredOrders);
     orders.forEach(order => console.log(order.date, new Date(order.date)));

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, ScrollView, FlatList, ToastAndroid, Alert, Dimensions, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, FlatList, ToastAndroid, Alert, Dimensions, StyleSheet, Modal, TextInput } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Style_Payment from '../../styles/Style_Payment';
 import colors from '../../styles/colors';
@@ -31,6 +31,44 @@ const Page_Payment = props => {
   const [shippingFee, setShippingFee] = useState(29000);
   const [paymentLink, setPaymentLink] = useState('');
   const toast = useToast();
+  const [modelVisible, setModelVisible] = useState(false);
+
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [newAddress, setNewAddress] = useState('');
+
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editAddress, setEditAddress] = useState('');
+
+  useEffect(() => {
+    if (users) {
+      setName(prevName => prevName || `${users.name}`);
+      setPhone(prevPhone => prevPhone || `${users.phone_number}`);
+    }
+  });
+
+  useEffect(() => {
+    if (address) {
+      setNewAddress(prevAddress => prevAddress ||
+        `${address.detail}, ${address.commune}, ${address.district}, ${address.province}`
+      );
+    }
+  }, [address]);
+
+  const openEditModal = () => {
+    setEditName(name);
+    setEditPhone(phone);
+    setEditAddress(newAddress);
+    setModelVisible(true);
+  };
+
+  const handleUpdate = () => {
+    setName(editName);
+    setPhone(editPhone);
+    setNewAddress(editAddress);
+    setModelVisible(false);
+  };
 
   // Cập nhật dữ liệu Address
   useFocusEffect(
@@ -82,8 +120,12 @@ const Page_Payment = props => {
         const selectedAddress = response.data.find(addr => addr.selected);
         if (selectedAddress) {
           setAddress(selectedAddress);
+          setNewAddress(
+            `${selectedAddress.detail}, ${selectedAddress.commune}, ${selectedAddress.district}, ${selectedAddress.province}`
+          )
         } else {
           setAddress(null);
+          setNewAddress('');
         }
       }
       console.log('data địa chỉ: ', response);
@@ -263,12 +305,18 @@ const Page_Payment = props => {
     try {
       console.log('user đặt hàng: ', users._id);
       console.log('phương thức thanh toán: ', selectedPayment);
+      console.log('Tên người nhận: ', name);
+      console.log('Số điện thoại: ', phone);
+      console.log('Địa chỉ người nhận: ', newAddress);
       console.log('địa chỉ giao hàng: ', address._id);
 
       const response = await api_addOrder(
         users._id,
         selectedPayment,
-        address._id,
+        // address._id,
+        name,
+        phone,
+        newAddress
       );
       if (response) {
         showToast();
@@ -322,26 +370,35 @@ const Page_Payment = props => {
         <View style={Style_Payment.container_info}>
           <View style={Style_Payment.container_title}>
             <Text style={Style_Payment.text_title}>Người nhận</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Location")}>
-              <Text style={Style_Payment.btn_text}>Đổi địa chỉ</Text>
+            <TouchableOpacity onPress={openEditModal}>
+              <Text style={[Style_Payment.btn_text, { color: colors.Red, fontSize: 18 }]}>Đổi thông tin</Text>
             </TouchableOpacity>
           </View>
 
           <Text style={Style_Payment.text_body_1}>
             Họ tên:{' '}
             <Text style={Style_Payment.text_body_2}>
-              {users?.name || 'Chưa có thông tin'}
+              {name || 'Chưa có thông tin'}
             </Text>
           </Text>
 
           <Text style={Style_Payment.text_body_1}>
             SDT:{' '}
             <Text style={Style_Payment.text_body_2}>
-              {users?.phone_number || 'Chưa có thông tin'}
+              {phone || 'Chưa có thông tin'}
             </Text>
           </Text>
 
-          {renderAddress()}
+          <Text style={Style_Payment.text_body_1}>
+            Địa chỉ:{' '}
+            <Text style={Style_Payment.text_body_2}>
+              {newAddress || 'Chưa có thông tin'}
+            </Text>
+          </Text>
+
+          <TouchableOpacity onPress={() => navigation.navigate("Location")}>
+            <Text style={[Style_Payment.btn_text, { textAlign: 'right' }]}>Đổi địa chỉ</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={Style_Payment.container_product}>
@@ -452,6 +509,52 @@ const Page_Payment = props => {
           />
         </View>
       ) : null}
+
+      <Modal
+        animationType='slide'
+        transparent={true}
+        visible={modelVisible}
+        onRequestClose={() => setModelVisible(false)}>
+        <View style={Style_Payment.modalContainer}>
+          <View style={Style_Payment.modalContent}>
+            <Text style={Style_Payment.modalTitle}>Chỉnh sửa người nhận</Text>
+
+            <Text style={Style_Payment.modalLabel}>Người nhận</Text>
+            <TextInput
+              style={Style_Payment.textInput}
+              value={editName}
+              onChangeText={setEditName} />
+
+            <Text style={Style_Payment.modalLabel}>Số điện thoại</Text>
+            <TextInput
+              style={Style_Payment.textInput}
+              keyboardType='phone-pad'
+              value={editPhone}
+              onChangeText={setEditPhone} />
+
+            <Text style={Style_Payment.modalLabel}>Địa chỉ</Text>
+            <TextInput
+              style={[Style_Payment.textInput, {lineHeight: 24}]}
+              multiline
+              value={editAddress}
+              onChangeText={setEditAddress} />
+
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <TouchableOpacity
+                style={[Style_Payment.modalButton, { backgroundColor: colors.Blue }]}
+                onPress={handleUpdate}>
+                <Text style={Style_Payment.modalTextButton}>Cập nhật</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[Style_Payment.modalButton, { backgroundColor: colors.Red }]}
+                onPress={() => setModelVisible(false)}>
+                <Text style={Style_Payment.modalTextButton}>Hủy</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

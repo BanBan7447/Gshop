@@ -26,8 +26,7 @@ const Page_Detail = (props) => {
     const [notification, setNotification] = useState(false);
 
     const screenWidth = Dimensions.get('window').width; // Lấy chiều rộng màn hình
-    const isOutStock = product?.status === "Hết hàng"; // Thêm trạng thái để kiểm tra nếu sản phẩm đã hết hàng
-
+    const isOutStock = product?.quantity <= 0; // Thêm trạng thái để kiểm tra nếu sản phẩm đã hết hàng
     const { users } = useContext(AppContext);
 
     // Hàm lấy dữ liệu sản phẩm

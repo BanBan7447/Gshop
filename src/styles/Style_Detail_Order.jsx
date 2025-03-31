@@ -6,7 +6,7 @@ const Style_Detail_Order = StyleSheet.create({
     container:{
         backgroundColor: colors.White,
         paddingHorizontal: 20,
-        flex: 1,
+        flex: 1
     },
     navigation: {
         flexDirection: 'row',
@@ -55,6 +55,17 @@ const Style_Detail_Order = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 4,
         marginBottom: 24
+    },
+    user_title: {
+        fontSize: 20,
+        color: colors.Black,
+        fontFamily: 'Inter Bold'
+    },
+    user_info: {
+        fontFamily: 'Inter Medium',
+        fontSize: 16,
+        color: colors.Black,
+        marginTop: 8
     },
     container_user:{
         marginBottom: 24

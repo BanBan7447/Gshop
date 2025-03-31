@@ -199,6 +199,58 @@ const Style_Payment = StyleSheet.create({
         color: colors.White,
         fontFamily: 'Inter Bold',
         fontSize: 20
+    },
+
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    },
+
+    modalContent: {
+        width: 336,
+        padding: 20,
+        backgroundColor: colors.White,
+        borderRadius: 16,
+    },
+
+    modalTitle: {
+        fontFamily: 'Inter Bold',
+        fontSize: 20,
+        color: colors.Black,
+        textAlign: 'center',
+        marginBottom: 12
+    },
+
+    modalButton: {
+        flex: 1,
+        padding: 12,
+        alignItems: 'center',
+        borderRadius: 12
+    },
+
+    modalTextButton: {
+        fontSize: 16,
+        color: colors.White,
+        fontFamily: 'Inter Bold'
+    },
+
+    modalLabel: {
+        fontSize: 16,
+        color: colors.Grey,
+        textAlign: 'left',
+        marginBottom: 8
+    },
+
+    textInput: {
+        width: '100%',
+        marginBottom: 16,
+        padding: 6,
+        backgroundColor: colors.Light_Blue,
+        borderRadius: 12,
+        paddingLeft: 12,
+        fontSize: 16
     }
 })
 
