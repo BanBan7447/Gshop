@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ToastAndroid } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ToastAndroid, ScrollView } from 'react-native';
 import React, { useContext, useState, useEffect } from 'react';
 import Style_Edit_Profile from '../../styles/Style_Edit_Profile';
 import { api_updateProfile, api_uploadAvatar } from '../../helper/ApiHelper';
@@ -15,6 +15,29 @@ const Page_Edit_Profile = (props) => {
 
     const [avatar, setAvatar] = useState(users?.avatar);
     const [loading, setLoading] = useState(false);
+
+    const [emailError, setEmailError] = useState("");
+    const [phoneError, setPhoneError] = useState("");
+
+    const validateEmail = (text) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(text)) {
+            setEmailError("Email không hợp lệ");
+        } else {
+            setEmailError("");
+        }
+        setEmail(text);
+    };
+
+    const validatePhone = (text) => {
+        const cleaned = text.replace(/\D/g, "");
+        if (cleaned.length !== 10) {
+            setPhoneError("Số điện thoại phải có đúng 10 số");
+        } else {
+            setPhoneError("");
+        }
+        setPhone(text);
+    }
 
     // Chọn ảnh từ thư viện
     const pickAvatar = () => {
@@ -39,8 +62,12 @@ const Page_Edit_Profile = (props) => {
 
     // Cập nhật thông tin user
     const updateProfile = async () => {
-        setLoading(true);
+        if (emailError || phoneError) {
+            Alert.alert("Lỗi cập nhật", "Vui lòng kiểm tra lại thông tin nhập vào và thử lại.");
+            return;
+        }
 
+        setLoading(true);
         try {
             // Gọi API cập nhật thông tin người dùng
             const profileResponse = await api_updateProfile(email, name, phone_number);
@@ -74,14 +101,6 @@ const Page_Edit_Profile = (props) => {
             }
             setUsers(updateUser);
 
-            // setUsers((prev) => ({
-            //     ...prev,
-            //     name,
-            //     email,
-            //     phone_number,
-            //     avatar: newAvatar,
-            // }));
-
             // Lưu vào AsyncStorage
             await AsyncStorage.setItem('userInfo', JSON.stringify(updateUser))
 
@@ -96,17 +115,14 @@ const Page_Edit_Profile = (props) => {
     }
 
     return (
-        <View style={Style_Edit_Profile.container}>
+        <ScrollView style={Style_Edit_Profile.container}>
             <TouchableOpacity style={Style_Edit_Profile.header}
-                onPress={() => navigation.navigate('Tab', { screen: 'Profile' })}>
+                onPress={() => navigation.goBack()}>
 
                 <Image style={Style_Edit_Profile.backIcon} source={require('../../assets/icon/icon_long_arrow.png')} />
                 <Text style={Style_Edit_Profile.headerTitle}>Chỉnh sửa thông tin</Text>
             </TouchableOpacity>
             <View style={Style_Edit_Profile.profileImageContainer}>
-                {/* <Image source={avatar ? { uri: avatar } : require("../../assets/icon/icon_deafult_profile.png")}
-                    style={Style_Edit_Profile.profileImage} /> */}
-
                 <Image
                     source={
                         avatar && (avatar.startsWith("https") || avatar.startsWith("file") || avatar.startsWith("content"))
@@ -117,12 +133,15 @@ const Page_Edit_Profile = (props) => {
                 />
 
             </View>
-            <TouchableOpacity
-                style={Style_Edit_Profile.updateButton}
-                onPress={pickAvatar}>
-                <Image style={Style_Edit_Profile.uploadIcon} source={require('../../assets/icon/icon_upload_white.png')} />
-                <Text style={Style_Edit_Profile.updateButtonText}>Cập nhật ảnh đại diện</Text>
-            </TouchableOpacity>
+
+            <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 24 }}>
+                <TouchableOpacity
+                    style={Style_Edit_Profile.updateButton}
+                    onPress={pickAvatar}>
+                    <Image style={Style_Edit_Profile.uploadIcon} source={require('../../assets/icon/icon_upload_white.png')} />
+                    <Text style={Style_Edit_Profile.updateButtonText}>Cập nhật ảnh đại diện</Text>
+                </TouchableOpacity>
+            </View>
 
             <View>
                 <Text style={Style_Edit_Profile.label}>Họ tên</Text>
@@ -140,9 +159,10 @@ const Page_Edit_Profile = (props) => {
                     style={Style_Edit_Profile.input}
                     placeholder="Nhập số điện thoại"
                     value={phone_number}
-                    onChangeText={setPhone}
+                    onChangeText={validatePhone}
                     keyboardType="phone-pad"
                 />
+                {phoneError ? <Text style={Style_Edit_Profile.error}>{phoneError}</Text> : null}
             </View>
 
             <View>
@@ -151,9 +171,11 @@ const Page_Edit_Profile = (props) => {
                     style={Style_Edit_Profile.input}
                     placeholder="Nhập email"
                     value={email}
-                    onChangeText={setEmail}
+                    onChangeText={validateEmail}
                     keyboardType="email-address"
+                    editable={false}
                 />
+                {emailError ? <Text style={Style_Edit_Profile.error}>{emailError}</Text> : null}
             </View>
 
             <TouchableOpacity
@@ -162,7 +184,7 @@ const Page_Edit_Profile = (props) => {
                 disabled={loading}>
                 <Text style={Style_Edit_Profile.saveButtonText}>Cập nhật</Text>
             </TouchableOpacity>
-        </View>
+        </ScrollView>
     );
 };
 

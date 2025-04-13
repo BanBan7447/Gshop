@@ -8,7 +8,8 @@ import {
     api_addReview,
     api_getDetailPayment,
     api_getRateByProduct,
-    api_editReview
+    api_editReview,
+    api_editStatusOrder
 } from '../../helper/ApiHelper';
 import colors from '../../styles/colors';
 import Style_Detail_Order from '../../styles/Style_Detail_Order';
@@ -26,62 +27,7 @@ const Page_Detail_Order = (props) => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [loading, setLoading] = useState(false);
     const [productImages, setProductImages] = useState({});
-    const [ratedProducts, setRatedProducts] = useState([]);
-
-    const [modelDialog, setModelDialog] = useState(false);
-    const [star, setStar] = useState(0);
-    const [content, setContent] = useState('');
-    const starText = ["Rất tệ", "Tệ", "Ổn", "Tốt", "Rất tốt"];
-    const [reviewedProducts, setReviewProducts] = useState([]);
-
-    const [userReviews, setUserReviews] = useState({});
-
-    useEffect(() => {
-        const getRatedProducts = async () => {
-            try {
-                // const ratedList = await Promise.all(
-                //     products.map(async (product) => {
-                //         const ratings = await api_getRateByProduct(product._id);
-                //         const userReview = ratings.find(rating => rating.id_user === user._id);
-
-                //         // Log đánh giá của user hiện tại nếu có
-                //         if (userReview) {
-                //             console.log(`📝 Đánh giá của user ${user._id} cho sản phẩm ${product._id}:`, userReview);
-                //         }
-
-                //         // const userRated = ratings.some(rating => rating.id_user === user._id);
-                //         return userReview ? product._id : null;
-                //     })
-                // );
-
-                // // Lọc bỏ những giá trị null và cập nhật state
-                // setRatedProducts(ratedList.filter(id => id !== null));
-
-                const ratedList = [];
-                const reviews = {}; // Lưu đánh giá của user hiện tại
-
-                await Promise.all(
-                    products.map(async (product) => {
-                        const ratings = await api_getRateByProduct(product._id);
-
-                        // Lọc ra đánh giá của user hiện tại
-                        const userReview = ratings.find(rating => rating.id_user === user._id);
-                        if (userReview) {
-                            ratedList.push(product._id);
-                            reviews[product._id] = userReview; // Lưu đánh giá
-                        }
-                    })
-                );
-
-                setRatedProducts(ratedList);
-                setUserReviews(reviews); // Cập nhật state đánh giá của user
-            } catch (e) {
-                console.log('Lỗi khi lấy danh sách đánh giá:', e);
-            }
-        };
-
-        getRatedProducts();
-    }, [products]);
+    const [orderData, setOrderData] = useState(order);
 
     const getOrderDetails = async () => {
         try {
@@ -144,67 +90,30 @@ const Page_Detail_Order = (props) => {
                 ? productImage[0].image[1]
                 : 'https://via.placeholder.com/300';
 
-            // Kiểm tra xem user đã đánh giá chưa
-            const isUserRated = ratedProducts.includes(product._id);
-            const userReview = userReviews[product._id]; // Lấy đánh giá của user hiện tại
-
             console.log(`Render ảnh cho sản phẩm ${product._id}:`, imageUrl);
             return (
                 <View key={product._id}>
-                    <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                    <View style={{ flexDirection: 'row', marginTop: 12 }}>
                         <FastImage
                             source={{
                                 uri: imageUrl,
                                 priority: FastImage.priority.high
                             }}
-                            style={{ width: 100, height: 100, borderRadius: 20 }}
+                            style={{ width: 88, height: 88, borderRadius: 16 }}
                             resizeMode={FastImage.resizeMode.cover} />
-                        <View style={{ justifyContent: 'center', marginLeft: 10, marginTop: -10 }}>
+                        <View style={{ flex: 1, justifyContent: 'center', marginLeft: 12 }}>
                             <Text
-                                style={{ fontSize: 16, fontFamily: 'Inter Bold', marginTop: 10, maxWidth: 200 }}
-                                numberOfLines={2}>
+                                style={{ fontSize: 14, fontFamily: 'Inter Bold', color: colors.Black, marginBottom: 4 }}
+                                numberOfLines={1}>
                                 {product.name}
                             </Text>
-                            <Text style={{ fontSize: 18, color: colors.Red }}>
+                            <Text style={{ fontSize: 14, color: colors.Red, fontFamily: 'Inter Bold', marginBottom: 4 }}>
                                 {Number(product.unit_price).toLocaleString("vi-VN")}đ
                             </Text>
 
-                            <Text style={{ fontSize: 16 }}>x{product.order_quantity}</Text>
+                            <Text style={{ fontSize: 14, color: colors.Black, fontFamily: 'Inter Medium' }}>x{product.order_quantity}</Text>
                         </View>
                     </View>
-
-                    {
-                        order.status === "Đã giao" && (
-                            <View style={{ alignItems: 'flex-end' }}>
-                                {
-                                    isUserRated ? (
-                                        // <TouchableOpacity onPress={() =>
-                                        //     navigation.navigate('WriteRate',
-                                        //         { product, user, productImage, userReview })}>
-                                        //     <Text style={[Style_Detail_Order.textRating, { color: colors.Blue }]}>
-                                        //         Chỉnh sửa đánh giá
-                                        //     </Text>
-                                        // </TouchableOpacity>
-
-                                        <TouchableOpacity
-                                            onPress={() => navigation.navigate("Rating", { product })}>
-                                            <Text style={[Style_Detail_Order.textRating, { color: colors.Blue }]}>
-                                                Cảm ơn bạn đã góp ý
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ) : (
-                                        <TouchableOpacity onPress={() =>
-                                            navigation.navigate('WriteRate',
-                                                { product, user, productImage })}>
-                                            <Text style={[Style_Detail_Order.textRating, { color: colors.Red }]}>
-                                                Đánh giá
-                                            </Text>
-                                        </TouchableOpacity>
-                                    )
-                                }
-                            </View>
-                        )
-                    }
                 </View>
             )
         })
@@ -218,21 +127,22 @@ const Page_Detail_Order = (props) => {
     const statusColors = {
         "Đang xử lý": colors.Blue,
         "Đang giao hàng": colors.Orange,
-        "Đã giao": colors.Green
+        "Đã giao": colors.Green,
+        "Đã hủy": colors.Red
     };
 
     // Hàm láy dữ liệu địa chỉ của user
-    const getAddressUser = async () => {
-        try {
-            const response = await api_getDetailAddress(order.id_address);
-            if (response.status == true) {
-                setAddress(response.data);
-            }
-            console.log('data địa chỉ: ', response)
-        } catch (e) {
-            console.log(e);
-        }
-    };
+    // const getAddressUser = async () => {
+    //     try {
+    //         const response = await api_getDetailAddress(order.id_address);
+    //         if (response.status == true) {
+    //             setAddress(response.data);
+    //         }
+    //         console.log('data địa chỉ: ', response)
+    //     } catch (e) {
+    //         console.log(e);
+    //     }
+    // };
 
     // Hàm lấy dữ liệu phương thức thanh toán của đơn hàng
     const getPaymentMethod = async () => {
@@ -249,30 +159,9 @@ const Page_Detail_Order = (props) => {
 
     // Hàm gọi getAddressUser
     useEffect(() => {
-        getAddressUser();
+        //getAddressUser();
         getPaymentMethod();
     }, []);
-
-    // Hàm render address
-    const renderAddress = () => {
-        return (
-            <View>
-                <Text style={{ fontSize: 16, color: colors.Black, marginTop: 10 }}>Địa chỉ: <Text>
-                    {
-                        address ? (
-                            <Text>
-                                {address.detail}, {address.commune}, {address.district}, {address.province}
-                            </Text>
-                        ) : (
-                            <Text>Đang tải...</Text>
-                        )
-                    }
-                </Text>
-                </Text>
-                <Text style={{ fontSize: 20, color: colors.Black, marginTop: 10 }}>Sản phẩm</Text>
-            </View>
-        )
-    };
 
     // Tính tổng tiền sản phẩm
     const productTotalPrice = () => {
@@ -280,6 +169,34 @@ const Page_Detail_Order = (props) => {
             return total + products.unit_price * products.order_quantity
         }, 0);
     }
+
+    const handleCancelOrder = async () => {
+        if (orderData.status === "Đã giao" || order.status === "Đã hủy") {
+            return;
+        };
+
+        Alert.alert(
+            "Xác nhận đơn hàng",
+            "Bạn có chắc muốn hủy đơn hàng này không?",
+            [
+                { text: "Không", style: "cancel" },
+                {
+                    text: "Hủy đơn",
+                    style: "destructive",
+                    onPress: async () => {
+                        setLoading(true);
+                        const result = await api_editStatusOrder(order._id, "Đã hủy");
+                        if (result.success) {
+                            setOrderData(result.updatedOrder)
+                            navigation.goBack();
+                        } else {
+                            Alert.alert("Thất bại", result.message || "Không thể hủy đơn hàng.");
+                        }
+                    }
+                }
+            ]
+        )
+    };
 
     return (
         <ScrollView style={Style_Detail_Order.container}>
@@ -298,7 +215,7 @@ const Page_Detail_Order = (props) => {
             <View style={Style_Detail_Order.container_title}>
                 <Text
                     style={[Style_Detail_Order.status, { color: statusColors[order.status] }]}>
-                    {order.status}
+                    {order?.status}
                 </Text>
 
                 <Text style={Style_Detail_Order.date}>{order.date}</Text>
@@ -322,13 +239,20 @@ const Page_Detail_Order = (props) => {
 
             <Text style={[Style_Detail_Order.user_title, { marginTop: 16 }]}>Sản phẩm</Text>
             {renderProductOrder()}
+            {
+                order.status === 'Đã giao' && (
+                    <TouchableOpacity style={{ alignItems: 'flex-end', marginTop: 16 }} onPress={() => navigation.navigate('WriteRate', { products, user, productImages })}>
+                        <Text style={[Style_Detail_Order.textRating, { color: colors.Red }]}>Đánh giá sản phẩm</Text>
+                    </TouchableOpacity>
+                )
+            }
 
             <Text style={[Style_Detail_Order.user_title, { marginTop: 16 }]}>Thanh toán</Text>
             {
                 paymentMethod ? (
-                    <View style={Style_Detail_Order.row}>
-                        <Text>Phương thức:</Text>
-                        <Text>{paymentMethod.name}</Text>
+                    <View style={[Style_Detail_Order.row]}>
+                        <Text style={{fontSize: 14}}>Phương thức:</Text>
+                        <Text style={{fontSize: 14, width: '50%', textAlign: 'right'}}>{paymentMethod.name}</Text>
                     </View>
                 ) : (
                     <Text style={Style_Detail_Order.centerText}>Đang tải...</Text>
@@ -336,93 +260,29 @@ const Page_Detail_Order = (props) => {
             }
 
             <View style={Style_Detail_Order.row}>
-                <Text>Tổng sản phẩm:</Text>
-                <Text>{productTotalPrice().toLocaleString('vi-VN')}đ</Text>
+                <Text style={{fontSize: 14}}>Tổng sản phẩm:</Text>
+                <Text style={{fontSize: 14}}>{productTotalPrice().toLocaleString('vi-VN')}đ</Text>
             </View>
 
             <View style={Style_Detail_Order.row}>
-                <Text>Phí vận chuyển:</Text>
-                <Text>{order.shipping_fee.toLocaleString('vi-VN')}đ</Text>
+                <Text style={{fontSize: 14}}>Phí vận chuyển:</Text>
+                <Text style={{fontSize: 14}}>{order.shipping_fee.toLocaleString('vi-VN')}đ</Text>
             </View>
 
             <View style={Style_Detail_Order.row}>
-                <Text style={{ fontSize: 18, color: colors.Black }}>Tổng tiền:</Text>
-                <Text style={{ fontSize: 18, color: colors.Black, marginBottom: 16 }}>{order.total_price.toLocaleString('vi-VN')}đ</Text>
+                <Text style={{ fontFamily: 'Inter Bold', fontSize: 16, color: colors.Black }}>Tổng tiền:</Text>
+                <Text style={{ fontFamily: 'Inter Bold', fontSize: 16, color: colors.Black, marginBottom: 16 }}>{order.total_price.toLocaleString('vi-VN')}đ</Text>
             </View>
 
-            {/* <Modal visible={modelDialog} transparent animationType='slide'>
-                <View style={Style_Rating.container_model}>
-                    <View style={Style_Rating.content_model}>
-                        <Text style={Style_Rating.title_model}>Đánh giá sản phẩm</Text>
-
-                        {
-                            selectedProduct ? (
-                                <View>
-                                    <Image
-                                        source={{ uri: productImages[selectedProduct._id]?.[0]?.image?.[1] || 'https://via.placeholder.com/300' }}
-                                        style={Style_Rating.img_model} />
-                                    <Text style={Style_Rating.name_model}>{selectedProduct.name}</Text>
-
-                                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                                        {
-                                            [1, 2, 3, 4, 5].map((num) => (
-                                                <View key={num} style={{ alignItems: 'center', marginHorizontal: 5 }}>
-                                                    <TouchableOpacity onPress={() => setStar(num)}>
-                                                        <Image
-                                                            source={
-                                                                num <= star
-                                                                    ? require('../../assets/icon/icon_star.png')
-                                                                    : require('../../assets/icon/icon_star_black.jpg')
-                                                            }
-                                                            style={Style_Rating.star_model} />
-                                                    </TouchableOpacity>
-
-                                                    <Text style={Style_Rating.star_text}>
-                                                        {starText[num - 1]}
-                                                    </Text>
-                                                </View>
-                                            ))
-                                        }
-                                    </View>
-
-                                    <Text style={Style_Rating.label_text_input}>
-                                        Mời bạn góp ý
-                                    </Text>
-
-                                    <TextInput
-                                        style={Style_Rating.text_input}
-                                        multiline
-                                        value={content}
-                                        onChangeText={setContent} />
-
-                                    <View
-                                        style={Style_Rating.contaner_btn}>
-                                        <TouchableOpacity
-                                            style={Style_Rating.btn_submit}
-                                            onPress={submitReview}
-                                            disabled={loading}>
-                                            <Text style={Style_Rating.text_submit_cancel}>
-                                                {loading ? 'Đang gửi...' : 'Gửi đánh giá'}
-                                            </Text>
-                                        </TouchableOpacity>
-
-                                        <TouchableOpacity
-                                            style={Style_Rating.btn_cancel}
-                                            onPress={() => setModelDialog(false)}>
-                                            <Text style={Style_Rating.text_submit_cancel}>
-                                                Hủy
-                                            </Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                            ) : (
-                                <Text>Đang tải dữ liệu</Text>
-                            )
-                        }
-
-                    </View>
-                </View>
-            </Modal> */}
+            {
+                (orderData?.status !== "Đã giao" && orderData?.status !== "Đã hủy") && (
+                    <TouchableOpacity
+                        style={Style_Detail_Order.cancelOrderBtn}
+                        onPress={handleCancelOrder}>
+                        <Text style={Style_Detail_Order.textCancelOrder}>Hủy hàng</Text>
+                    </TouchableOpacity>
+                )
+            }
         </ScrollView>
     )
 }

@@ -25,7 +25,7 @@ const Style_Detail_News = StyleSheet.create({
     text_navigation: {
         fontFamily: 'Inter Medium',
         color: colors.Black,
-        fontSize: 18
+        fontSize: 16
     },
 
     thumbnails_news: {
@@ -39,7 +39,7 @@ const Style_Detail_News = StyleSheet.create({
     title_news: {
         fontFamily: 'Inter Bold',
         color: colors.Black,
-        fontSize: 24,
+        fontSize: 20,
         marginBottom: 4
     },
 

@@ -18,7 +18,7 @@ const Styles_News = StyleSheet.create({
     title: {
         fontFamily: 'Inter Bold',
         color: colors.Black,
-        fontSize: 24
+        fontSize: 20
     },
 
     container_input: {
@@ -53,7 +53,7 @@ const Styles_News = StyleSheet.create({
     title_news: {
         fontFamily: 'Inter Bold',
         color: colors.Black,
-        fontSize: 20,
+        fontSize: 16,
         marginBottom: 4
     },
 
@@ -61,7 +61,7 @@ const Styles_News = StyleSheet.create({
         textAlign: 'right',
         fontFamily: 'Inter Regular',
         color: colors.Grey,
-        fontSize: 14
+        fontSize: 12
     }
 })
 

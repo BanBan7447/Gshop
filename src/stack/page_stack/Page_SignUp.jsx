@@ -3,17 +3,21 @@ import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, ToastAndroi
 import Style_SignUp from '../../styles/Style_SignUp';
 import { api_signUp } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
+import colors from '../../styles/colors';
+import Style_ForgotPass from '../../styles/Style_ForgotPass';
+import Style_Login from '../../styles/Style_Login';
 
 const Page_SignUp = (props) => {
     const { navigation } = props;
-    const { users, setUsers } = useContext(AppContext);
-
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone_number, setPhone_number] = useState("");
     const [password, setPassword] = useState("");
-
     const [hidePassword, setHidePassword] = useState(false);
+
+    const [emailError, setEmailError] = useState("");
+    const [phoneError, setPhoneError] = useState("");
+    const [passError, setPassError] = useState("");
 
     // Hàm tự động định dạng số điện thoại khi đăng nhập
     const formatPhone = (text) => {
@@ -39,22 +43,48 @@ const Page_SignUp = (props) => {
         });
     };
 
-    const handleChangeText = (text) => {
-        // Xoá tất cả các ký tự không phải số
-        const cleaned = text.replace(/\D/g, "");
-
-        // Kiểm tra số điện thoại hợp lệ
-        if (cleaned.length > 10) {
-            setPhone_number(cleaned);
-        } else if (/^\d+$/.test(cleaned) && cleaned.length > 3) {
-            setPhone_number(formatPhone(cleaned))
+    const validateEmail = (text) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(text)) {
+            setEmailError("Email không hợp lệ");
         } else {
-            setPhone_number(text)
+            setEmailError("");
         }
+        setEmail(text);
+    };
+
+    const validatePhoneNumber = (text) => {
+        const cleaned = text.replace(/\D/g, "");
+        if (cleaned.length !== 10) {
+            setPhoneError("Số điện thoại phải có đúng 10 số");
+        } else {
+            setPhoneError("");
+        }
+        setPhone_number(formatPhone(cleaned));
+    };
+
+    const validatePassword = (text) => {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(text)) {
+            setPassError("Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt")
+        } else {
+            setPassError("");
+        }
+        setPassword(text);
     }
+
     // Hàm đăng ký
-    // 
     const onSignUp = async () => {
+        if (!name || !email || !phone_number || !password) {
+            Alert.alert("Lỗi đăng ký", "Vui lòng nhập đầy đủ thông tin");
+            return;
+        }
+
+        if (emailError || phoneError || passError) {
+            Alert.alert("Lỗi đăng ký", "Vui lòng kiểm tra lại thông tin nhập vào và thử lại.");
+            return;
+        }
+
         try {
             const body = {
                 name: name,
@@ -62,22 +92,6 @@ const Page_SignUp = (props) => {
                 phone_number: phone_number,
                 password: password
             };
-
-            // const onSignUp = async () => {
-            //     try {
-            //         const body = {
-            //             name,
-            //             email,
-            //             phone_number,
-            //             password
-            //         };
-
-            // Kiểm tra mật khẩu (ít nhất 1 chữ hoa, 1 chữ thường và 1 số)
-            const checkPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-            if (!checkPassword.test(password)) {
-                Alert.alert('Sai mật khẩu', 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số');
-                return;
-            }
 
             const response = await api_signUp(body);
 
@@ -93,28 +107,13 @@ const Page_SignUp = (props) => {
             Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng ký.');
         }
     };
-    //         const response = await api_signUp(body);
-
-    //         if (response) {
-    //             ToastAndroid.show('Đăng ký thành công', ToastAndroid.LONG);
-
-    //             // Điều hướng sang trang đăng nhập và truyền dữ liệu
-    //             navigation.navigate('Login', { email, password });
-    //         } else {
-    //             Alert.alert('Đăng ký thất bại', 'Email hoặc SĐT đã tồn tại');
-    //         }
-    //     } catch (e) {
-    //         Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng ký.');
-    //     }
-    // };
 
     return (
-        <ScrollView>
+        <ScrollView style={{ backgroundColor: colors.White }}>
             <View style={Style_SignUp.container}>
                 <Image
                     style={Style_SignUp.logoContainer}
                     source={require('../../assets/image/logo_app_2.png')} />
-
 
                 <Text style={Style_SignUp.title}>Đăng ký</Text>
 
@@ -130,50 +129,49 @@ const Page_SignUp = (props) => {
                     style={Style_SignUp.input}
                     keyboardType='phone-pad'
                     value={phone_number}
-                    onChangeText={handleChangeText}
+                    onChangeText={setPhone_number}
                 />
+                {phoneError ? <Text style={Style_SignUp.error}>{phoneError}</Text> : null}
 
                 <Text style={Style_SignUp.email}>Email</Text>
                 <TextInput
                     style={Style_SignUp.input}
                     value={email}
-                    onChangeText={text => setEmail(text)}
+                    onChangeText={validateEmail}
                 />
-                <View>
-                    <Text style={Style_SignUp.passs}>Mật khẩu</Text>
-                </View>
+                {emailError ? <Text style={Style_SignUp.error}>{emailError}</Text> : null}
 
-                <View style={Style_SignUp.passwordContainer}>
+                <Text style={Style_Login.label}>Mật khẩu</Text>
+                <View style={Style_ForgotPass.inputContainer}>
                     <TextInput
-                        style={[Style_SignUp.input, Style_SignUp.passwordInput]}
+                        style={Style_ForgotPass.textInput}
+                        secureTextEntry={hidePassword}
                         value={password}
-                        secureTextEntry={!hidePassword}
-                        onChangeText={text => setPassword(text)}
+                        onChangeText={setPassword}
                     />
-                    <TouchableOpacity
-                        onPress={() => setHidePassword(!hidePassword)}>
+                    <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
                         <Image
-                             source={hidePassword
-                                ? require('../../assets/icon/icon_hide.png')
-                                : require('../../assets/icon/icon_show.png')}
-                            style={Style_SignUp.eyeIcon} />
+                            source={
+                                hidePassword
+                                    ? require('../../assets/icon/icon_hide.png')
+                                    : require('../../assets/icon/icon_show.png')
+                            }
+                            style={Style_ForgotPass.eyeIcon}
+                        />
                     </TouchableOpacity>
                 </View>
+                {passError ? <Text style={Style_SignUp.error}>{passError}</Text> : null}
 
-                <TouchableOpacity>
-                    <Text style={Style_SignUp.forgotPassword}>Quên mật khẩu?</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={Style_SignUp.loginButton}
+                <TouchableOpacity style={Style_SignUp.registerButton}
                     onPress={() => onSignUp()}>
-                    <Text style={Style_SignUp.loginButtonText}>Đăng ký</Text>
+                    <Text style={Style_SignUp.registerButtonText}>Đăng ký</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>
                     <Text style={Style_SignUp.newUserText}>Bạn mới sử dụng GShop?</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={Style_SignUp.registerButton}
+                <TouchableOpacity style={Style_SignUp.loginButton}
                     onPress={() => navigation.navigate('Login')}>
-                    <Text style={Style_SignUp.registerButtonText}>Đăng nhập</Text>
+                    <Text style={Style_SignUp.loginButtonText}>Đăng nhập</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>

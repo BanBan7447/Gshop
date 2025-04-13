@@ -34,7 +34,13 @@ const Page_Search = (props) => {
                     keyWords.some(keyWords => product.name.includes(keyWords))
                 )
                 // Sắp xếp sản phẩm theo lượt xem từ cao đến thấp (nổi bật)
-                .sort((a, b) => b.viewer - a.viewer);
+                //.sort((a, b) => b.viewer - a.viewer);
+                .sort((a, b) => {
+                    if(a.quantity === 0 && b.quantity !== 0) return 1;
+                    if(a.quantity !== 0 && b.quantity === 0) return -1;
+
+                    return b.viewer - a.viewer;
+                });
 
             console.log('All Products:', filterDataProduct);  // In ra dữ liệu sản phẩm để kiểm tra
 
@@ -178,7 +184,7 @@ const Page_Search = (props) => {
                     }
 
                     {
-                        isOutStock && (
+                        item.quantity <= 0 && (
                             <View style={Style_Home.label_outStock}>
                                 <Text style={Style_Home.text_outStock}>Đã hết hàng</Text>
                             </View>
@@ -244,7 +250,7 @@ const Page_Search = (props) => {
 
                             <TextInput
                                 style={Style_Search.text_input}
-                                placeholder='Tìm kiếm'
+                                placeholder='Sản phẩm bạn mong muốn'
                                 placeholderTextColor={colors.Black}
                                 value={searchText}
                                 onChangeText={text => funFilterProducts(text)} />

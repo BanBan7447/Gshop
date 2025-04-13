@@ -24,7 +24,7 @@ const Style_Detail_Order = StyleSheet.create({
     text_navigation: {
         fontFamily: 'Inter Medium',
         color: colors.Black,
-        fontSize: 20
+        fontSize: 16
     },
     title_order: {
         fontFamily: 'Inter Bold',
@@ -36,18 +36,18 @@ const Style_Detail_Order = StyleSheet.create({
         fontFamily: 'Inter Bold',
         color: colors.Black,
         fontSize: 16,
-        lineHeight: 32,
+        lineHeight: 24,
         marginBottom: 8,
         alignItems: 'center',
     },
     date: {
         fontFamily: 'Inter Medium',
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Black
     },
     status: {
-        fontFamily: 'Inter Semibold',
-        fontSize: 17,
+        fontFamily: 'Inter Medium',
+        fontSize: 14,
     },
     container_title: {
         flexDirection: 'row-reverse',
@@ -57,15 +57,16 @@ const Style_Detail_Order = StyleSheet.create({
         marginBottom: 24
     },
     user_title: {
-        fontSize: 20,
+        fontSize: 16,
         color: colors.Black,
         fontFamily: 'Inter Bold'
     },
     user_info: {
         fontFamily: 'Inter Medium',
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Black,
-        marginTop: 8
+        marginTop: 8,
+        lineHeight: 20
     },
     container_user:{
         marginBottom: 24
@@ -96,7 +97,7 @@ const Style_Detail_Order = StyleSheet.create({
     },
     payment_totalPrice: {
         fontFamily: 'Inter Bold',
-        fontSize: 18,
+        fontSize: 16,
         color: colors.Black
     },
     row: {
@@ -111,6 +112,20 @@ const Style_Detail_Order = StyleSheet.create({
     textRating: {
         fontSize: 16,
         fontFamily: 'Inter Bold'
+    },
+    cancelOrderBtn: {
+        backgroundColor: colors.Red,
+        width: '100%',
+        height: 56,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 24
+    },
+    textCancelOrder: {
+        color: colors.White,
+        fontFamily: 'Inter Bold',
+        fontSize: 14
     }
 })
 

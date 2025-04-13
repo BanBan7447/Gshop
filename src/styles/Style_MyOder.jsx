@@ -7,7 +7,6 @@ const Style_MyOder = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.White,
-        paddingHorizontal: 20,
         paddingTop: 20
     },
     header: {
@@ -15,14 +14,16 @@ const Style_MyOder = StyleSheet.create({
         alignItems: 'center',
         marginLeft: 16,
         marginBottom: 8,
-        marginLeft: 15
+        marginLeft: 15,
+        paddingHorizontal: 20
     },
     backIcon: {
         width: 24,
         height: 24
     },
     headerTitle: {
-        fontSize: 20,
+        fontFamily: 'Inter Medium',
+        fontSize: 16,
         marginLeft: 18,
         color: colors.Black,
         color: '#282828',
@@ -31,7 +32,7 @@ const Style_MyOder = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 16,
-        marginTop: 15,
+        marginTop: 16,
     },
     tab: {
         fontSize: 16,
@@ -45,12 +46,11 @@ const Style_MyOder = StyleSheet.create({
     orderContainer: {
         backgroundColor: colors.White,
         backgroundColor: '#FFFFFF',
-        padding: 16,
-        borderRadius: 12,
-        marginBottom: 16,
         bottom: 1,
-        color: colors.Light_Grey,
-        color: '#AAAAAA'
+        color: '#AAAAAA',
+        borderBottomWidth: 1,
+        paddingVertical: 20,
+        paddingHorizontal: 20
     },
     orderHeader: {
         flexDirection: 'row',
@@ -59,17 +59,17 @@ const Style_MyOder = StyleSheet.create({
     },
     orderTitle: {
         width: '50%',
-        fontSize: 18,
+        fontSize: 16,
         fontFamily: 'Inter Bold',
         color: colors.Black
     },
     orderDate: {
         marginTop: 4,
-        fontSize: 16,
+        fontSize: 12,
         color: colors.Black,
     },
     orderDetail: {
-        fontSize: 16,
+        fontSize: 14,
         marginBottom: 4,
         color: colors.Grey
     },
@@ -79,9 +79,11 @@ const Style_MyOder = StyleSheet.create({
     },
     boldText: {
         fontWeight: 'bold',
+        color: colors.Black
     },
     orderStatus: {
-        fontSize: 16,
+        fontFamily: 'Inter Medium',
+        fontSize: 14,
         marginTop: 4,
     },
     detailButton: {
@@ -90,45 +92,41 @@ const Style_MyOder = StyleSheet.create({
         borderRadius: 10,
     },
     detailButtonText: {
-        color:  colors.White,
-        fontSize: 16,
-        fontFamily: 'Inter Bold',
+        color: colors.Black
     },
     filterContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         marginVertical: 10,
+        paddingHorizontal: 20
     },
     filterButton: {
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 12,
         backgroundColor: colors.Light_Blue,
-        marginRight: 16
+        marginRight: 16,
     },
     filterButtonActive: {
         backgroundColor: colors.Red,
     },
     filterText: {
         color: colors.Black,
-        fontWeight: 'bold',
-        fontSize: 16,
+        fontFamily: 'Inter Bold',
+        fontSize: 14,
     },
     filterTextActive: {
+        fontFamily: 'Inter Bold',
         color: 'white',
-        fontSize: 16,
+        fontSize: 14,
     },
     detailButton: {
-        position: 'absolute',
-        right: 16,
-        bottom: 10,
         backgroundColor: colors.Red,
-        paddingVertical: 8,
-        paddingHorizontal: 16,
         borderRadius: 10,
-        width: 87,
-        height: 44,
-        alignItems: 'center',
+        width: 80,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     detailButtonText: {
         color: '#FFFFFF',
@@ -142,7 +140,6 @@ const Style_MyOder = StyleSheet.create({
     emptyContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 20,
     },
     emptyText: {
         fontSize: 16,

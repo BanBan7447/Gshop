@@ -19,12 +19,11 @@ const Page_Profile = (props) => {
   const ProfileOption = ({ icon, label, onPress, textColor = colors.Black, arrowIcon }) => {
     return (
       <TouchableOpacity style={Style_Profile.btn_page} onPress={onPress}>
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Image
             source={icon}
             style={[Style_Profile.icon_img, { marginRight: 16 }]} />
           <Text style={[Style_Profile.text_btn_page, { color: textColor }]}>{label}</Text>
-
         </View>
         <Image
           source={arrowIcon || require('../../assets/icon/icon_arrow.png')}
@@ -40,8 +39,8 @@ const Page_Profile = (props) => {
           <View style={Style_Profile.container_info}>
             <Image source={
               users.avatar?.startsWith("https")
-              ? {uri: users.avatar}
-              : require("../../assets/icon/icon_deafult_profile.png")
+                ? { uri: users.avatar }
+                : require("../../assets/icon/icon_deafult_profile.png")
             }
               style={Style_Profile.avatar}
             />
@@ -123,11 +122,6 @@ const Page_Profile = (props) => {
             icon={require('../../assets/icon/icon_security.png')}
             label={'Bảo mật'}
             onPress={() => navigation.navigate('Login')} />
-
-          <ProfileOption
-            icon={require('../../assets/icon/icon_help.png')}
-            label={'FAQ - Trợ giúp'}
-            onPress={() => navigation.navigate('FQA')} />
         </View>
       )}
     </View>

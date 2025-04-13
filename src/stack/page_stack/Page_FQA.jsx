@@ -40,7 +40,7 @@ const Page_FQA = (props) => {
             ]
         },
         {
-            question: 'Làm sao để chọn bộ Gunpla phù hợp \ncho người mới ?',
+            question: 'Làm sao để chọn bộ Gunpla phù hợp cho người mới ?',
             answer: [
                 'Nên chọn HG hoặc RG có độ khó thấp.',
                 'Muốn thử mẫu nhỏ gọn, nhanh lắp? → SD Gundam.',
@@ -49,7 +49,7 @@ const Page_FQA = (props) => {
             ]
         },
         {
-            question: 'Bảo quản Gunpla thế nào để tránh \nhỏng ?',
+            question: 'Bảo quản Gunpla thế nào để tránh hỏng?',
             answer: [
                 'Tránh ánh nắng trực tiếp, bụi bẩn, và va đập mạnh.',
                 'Sử dụng tủ kính hoặc hộp mica',
@@ -60,7 +60,6 @@ const Page_FQA = (props) => {
             ]
         }
     ];
-
 
     const toggleAccordion = (index) => {
         if (expandedIndex === index) {
@@ -85,9 +84,9 @@ const Page_FQA = (props) => {
                 <View key={index} style={Style_FQA.item}>
                     <TouchableOpacity style={Style_FQA.question} onPress={() => toggleAccordion(index)}>
                         <Text style={Style_FQA.questionText}>{item.question}</Text>
-                        <Image source={expandedIndex === index
-                            ? require('../../assets/icon/icon_polygo_up.jpg') // Icon mở
-                            : require('../../assets/icon/icon_polygo.png')    // Icon đóng
+                        <Image style={{width: 12, height: 12, transform: [{rotate: expandedIndex === index ? '180deg' : '0deg'}]}} source={expandedIndex === index
+                            ? require('../../assets/icon/icon_arrow_down.png') // Icon mở
+                            : require('../../assets/icon/icon_arrow_down.png') // Icon đóng
                         } />
                     </TouchableOpacity>
                     {expandedIndex === index && (

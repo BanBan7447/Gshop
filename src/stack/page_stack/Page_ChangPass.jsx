@@ -6,8 +6,15 @@ import colors from '../../styles/colors';
 import { AppContext } from '../../context';
 
 const Page_ChangPass = ({ navigation, route }) => {
+    const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
-    const [hidePassword, setHidePassword] = useState(true);
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [hideOldPassword, setHideOldPassword] = useState(true);
+    const [hideNewPassword, setHideNewPassword] = useState(true);
+    const [hideConfirmPassword, setHideConfirmPassword] = useState(true);
+
+
     const { users, setUsers } = useContext(AppContext);
 
     // Hàm kiểm tra mật khẩu có hợp lệ không
@@ -20,17 +27,27 @@ const Page_ChangPass = ({ navigation, route }) => {
         );
     };
 
+    // Kiểm tra điều kiện để nút lưu mật khẩu được kích hoạt
+    const isSaveButtonEnabled = () => {
+        return (
+            oldPassword.trim() !== '' &&
+            newPassword.trim() !== '' &&
+            confirmPassword.trim() !== '' &&
+            newPassword === confirmPassword &&
+            isPasswordValid(newPassword)
+        )
+    };
+
     // Hàm đổi mật khẩu
     const handleChangePassword = async () => {
-        if (!isPasswordValid(newPassword)) {
-            Alert.alert("Lỗi", "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái, số và ký tự đặc biệt.");
+        if (oldPassword !== users.password) {
+            Alert.alert("Lỗi", "Mật khẩu cũ không đúng.");
             return;
         }
 
         try {
             const response = await api_changePassword({
                 user_id: users?._id,
-                email: users?.email,
                 newPassword: newPassword
             });
 
@@ -47,6 +64,11 @@ const Page_ChangPass = ({ navigation, route }) => {
         }
     };
 
+    // Kiểm tra từng phần của mật khẩu mới
+    const isMinLength = newPassword.length >= 8;
+    const isLetterAndNumber = /[A-Za-z]/.test(newPassword) && /\d/.test(newPassword);
+    const isSpecialChar = /[#?!$&@]/.test(newPassword);
+
     return (
         <View style={Style_ChangPass.container}>
             <TouchableOpacity style={Style_ChangPass.header} onPress={() => navigation.goBack()}>
@@ -56,23 +78,38 @@ const Page_ChangPass = ({ navigation, route }) => {
 
             <Text style={Style_ChangPass.title}>Thay đổi mật khẩu</Text>
 
-            {/* Hiển thị Email */}
             <View style={Style_ChangPass.inputContainer}>
-                <TextInput value={users?.email} editable={false} style={Style_ChangPass.textInput} />
+                <TextInput
+                    placeholder="Nhập mật khẩu cũ"
+                    style={Style_ChangPass.textInput}
+                    secureTextEntry={hideOldPassword}
+                    value={oldPassword}
+                    onChangeText={setOldPassword}
+                />
+                <TouchableOpacity onPress={() => setHideOldPassword(!hideOldPassword)}>
+                    <Image
+                        source={
+                            hideOldPassword
+                                ? require('../../assets/icon/icon_hide.png')
+                                : require('../../assets/icon/icon_show.png')
+                        }
+                        style={Style_ChangPass.eyeIcon}
+                    />
+                </TouchableOpacity>
             </View>
 
-            {/* Nhập mật khẩu mới */}
+
             <View style={Style_ChangPass.inputContainer}>
                 <TextInput
                     placeholder="Nhập mật khẩu mới"
                     style={Style_ChangPass.textInput}
-                    secureTextEntry={hidePassword}
+                    secureTextEntry={hideNewPassword}
                     value={newPassword}
                     onChangeText={setNewPassword}
                 />
-                <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
+                <TouchableOpacity onPress={() => setHideNewPassword(!hideNewPassword)}>
                     <Image
-                        source={hidePassword
+                        source={hideNewPassword
                             ? require('../../assets/icon/icon_hide.png')
                             : require('../../assets/icon/icon_show.png')}
                         style={Style_ChangPass.eyeIcon}
@@ -80,26 +117,72 @@ const Page_ChangPass = ({ navigation, route }) => {
                 </TouchableOpacity>
             </View>
 
-            {/* Tiêu chí mật khẩu */}
-            <Text style={Style_ChangPass.infoText}>Mật khẩu của bạn phải bao gồm:</Text>
-            <View style={Style_ChangPass.listItem}>
-                <Image style={Style_ChangPass.tickIcon} source={require('../../assets/icon/icon_tick.png')} />
-                <Text style={Style_ChangPass.listText}>Ít nhất 8 ký tự</Text>
-            </View>
-            <View style={Style_ChangPass.listItem}>
-                <Image style={Style_ChangPass.tickIcon} source={require('../../assets/icon/icon_tick.png')} />
-                <Text style={Style_ChangPass.listText}>1 chữ cái và 1 số</Text>
-            </View>
-            <View style={Style_ChangPass.listItem}>
-                <Image style={Style_ChangPass.tickIcon} source={require('../../assets/icon/icon_tick.png')} />
-                <Text style={Style_ChangPass.listText}>1 ký tự đặc biệt (# ? ! $ & @)</Text>
-            </View>
-
-            <View style={Style_ChangPass.container_bottom}>
-                <TouchableOpacity style={Style_ChangPass.saveButton} onPress={handleChangePassword}>
-                    <Text style={Style_ChangPass.saveButtonText}>Lưu mật khẩu mới</Text>
+            <View style={Style_ChangPass.inputContainer}>
+                <TextInput
+                    placeholder="Xác nhận mật khẩu mới"
+                    style={Style_ChangPass.textInput}
+                    secureTextEntry={hideConfirmPassword}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                />
+                <TouchableOpacity onPress={() => setHideConfirmPassword(!hideConfirmPassword)}>
+                    <Image
+                        source={hideConfirmPassword
+                            ? require('../../assets/icon/icon_hide.png')
+                            : require('../../assets/icon/icon_show.png')}
+                        style={Style_ChangPass.eyeIcon}
+                    />
                 </TouchableOpacity>
             </View>
+
+            <Text style={Style_ChangPass.infoText}>Mật khẩu của bạn phải bao gồm:</Text>
+            <View style={Style_ChangPass.listItem}>
+                <Image
+                    style={Style_ChangPass.tickIcon}
+                    source={isMinLength
+                        ? require('../../assets/icon/icon_tick_green.png')
+                        : require('../../assets/icon/icon_tick.png')
+                    } />
+                <Text
+                    style={[Style_ChangPass.listText, isMinLength && { color: colors.Green }]}>
+                    Ít nhất 8 ký tự
+                </Text>
+            </View>
+
+            <View style={Style_ChangPass.listItem}>
+                <Image
+                    style={Style_ChangPass.tickIcon}
+                    source={isLetterAndNumber
+                        ? require('../../assets/icon/icon_tick_green.png')
+                        : require('../../assets/icon/icon_tick.png')
+                    } />
+
+                <Text
+                    style={[Style_ChangPass.listText, isLetterAndNumber && { color: colors.Green }]}>
+                    1 chữ cái và 1 số
+                </Text>
+            </View>
+
+            <View style={Style_ChangPass.listItem}>
+                <Image
+                    style={Style_ChangPass.tickIcon}
+                    source={isSpecialChar
+                        ? require('../../assets/icon/icon_tick_green.png')
+                        : require('../../assets/icon/icon_tick.png')
+                    } />
+
+                <Text
+                    style={[Style_ChangPass.listText, isSpecialChar && { color: colors.Green }]}>
+                    1 ký tự đặc biệt (# ? ! $ & @)
+                </Text>
+            </View>
+
+            <TouchableOpacity
+                style={[Style_ChangPass.saveButton, { opacity: isSaveButtonEnabled() ? 1 : 0.5 }]}
+                onPress={handleChangePassword}
+                disabled={!isSaveButtonEnabled()}>
+                <Text style={Style_ChangPass.saveButtonText}>Lưu mật khẩu mới</Text>
+            </TouchableOpacity>
         </View>
     );
 };

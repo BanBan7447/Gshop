@@ -6,6 +6,7 @@ import { AppContext } from '../../context'
 import { api_getNews } from '../../helper/ApiHelper'
 import Style_Detail_News from '../../styles/Style_Detail_News'
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
+import FastImage from 'react-native-fast-image'
 
 const Page_News = (props) => {
   const { navigation } = props;
@@ -50,9 +51,17 @@ const Page_News = (props) => {
             </SkeletonPlaceholder>
           ) : (
             <View>
-              <Image
-                source={{ uri: thumbnail }}
-                style={Styles_News.thumbnails_news} />
+              {
+                thumbnail && thumbnail.startsWith('https') ? (
+                  <FastImage
+                    source={{ uri: thumbnail }}
+                    style={Styles_News.thumbnails_news}/>
+                ) : (
+                  <Image
+                    source={{ uri: 'https://phutungnhapkhauchinhhang.com/wp-content/uploads/2020/06/default-thumbnail.jpg' }}
+                    style={Styles_News.thumbnails_news} />
+                )
+              }
               <Text
                 style={Styles_News.title_news}
                 numberOfLines={2}

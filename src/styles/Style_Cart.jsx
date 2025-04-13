@@ -23,7 +23,7 @@ const Style_Cart = StyleSheet.create({
 
     title_cart: {
         fontFamily: 'Inter Bold',
-        fontSize: 20,
+        fontSize: 16,
         color: colors.Black
     },
 
@@ -69,8 +69,8 @@ const Style_Cart = StyleSheet.create({
     },
 
     loading_img_product: {
-        width: 88,
-        height: 88,
+        width: 96,
+        height: 96,
         borderRadius: 12,
         overflow: 'hidden',
         marginBottom: 8,
@@ -86,16 +86,16 @@ const Style_Cart = StyleSheet.create({
     
     text_name: {
         fontFamily: 'Inter SemiBold',
-        fontSize: 18,
+        fontSize: 16,
         color: colors.Black,
-        marginBottom: 4
+        marginBottom: 2
     },
 
     text_price: {
         fontFamily: 'Inter SemiBold',
-        fontSize: 18,
+        fontSize: 14,
         color: colors.Red,
-        marginBottom: 8
+        marginBottom: 4
     },
 
     text_status: {
@@ -130,7 +130,7 @@ const Style_Cart = StyleSheet.create({
         borderWidth: 1,
         borderColor: colors.Light_Grey,
         borderRadius: 6,
-        fontSize: 14,
+        fontSize: 12,
         color: colors.Black,
         backgroundColor: colors.White,
         paddingVertical: 2,
@@ -148,7 +148,8 @@ const Style_Cart = StyleSheet.create({
     container_empty: {
         justifyContent: 'center',
         alignItems: 'center',
-        flex: 1
+        flex: 1,
+        width: '100%',
     },
 
     img_icon_empty: {
@@ -159,17 +160,16 @@ const Style_Cart = StyleSheet.create({
     title_empty: {
         fontFamily: 'Inter Bold',
         color: colors.Black,
-        fontSize: 24,
+        fontSize: 20,
         marginVertical: 8
     },
 
     text_empty: {
-        width: '90%',
         fontFamily: 'Inter Regular',
         color: colors.Black,
-        fontSize: 16,
+        fontSize: 14,
         textAlign: 'center',
-        lineHeight: 24
+        lineHeight: 20
     },
 
     btn_shopping: {
@@ -184,7 +184,7 @@ const Style_Cart = StyleSheet.create({
     
     text_shopping:{
         fontFamily: 'Inter Bold',
-        fontSize: 16,
+        fontSize: 12,
         color: colors.White
     },
 
@@ -211,7 +211,7 @@ const Style_Cart = StyleSheet.create({
     text_totalPrice: {
         fontFamily: 'Inter Bold',
         color: colors.Red,
-        fontSize: 24
+        fontSize: 16
     },
 
     label_checkAll: {
@@ -232,7 +232,7 @@ const Style_Cart = StyleSheet.create({
 
     text_payment: {
         fontFamily: 'Inter Bold',
-        fontSize: 18,
+        fontSize: 16,
         color: colors.White
     },
 

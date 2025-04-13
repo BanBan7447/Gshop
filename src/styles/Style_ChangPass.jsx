@@ -13,43 +13,40 @@ const Style_ChangPass = StyleSheet.create({
         alignItems: 'center',
     },
     backIcon: {
-        width: 24,
+        width: 20,
         height: 20,
     },
     headerTitle: {
-        fontSize: 20,
-        marginLeft: 13,
-        fontWeight: 'bold',
+        fontSize: 16,
+        marginLeft: 14,
+        fontFamily: 'Inter Medium',
         textAlignVertical: 'center',
+        color: colors.Black,
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.Light_Blue,
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        marginVertical: 10,
+    },
+    textInput: {
+        flex: 1,
+        height: 50,
+        fontSize: 14,
         color: colors.Black,
     },
     eyeIcon: {
         width: 24,
-        height: 14,
-        position: 'absolute',
-        right: 16,
-        marginTop: -6,
+        height: 24,
+        marginLeft: 10,
     },
     title: {
-        fontSize: 24,
+        fontSize: 16,
         fontWeight: 'bold',
         color: colors.Black,
-        marginTop: 40,
-    },
-    inputContainer: {
-        width: '100%',
-        height: 56,
-        backgroundColor: colors.Light_Blue,
-        borderRadius: 16,
-        marginTop: 15,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    textInput: {
-        flex: 1,
-        color: colors.Black,
-        fontSize: 16,
-        marginLeft: 15,
+        marginTop: 24,
     },
     placeholder: {
         color: colors.Black,
@@ -60,32 +57,30 @@ const Style_ChangPass = StyleSheet.create({
         height: 24
     },
     infoText: {
-        fontSize: 18,
+        fontSize: 16,
         color: colors.Black,
-        marginTop: 20,
+        marginTop: 24,
+        marginBottom: 8,
         fontWeight: 'bold',
     },
     listItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 5,
+        marginTop: 8,
     },
     tickIcon: {
         width: 16,
         height: 16,
     },
     listText: {
-        marginLeft: 5,
-        fontSize: 16,
+        marginLeft: 12,
+        fontSize: 14,
         color: colors.Black,
+        fontFamily: 'Inter Medium'
     },
     container_bottom: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        marginBottom: 24,
-        marginHorizontal: 20
+        paddingVertical: 24,
+        paddingHorizontal: 20
     },
     saveButton: {
         width: '100%',
@@ -93,14 +88,15 @@ const Style_ChangPass = StyleSheet.create({
         backgroundColor: colors.Red,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 16
+        borderRadius: 16,
+        marginTop: 24
     },
     saveButtonText: {
         color: colors.White,
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
     },
 })
-  
+
 
 export default Style_ChangPass

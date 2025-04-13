@@ -6,8 +6,11 @@ import Page_Search from '../stack/page_stack/Page_Search'
 import Page_Detail from '../stack/page_stack/Page_Detail'
 import Page_Login from '../stack/page_stack/Page_Login'
 import Page_SignUp from '../stack/page_stack/Page_SignUp'
+import Page_Find_Email from '../stack/page_stack/Page_Find_Email'
 import Page_Payment from '../stack/page_stack/Page_Payment'
 import Page_Write_Rate from '../stack/page_stack/Page_Write_Rate'
+import Page_Verify_OTP from '../stack/page_stack/Page_Verify_OTP'
+import Page_ForgotPass from '../stack/page_stack/Page_ForgotPass'
 
 import Page_ChangPass from '../stack/page_stack/Page_ChangPass'
 import Page_Edit_Profile from '../stack/page_stack/Page_Edit_Profile'
@@ -44,6 +47,9 @@ const Stack_Navigation = () => {
       <Stack.Screen name='WriteRate' component={Page_Write_Rate} />
       <Stack.Screen name='AddAddress' component={Page_Add_Address} />
       <Stack.Screen name='EditAddress' component={Page_Edit_Address} />
+      <Stack.Screen name='FindEmail' component={Page_Find_Email} />
+      <Stack.Screen name='VerityOTP' component={Page_Verify_OTP} />
+      <Stack.Screen name='ForgotPass' component={Page_ForgotPass} />
     </Stack.Navigator>
   )
 }
