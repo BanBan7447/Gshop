@@ -17,7 +17,8 @@ const Style_Edit_Profile = StyleSheet.create ({
         height: 20,
     },
     headerTitle: {
-        fontSize: 20,
+        fontFamily: 'Inter Medium',
+        fontSize: 16,
         marginLeft: 18,
         color: colors.Black,
     },
@@ -29,21 +30,20 @@ const Style_Edit_Profile = StyleSheet.create ({
         backgroundColor: colors.Grey,
         width: 120,
         height: 120,
-        marginTop: 25,
+        marginTop: 24,
+        marginBottom: 16,
     },
     updateButton: {
-        width: 231,
         height: 48,
         backgroundColor: colors.Blue,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
         borderRadius: 12,
-        marginHorizontal: 'auto',
-        marginTop: 12,
+        paddingHorizontal: 16
     },
     uploadIcon: {
-        marginRight: 10,
+        marginRight: 8,
         width: 24,
         height: 24
     },
@@ -52,7 +52,7 @@ const Style_Edit_Profile = StyleSheet.create ({
         fontSize: 16,
     },
     label: {
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Grey,
         marginTop: 10,
     },
@@ -66,6 +66,13 @@ const Style_Edit_Profile = StyleSheet.create ({
         backgroundColor: colors.Light_Blue,
         marginBottom: 16,
         marginTop: 9,
+        color: colors.Black
+    },
+    error: {
+        fontFamily: "Inter Regular",
+        marginTop: -4,
+        marginBottom: 16,
+        color: colors.Red
     },
     placeholder: {
         color: colors.Black,

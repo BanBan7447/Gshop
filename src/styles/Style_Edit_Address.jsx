@@ -5,12 +5,11 @@ const Style_Edit_Address = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#FFFFFF',
-        padding: 16,
+        padding: 20,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 10,
         marginBottom: 20
     },
     backIcon: {
@@ -18,10 +17,11 @@ const Style_Edit_Address = StyleSheet.create({
         height: 20,
     },
     headerTitle: {
-        fontSize: 20,
-        marginLeft: 13,
-        fontWeight: 'bold',
+        fontSize: 16,
+        marginLeft: 12,
+        fontFamily: 'Inter Medium',
         textAlignVertical: 'center',
+        color: colors.Black
     },
     name: {
         fontSize: 16,
@@ -30,16 +30,15 @@ const Style_Edit_Address = StyleSheet.create({
         width: '100%',
         marginTop: 10
     },
-    // text: {
-    //     fontSize: 16,
-    //     color: '#7F7F7F',
-    //     marginRight: 325,
-    //     marginBottom: 10,
-    //     width: '100%',
-    // },
+    title: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: colors.Black,
+        marginBottom: 8
+    },
     input: {
         width: '100%',
-        height: 50,
+        height: 56,
         borderWidth: 1,
         borderColor: '#E9F1FB',
         borderRadius: 16,
@@ -48,39 +47,37 @@ const Style_Edit_Address = StyleSheet.create({
         marginBottom: 16,
         marginTop: 5
     },
+    containerBTN: {
+        flexDirection: 'row',
+        gap: 16,
+        zIndex: 1000
+    },
     loginButton: {
-        width: '100%',
+        flex: 1,
+        height: 56,
+        backgroundColor: colors.Blue,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 16,
+    },
+    loginButtonText: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontFamily: 'Inter Bold'
+    },
+    deleteButton: {
+        flex: 1,
         height: 56,
         backgroundColor: '#E43727',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
-        marginBottom: 20,
-        marginTop: 20
     },
-    loginButtonText: {
-        color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    deleteButton: {
-        width: '100%',
-        height: 56,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 16,
-        marginBottom: 20,
-        borderWidth: 2, // Độ dày viền
-        borderColor: '#E43727', // Màu đỏ
-    },
-
     deleteButtonText: {
-        color: '#E43727',
-        fontSize: 18,
-        fontWeight: 'bold',
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontFamily: 'Inter Bold'
     }
-
-
 })
 
 export default Style_Edit_Address

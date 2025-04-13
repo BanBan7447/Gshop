@@ -13,7 +13,7 @@ const Style_Notification = StyleSheet.create({
     title: {
         fontFamily: 'Inter Bold',
         color: colors.Black,
-        fontSize: 24,
+        fontSize: 20,
         marginBottom: 24
     },
 

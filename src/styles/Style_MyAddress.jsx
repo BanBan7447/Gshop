@@ -19,9 +19,8 @@ const Style_MyAddress = StyleSheet.create({
         height: 20,
       },
       headerTitle: {
-        width: 164,
-        height: 28,
-        fontSize: 20,
+        width: '100%',
+        fontSize: 16,
         marginLeft: 18,
         color: colors.Black,
       },
@@ -55,28 +54,29 @@ const Style_MyAddress = StyleSheet.create({
         height: 48,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 15
+        marginTop: 16
       },
       locationIcon: {
         width: 24,
         height: 24,
       },
       addressDetails: {
-        marginLeft: 10,
-        marginTop: 15,
+        marginLeft: 16,
+        marginTop: 16,
         flex: 1,
       },
       addressText: {
-        fontSize: 16,
+        fontSize: 14,
         color: '#121212',
-        lineHeight: 24,
-        fontWeight: '400',
+        lineHeight: 20,
+        fontFamily: 'Inter Medium'
       },
       editText: {
-        fontSize: 18,
+        fontFamily: 'Inter Bold',
+        fontSize: 16,
         color: '#E43727',
         alignSelf: 'flex-end',
-        marginTop: 15,
+        marginTop: 12,
       },
 });
 export default Style_MyAddress

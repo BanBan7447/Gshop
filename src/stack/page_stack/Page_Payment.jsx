@@ -41,6 +41,12 @@ const Page_Payment = props => {
   const [editPhone, setEditPhone] = useState('');
   const [editAddress, setEditAddress] = useState('');
 
+  useFocusEffect(
+    useCallback(() => {
+      setModelVisible(false);
+    }, [])
+  );
+
   useEffect(() => {
     if (users) {
       setName(prevName => prevName || `${users.name}`);
@@ -180,28 +186,6 @@ const Page_Payment = props => {
     );
   };
 
-  // Hàm render address
-  const renderAddress = () => {
-    if (!address) {
-      return (
-        <Text style={Style_Payment.text_body_1}>
-          Địa chỉ:{' '}
-          <Text style={Style_Payment.text_body_2}>Chưa có địa chỉ</Text>
-        </Text>
-      );
-    }
-
-    return (
-      <Text style={Style_Payment.text_body_1}>
-        Địa chỉ:{' '}
-        <Text style={Style_Payment.text_body_2}>
-          {address.detail}, {address.commune}, {address.district},{' '}
-          {address.province}
-        </Text>
-      </Text>
-    );
-  };
-
   // Hàm bỏ chọn sản phẩm
   const removeItem = productId => {
     const updatedProducts = selectProduct.filter(
@@ -279,7 +263,7 @@ const Page_Payment = props => {
       duration: 2500,
       animationType: 'fade',
       style: { backgroundColor: 'red', borderRadius: 10 },
-      textStyle: { color: 'white', fontSize: 16 },
+      textStyle: { color: 'white', fontSize: 14 },
     });
   };
 
@@ -371,7 +355,7 @@ const Page_Payment = props => {
           <View style={Style_Payment.container_title}>
             <Text style={Style_Payment.text_title}>Người nhận</Text>
             <TouchableOpacity onPress={openEditModal}>
-              <Text style={[Style_Payment.btn_text, { color: colors.Red, fontSize: 18 }]}>Đổi thông tin</Text>
+              <Text style={[Style_Payment.btn_text, { color: colors.Red, fontSize: 16 }]}>Đổi thông tin</Text>
             </TouchableOpacity>
           </View>
 
@@ -396,9 +380,9 @@ const Page_Payment = props => {
             </Text>
           </Text>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Location")}>
+          {/* <TouchableOpacity onPress={() => navigation.navigate("Location", { fromCheckout: true })}>
             <Text style={[Style_Payment.btn_text, { textAlign: 'right' }]}>Đổi địa chỉ</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <View style={Style_Payment.container_product}>
@@ -434,20 +418,9 @@ const Page_Payment = props => {
                     {item.id_product?.price?.toLocaleString('vi-VN')}
                   </Text>
 
-                  <View style={Style_Payment.container_quantity}>
-                    <Text style={Style_Payment.text_quantity}>
-                      Số lượng: {item.quantity}
-                    </Text>
-
-                    <TouchableOpacity
-                      style={Style_Payment.btn_delete}
-                      onPress={() => removeItem(item.id_product._id)}>
-                      <Image
-                        source={require('../../assets/icon/icon_x_black.png')}
-                        style={Style_Payment.icon_quantity}
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <Text style={Style_Payment.text_quantity}>
+                    Số lượng: {item.quantity}
+                  </Text>
                 </View>
               </View>
             );
@@ -469,21 +442,21 @@ const Page_Payment = props => {
           <Text style={Style_Payment.text_title}>Chi phí thanh toán</Text>
 
           <View style={[Style_Payment.container_totalPrice, { marginBottom: 8 }]}>
-            <Text style={{ fontSize: 16 }}>Tổng tiền sản phẩm: </Text>
+            <Text style={{ fontSize: 16 }}>Tổng tiền sản phẩm:</Text>
             <Text style={{ fontSize: 16 }}>
               {cart.totalPrice?.toLocaleString('vi-VN')}đ
             </Text>
           </View>
 
           <View style={[Style_Payment.container_totalPrice, { marginBottom: 8 }]}>
-            <Text style={{ fontSize: 16 }}>Phí vận chuyển</Text>
+            <Text style={{ fontSize: 16 }}>Phí vận chuyển:</Text>
             <Text style={{ fontSize: 16 }}>
               {shippingFee.toLocaleString('vi-VN')}đ
             </Text>
           </View>
 
           <View style={Style_Payment.container_totalPrice}>
-            <Text style={Style_Payment.text_totalPrice}>Tổng tiền</Text>
+            <Text style={Style_Payment.text_totalPrice}>Tổng tiền:</Text>
             <Text style={Style_Payment.text_totalPrice}>
               {finalPrice.toLocaleString('vi-VN')}đ
             </Text>
@@ -533,23 +506,29 @@ const Page_Payment = props => {
               onChangeText={setEditPhone} />
 
             <Text style={Style_Payment.modalLabel}>Địa chỉ</Text>
-            <TextInput
-              style={[Style_Payment.textInput, {lineHeight: 24}]}
+            {/* <TextInput
+              style={[Style_Payment.textInput, { lineHeight: 24 }]}
               multiline
               value={editAddress}
-              onChangeText={setEditAddress} />
+              onChangeText={setEditAddress} /> */}
+
+            <TouchableOpacity
+              style={[Style_Payment.textInput]}
+              onPress={() => navigation.navigate("Location", { fromCheckout: true })}>
+              <Text style={{ lineHeight: 20, fontSize: 14, color: colors.Black }}>{editAddress}</Text>
+            </TouchableOpacity>
 
             <View style={{ flexDirection: 'row', gap: 16 }}>
-              <TouchableOpacity
-                style={[Style_Payment.modalButton, { backgroundColor: colors.Blue }]}
-                onPress={handleUpdate}>
-                <Text style={Style_Payment.modalTextButton}>Cập nhật</Text>
-              </TouchableOpacity>
-
               <TouchableOpacity
                 style={[Style_Payment.modalButton, { backgroundColor: colors.Red }]}
                 onPress={() => setModelVisible(false)}>
                 <Text style={Style_Payment.modalTextButton}>Hủy</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[Style_Payment.modalButton, { backgroundColor: colors.Blue }]}
+                onPress={handleUpdate}>
+                <Text style={Style_Payment.modalTextButton}>Cập nhật</Text>
               </TouchableOpacity>
             </View>
           </View>

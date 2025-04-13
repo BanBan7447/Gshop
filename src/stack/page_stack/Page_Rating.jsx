@@ -66,7 +66,12 @@ const Page_Rating = (props) => {
         const totalPoints = reviews.reduce((sum, review) => sum + review.star, 0);
         const avarageRating = totalPoints / reviews.length;
         setTotalRate(avarageRating.toFixed(1));
-        setRatings(reviews);
+
+        const myReview = reviews.find(my => my.id_user === users._id);
+        const othersReview = reviews.filter(my => my.id_user !== users._id);
+
+        const sortedReviews = myReview ? [myReview, ...othersReview] : reviews;
+        setRatings(sortedReviews);
       }
     } catch (e) {
       console.log(e);
@@ -114,8 +119,10 @@ const Page_Rating = (props) => {
       <View style={Style_Rating.container_customer}>
 
         <View style={Style_Rating.contain_name_date}>
-          <Text style={Style_Rating.name_customer}>{userNames[item.id_user]}</Text>
-          <Text>{item.date}</Text>
+          <Text style={Style_Rating.name_customer}>
+            {item.id_user === users._id ? "Đánh giá của tôi" : userNames[item.id_user]}
+          </Text>
+          <Text style={{ fontSize: 12 }}>{item.date}</Text>
         </View>
 
         {renderStars(item.star)}

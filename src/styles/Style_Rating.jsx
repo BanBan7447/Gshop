@@ -21,7 +21,7 @@ const Style_Rating = StyleSheet.create({
     text_navigation: {
         fontFamily: 'Inter Medium',
         color: colors.Black,
-        fontSize: 20
+        fontSize: 16
     },
 
     container_loading: {
@@ -39,7 +39,7 @@ const Style_Rating = StyleSheet.create({
     text_name: {
         fontFamily: 'Inter Bold',
         color: colors.Black,
-        fontSize: 24
+        fontSize: 20
     },
 
     container_rating: {
@@ -53,13 +53,13 @@ const Style_Rating = StyleSheet.create({
     text_rating: {
         fontFamily: 'Inter Medium',
         color: colors.Grey,
-        fontSize: 18
+        fontSize: 16
     },
 
     text_rateNumber: {
         fontFamily: 'Inter Medium',
         color: colors.Black,
-        fontSize: 18,
+        fontSize: 16,
         marginStart: 4
     },
 
@@ -78,7 +78,7 @@ const Style_Rating = StyleSheet.create({
     name_customer: {
         fontFamily: 'Inter Medium',
         color: colors.Black,
-        fontSize: 18,
+        fontSize: 16,
     },
 
     content_rating: {
@@ -128,7 +128,7 @@ const Style_Rating = StyleSheet.create({
     },
 
     text_noRating: {
-        fontSize: 18,
+        fontSize: 16,
         fontFamily: 'Inter Bold',
         color: colors.Black,
         marginTop: 16

@@ -36,13 +36,13 @@ const Style_Detail = StyleSheet.create({
     fontFamily: 'Inter Bold',
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 16,
     color: colors.Green,
     marginStart: 12,
   },
 
   text_numberCart: {
-    fontSize: 11,
+    fontSize: 8,
     color: colors.White,
   },
 
@@ -55,7 +55,7 @@ const Style_Detail = StyleSheet.create({
     borderRadius: 50,
     position: 'absolute',
     right: 0,
-    top: 0,
+    top: -2,
   },
 
   img_icon: {
@@ -73,7 +73,7 @@ const Style_Detail = StyleSheet.create({
   text_navigation: {
     fontFamily: 'Inter Medium',
     color: colors.Black,
-    fontSize: 20,
+    fontSize: 16,
   },
 
   img_product: {
@@ -95,14 +95,14 @@ const Style_Detail = StyleSheet.create({
 
   text_name: {
     fontFamily: 'Inter SemiBold',
-    fontSize: 24,
+    fontSize: 20,
     color: colors.Black,
     marginBottom: 4,
   },
 
   text_price: {
     fontFamily: 'Inter Bold',
-    fontSize: 28,
+    fontSize: 20,
     color: colors.Red,
     marginBottom: 4,
   },
@@ -110,14 +110,14 @@ const Style_Detail = StyleSheet.create({
   text_title_state: {
     fontFamily: 'Inter Medium',
     color: colors.Black,
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 16,
   },
 
   text_title_describe: {
     fontFamily: 'Inter Medium',
     color: colors.Black,
-    fontSize: 20,
+    fontSize: 16,
   },
 
   text_describe: {
@@ -139,7 +139,7 @@ const Style_Detail = StyleSheet.create({
 
   text_AddCart: {
     fontFamily: 'Inter Bold',
-    fontSize: 18,
+    fontSize: 16,
     color: colors.White,
   },
 
@@ -178,8 +178,8 @@ const Style_Detail = StyleSheet.create({
   container_numberPic: {
     position: 'absolute',
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 14,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -196,7 +196,7 @@ const Style_Detail = StyleSheet.create({
   text_view: {
     fontFamily: 'Inter Medium',
     color: colors.White,
-    fontSize: 14,
+    fontSize: 12,
   },
 
   container_loading: {
@@ -216,7 +216,7 @@ const Style_Detail = StyleSheet.create({
 
   text_rate: {
     fontFamily: 'Inter SemiBold',
-    fontSize: 16,
+    fontSize: 14,
     color: colors.Black,
     marginLeft: 6,
   },

@@ -4,13 +4,12 @@ import colors from './colors'
 const Style_Add_Address = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
-        padding: 16,
+        backgroundColor: colors.White,
+        padding: 20,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 10,
         marginBottom: 20
     },
     backIcon: {
@@ -18,10 +17,17 @@ const Style_Add_Address = StyleSheet.create({
         height: 20,
     },
     headerTitle: {
-        fontSize: 20,
-        marginLeft: 13,
-        fontWeight: 'bold',
+        fontSize: 16,
+        marginLeft: 12,
+        fontFamily: 'Inter Medium',
         textAlignVertical: 'center',
+        color: colors.Black
+    },
+    title: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: colors.Black,
+        marginBottom: 8
     },
     name: {
         fontSize: 16,
@@ -39,14 +45,13 @@ const Style_Add_Address = StyleSheet.create({
     // },
     input: {
         width: '100%',
-        height: 50,
-        borderWidth: 1,
-        borderColor: '#E9F1FB',
+        height: 48,
         borderRadius: 16,
         paddingHorizontal: 16,
-        backgroundColor: '#E9F1FB',
+        backgroundColor: colors.Light_Blue,
         marginBottom: 16,
-        marginTop: 5
+        marginTop: 6,
+        borderWidth: 0
     },
     loginButton: {
         width: '100%',
@@ -60,12 +65,18 @@ const Style_Add_Address = StyleSheet.create({
     },
     loginButtonText: {
         color: '#FFFFFF',
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: 'bold',
     },
-
-
-
+    container_switch: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    text_switch: {
+        fontSize: 14,
+        color: colors.Black
+    }
 })
 
 export default Style_Add_Address

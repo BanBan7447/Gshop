@@ -136,7 +136,11 @@ const Page_Home = (props) => {
       const response = await api_getProducts();
       const filterDataProducts = processProducts(response);
       console.log('All Products:', filterDataProducts);  // In ra dữ liệu sản phẩm để kiểm tra
-      setProducts(filterDataProducts); // Cập nhật danh sách sản phẩm với tất cả sản phẩm
+      // setProducts(filterDataProducts); // Cập nhật danh sách sản phẩm với tất cả sản phẩm
+      setProducts([
+        ...filterDataProducts.filter(product => product.quantity > 0),
+        ...filterDataProducts.filter(product => product.quantity <= 0)
+      ])
     } catch (e) {
       console.log(e);
     } finally {
@@ -149,7 +153,11 @@ const Page_Home = (props) => {
     try {
       const response = await api_getProductsByCategory(selectCategory);
       const filterDataProducts = processProducts(response);
-      setProducts(filterDataProducts);
+      //setProducts(filterDataProducts);
+      setProducts([
+        ...filterDataProducts.filter(product => product.quantity > 0),
+        ...filterDataProducts.filter(product => product.quantity <= 0)
+      ])
     } catch (e) {
       console.log(e);
     } finally {
@@ -359,72 +367,81 @@ const Page_Home = (props) => {
             <View style={Style_Home.container_filer}>
               <Text style={Style_Home.title}>Đề xuất cho bạn</Text>
 
-              <DropDownPicker
-                open={open}
-                value={value}
-                items={items}
-                setOpen={setOpen}
-                setValue={setValue}
-                setItems={setItems}
-                containerStyle={{
-                  width: 160,
-                  height: 40,
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
+              <View style={{ zIndex: 1000 }}>
+                <DropDownPicker
+                  open={open}
+                  value={value}
+                  items={items}
+                  setOpen={setOpen}
+                  setValue={setValue}
+                  setItems={setItems}
+                  containerStyle={{
+                    width: 160,
+                    height: 40,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
 
-                style={{
-                  borderWidth: 0,
-                }}
+                  style={{
+                    borderWidth: 0,
+                  }}
 
-                textStyle={{
-                  fontSize: 16,
-                  color: colors.Black,
-                  marginRight: 10,
-                  textAlign: 'left'
-                }}
+                  textStyle={{
+                    fontFamily: 'Inter Medium',
+                    fontSize: 12,
+                    color: colors.Black,
+                    marginRight: 2,
+                    textAlign: 'left'
+                  }}
 
-                labelStyle={{
-                  textAlign: 'right'
-                }}
+                  labelStyle={{
+                    textAlign: 'right'
+                  }}
 
-                dropDownContainerStyle={{
-                  backgroundColor: colors.White, // Màu nền của dropdown
-                  borderTopStartRadius: 12,
-                  borderTopEndRadius: 12,
-                  borderBottomStartRadius: 12,
-                  borderBottomStartRadius: 12,
-                  borderWidth: 1,
-                  borderColor: colors.Light_Grey,
-                  width: '100%'
-                }}
+                  dropDownContainerStyle={{
+                    borderTopStartRadius: 12,
+                    borderTopEndRadius: 12,
+                    borderBottomStartRadius: 12,
+                    borderBottomStartRadius: 12,
+                    borderWidth: 1,
+                    borderColor: colors.Light_Grey,
+                    width: '100%',
+                  }}
 
-                onChangeValue={(value) => {
-                  filterProducts(value)
-                }}
+                  listItemLabelStyle={{
+                    fontSize: 11,
+                    color: colors.Black,
+                    textAlign: 'left',
+                    fontFamily: 'Inter Medium'
+                  }}
 
-                showArrowIcon={true}
-                ArrowDownIconComponent={() => {
-                  return (
-                    <Image
-                      style={{ width: 12, height: 12 }}
-                      source={require('../../assets/icon/icon_arrow_down.png')} />
-                  )
-                }}
+                  onChangeValue={(value) => {
+                    filterProducts(value)
+                  }}
 
-                ArrowUpIconComponent={() => {
-                  return (
-                    <Image
-                      style={{ width: 12, height: 12, transform: [{ rotate: '180deg' }] }}
-                      source={require('../../assets/icon/icon_arrow_down.png')} />
-                  )
-                }}
+                  showArrowIcon={true}
+                  ArrowDownIconComponent={() => {
+                    return (
+                      <Image
+                        style={{ width: 12, height: 12 }}
+                        source={require('../../assets/icon/icon_arrow_down.png')} />
+                    )
+                  }}
 
-                scrollViewProps={{
-                  nestedScrollEnabled: false,
-                  keyboardShouldPersistTaps: 'handled'
-                }}
-              />
+                  ArrowUpIconComponent={() => {
+                    return (
+                      <Image
+                        style={{ width: 12, height: 12, transform: [{ rotate: '180deg' }] }}
+                        source={require('../../assets/icon/icon_arrow_down.png')} />
+                    )
+                  }}
+
+                  scrollViewProps={{
+                    nestedScrollEnabled: false,
+                    keyboardShouldPersistTaps: 'handled'
+                  }}
+                />
+              </View>
             </View>
 
             <FlatList

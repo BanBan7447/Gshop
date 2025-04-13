@@ -32,13 +32,12 @@ const Style_Home = StyleSheet.create({
         marginBottom: 24,
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: '100%',
         height: 40,
     },
 
     title: {
         fontFamily: 'Inter Medium',
-        fontSize: 20,
+        fontSize: 16,
         color: colors.Black
     },
 
@@ -61,7 +60,7 @@ const Style_Home = StyleSheet.create({
 
     render_text_category: {
         fontFamily: 'Inter Medium',
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Black,
     },
 
@@ -108,7 +107,7 @@ const Style_Home = StyleSheet.create({
 
     price_product: {
         fontFamily: 'Inter Bold',
-        fontSize: 24,
+        fontSize: 18,
         color: colors.Red,
     },
 

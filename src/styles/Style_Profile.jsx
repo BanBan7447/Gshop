@@ -6,7 +6,7 @@ const Style_Profile = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.White,
         paddingHorizontal: 20,
-        paddingTop: 20
+        paddingTop: 20,
     },
 
     avatar: {
@@ -18,37 +18,37 @@ const Style_Profile = StyleSheet.create({
 
     icon_img: {
         width: 24,
-        height: 24
+        height: 24,
     },
 
     container_info: {
-        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 24
     },
 
     info: {
-        alignItems: 'center',
-        justifyContent: 'center',
+        flex: 1,
+        alignItems: 'center'
     },
 
     title_welcome: {
         fontFamily: 'Inter SemiBold',
-        fontSize: 18,
-        marginBottom: 6
+        fontSize: 13,
+        marginBottom: 6,
+        color: colors.Black
     },
 
     title_name: {
         fontFamily: 'Inter SemiBold',
-        fontSize: 22,
+        fontSize: 16,
         marginBottom: 4,
         color: colors.Black
     },
 
     title_phone: {
         fontFamily: 'Inter Medium',
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Black
     },
 
@@ -64,20 +64,20 @@ const Style_Profile = StyleSheet.create({
     text_btn_Login_SignUp: {
         fontFamily: 'Inter SemiBold',
         color: colors.White,
-        fontSize: 16
+        fontSize: 14
     },
 
     btn_page: {
         width: '100%',
         height: 56,
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
     },
 
     text_btn_page: {
         fontFamily: 'Inter SemiBold',
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Black
     }
 });

@@ -15,7 +15,7 @@ const Style_Login = StyleSheet.create({
         alignSelf: 'flex-start', // Đưa logo về góc trái
     },
     title: {
-        fontSize: 32,
+        fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
         color: colors.Black,
@@ -26,15 +26,13 @@ const Style_Login = StyleSheet.create({
         marginBottom: 16,
     },
     label: {
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Grey,
         marginBottom: 8,
     },
     input: {
         width: '100%',
-        height: 50,
-        borderWidth: 1,
-        borderColor: colors.Light_Blue,
+        height: 56,
         borderRadius: 16,
         paddingHorizontal: 16,
         backgroundColor: colors.Light_Blue,
@@ -52,14 +50,15 @@ const Style_Login = StyleSheet.create({
         height: 14,
         position: 'absolute',
         right: 16,
-        marginTop: -6,
+        marginTop: -8,
     },
     forgotPasswordContainer: {
         alignSelf: 'flex-end',
     },
     forgotPassword: {
+        fontFamily: 'Inter Medium',
         color: colors.Black,
-        fontSize: 16,
+        fontSize: 14,
     },
     loginButton: {
         width: '100%',
@@ -68,36 +67,35 @@ const Style_Login = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
-        marginBottom: 20,
-        marginTop: 30
+        marginBottom: 24,
+        marginTop: 24
     },
     loginButtonText: {
         color: colors.White,
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontFamily: 'Inter Bold',
     },
     newUserContainer: {
         justifyContent: 'center',
         alignItems: 'center',
     },
     newUserText: {
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Black,
-        marginBottom: 5,
+        marginBottom: 12,
     },
     registerButton: {
-        width: 370,
+        width: '100%',
         height: 56,
         backgroundColor: colors.Blue,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
-        marginBottom: 20,
     },
     registerButtonText: {
         color: colors.White,
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontFamily: 'Inter Bold',
     },
 })
 

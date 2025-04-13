@@ -12,7 +12,8 @@ const Style_Write_Rate = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         height: 56,
-        marginTop: 8
+        marginTop: 8,
+        marginBottom: 16
     },
 
     img_icon: {
@@ -30,37 +31,40 @@ const Style_Write_Rate = StyleSheet.create({
     text_navigation: {
         fontFamily: 'Inter Medium',
         color: colors.Black,
-        fontSize: 20
+        fontSize: 16
     },
 
     img_product: {
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         borderRadius: 16,
         marginRight: 16
     },
 
     container_product: {
+        marginBottom: 32,
+    },
+
+    container_info: {
         flexDirection: 'row',
-        marginTop: 16
     },
 
     text_name: {
         fontFamily: 'Inter Bold',
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Black,
         marginBottom: 4,
-        lineHeight: 24
+        lineHeight: 20
     },
 
     text_price: {
         fontFamily: 'Inter Bold',
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Red
     },
 
     star_text: {
-        fontSize: 16,
+        fontSize: 14,
         marginTop: 8,
         fontFamily: 'Inter Medium',
         color: colors.Black,
@@ -69,7 +73,7 @@ const Style_Write_Rate = StyleSheet.create({
     label_text_input: {
         fontFamily: 'Inter Medium',
         color: colors.Grey,
-        fontSize: 16,
+        fontSize: 14,
         marginTop: 16,
         marginBottom: 8
     },
@@ -81,7 +85,8 @@ const Style_Write_Rate = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         textAlignVertical: 'top',
-        marginBottom: 16
+        marginBottom: 16,
+        color: colors.Black
     },
 
     btn_upload: {
@@ -101,12 +106,13 @@ const Style_Write_Rate = StyleSheet.create({
     },
 
     btn_review: {
-        height: 48,
+        height: 56,
         borderRadius: 16,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 16
+        paddingHorizontal: 20,
+        marginTop: -24
     },
 
     text_review: {
@@ -124,18 +130,11 @@ const Style_Write_Rate = StyleSheet.create({
 
     },
 
-    container_bottom: {
-        alignSelf: 'flex-end',
-        flexDirection: 'row',
-        gap: 12,
-        marginBottom: 16
-    },
-
     text_empty: {
         textAlign: 'center',
         color: colors.Grey,
-        marginVertical: 16,
-        fontSize: 16
+        marginBottom: 16,
+        fontSize: 16,
     }
 })
 

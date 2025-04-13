@@ -12,7 +12,7 @@ const Style_Search = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         height: 56,
-        marginHorizontal: 24,
+        marginHorizontal: 20,
         marginTop: 8
     },
 
@@ -25,7 +25,7 @@ const Style_Search = StyleSheet.create({
     text_navigation: {
         fontFamily: 'Inter Medium',
         color: colors.Black,
-        fontSize: 20
+        fontSize: 16
     },
 
     contain_text_input: {

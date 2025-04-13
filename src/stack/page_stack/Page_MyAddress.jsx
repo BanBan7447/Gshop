@@ -6,57 +6,68 @@ import { api_getAddressList, api_updateAddressSelected } from '../../helper/ApiH
 import { AppContext } from '../../context';
 
 const Page_MyAddress = (props) => {
-    const { navigation } = props;
+    const { navigation, route } = props;
     const [address, setAddress] = useState([]);
     const [loading, setLoading] = useState(true);
     const { users, setUsers } = useContext(AppContext);
     const [selectedAddressId, setSelectedAddressId] = useState(null);
 
-    const fetchAddresses = async () => {
+    const fromCheckout = route?.params?.fromCheckout || false;
+
+    const fetchAddress = async () => {
         setLoading(true);
         try {
             const data = await api_getAddressList(users._id);
-            if (Array.isArray(data)) {
+            console.log("Danh sách địa chỉ mới nhất:", data);
+
+            if (Array.isArray(data) && data.length > 0) {
                 setAddress(data);
 
                 const selectedAddress = data.find(addr => addr.selected);
                 if (selectedAddress) {
                     setSelectedAddressId(selectedAddress?._id);
+                    console.log("ID của địa chỉ: ", selectedAddress?._id);
                 }
-
-                console.log("ID của địa chỉ: ", selectedAddress?._id)
             } else {
-                console.error("Lỗi: API không trả về danh sách hợp lệ!", data);
+                setAddress([]);
             }
-        } catch (error) {
-            console.error('Lỗi khi lấy danh sách địa chỉ:', error);
+        } catch (e) {
+            console.error('Lỗi khi lấy danh sách địa chỉ:', e);
+            setAddress([]);
         } finally {
             setLoading(false);
         }
-    };
+    }
 
     // Gọi API mỗi khi màn hình được focus
     useFocusEffect(
         useCallback(() => {
-            fetchAddresses();
+            fetchAddress();
         }, [])
     );
 
     // Hàm chọn địa chỉ
     const handleSelectAddress = async (id_address) => {
-        const selectState = id_address !== selectedAddressId;
+        if (id_address === selectedAddressId) {
+            return;
+        }
 
-        const response = await api_updateAddressSelected(users._id, id_address, selectState);
-        console.log("Địa chỉ của user: ", users._id);
-        console.log("ID địa chỉ: ", id_address);
-
-        if (response) {
-            setSelectedAddressId(selectState ? id_address : null);
-            fetchAddresses();
-
-            if (selectState) {
-                navigation.goBack();
+        try {
+            if (selectedAddressId) {
+                await api_updateAddressSelected(users._id, selectedAddressId, false);
             }
+
+            await api_updateAddressSelected(users._id, id_address, true);
+
+            setSelectedAddressId(id_address);
+            fetchAddress();
+
+            if (selectedAddressId && fromCheckout) {
+                // navigation.navigate("Payment")
+                navigation.goBack()
+            }
+        } catch (e) {
+            console.log(e)
         }
     }
 
@@ -90,22 +101,19 @@ const Page_MyAddress = (props) => {
 
     return (
         <View style={Style_MyAddress.container}>
-            {/* Header */}
             <TouchableOpacity
                 style={Style_MyAddress.header}
-                onPress={() => navigation.navigate('Tab', { screen: 'Profile' })}>
+                onPress={() => navigation.goBack()}>
                 <Image style={Style_MyAddress.backIcon} source={require('../../assets/icon/icon_long_arrow.png')} />
                 <Text style={Style_MyAddress.headerTitle}>Địa chỉ giao hàng</Text>
             </TouchableOpacity>
 
-            {/* Thêm địa chỉ */}
             <TouchableOpacity
                 style={Style_MyAddress.addButton}
                 onPress={() => navigation.navigate('AddAddress')}>
                 <Text style={Style_MyAddress.addButtonText}>Thêm địa chỉ</Text>
             </TouchableOpacity>
 
-            {/* Hiển thị loading */}
             {loading ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <ActivityIndicator size="large" color="#ff0000" />
@@ -116,9 +124,12 @@ const Page_MyAddress = (props) => {
                         data={address}
                         keyExtractor={(item) => item._id || item.id}
                         renderItem={renderAddressItem}
+                        showsVerticalScrollIndicator={false}
                     />
                 ) : (
-                    <Text style={{ textAlign: 'center', marginTop: 20 }}>Không có địa chỉ nào</Text>
+                    <View>
+                        <Text style={{ textAlign: 'center', marginTop: 20 }}>Không có địa chỉ nào</Text>
+                    </View>
                 )
             )}
         </View>

@@ -54,7 +54,6 @@ const api_changePassword = async (data) => {
         const { user_id, email, newPassword } = data;
         const body = {
             user_id: user_id,
-            email: email,
             newPassword: newPassword
         };
 
@@ -64,8 +63,8 @@ const api_changePassword = async (data) => {
             return response;
         }
         return false;
-    } catch (error) {
-        console.log('Lỗi đổi mật khẩu:', error);
+    } catch (e) {
+        console.log('Lỗi đổi mật khẩu:', e);
         return { status: false, message: 'Đổi mật khẩu thất bại' };
     }
 };
@@ -239,6 +238,21 @@ const api_getDetailNews = async (_id) => {
     }
 }
 
+// Gọi API lấy danh sách đánh giá theo user
+const api_getRateByUser = async (id_user) => {
+    try {
+        console.log('>>>>>>>>>>>>>>>>>> get Rate by User');
+        const response = await AxiosInstance().get(`/rating/list-by-iduser?id_user=${id_user}`);
+        
+        if (response.status == true) {
+            console.log("Data đánh giá trả về của user: ", response.data)
+            return response.data;
+        }
+    } catch {
+        console.log(e);
+    }
+}
+
 // Gọi API lấy danh sách đánh giá theo sản phẩm
 const api_getRateByProduct = async (id_product) => {
     try {
@@ -254,7 +268,6 @@ const api_getRateByProduct = async (id_product) => {
         console.log(e);
     }
 }
-
 
 // Gọi API thêm đánh giá
 const api_addReview = async (star, content, id_user, id_product) => {
@@ -275,7 +288,8 @@ const api_addReview = async (star, content, id_user, id_product) => {
 }
 
 // Gọi API upload image rating
-const BASE_URL = "https://gshopbackend.onrender.com/rating";
+//const BASE_URL = "https://gshopbackend-1.onrender.com/rating";
+const BASE_URL = "http://10.0.2.2:3000/rating"
 const api_uploadImage = async (id_rating, images) => {
     try {
         let formData = new FormData();
@@ -444,7 +458,7 @@ const api_updateSelected = async (id_user, id_product, selected) => {
         console.log("Response API cập nhật selected: ", response)
 
         if (response.status == true) {
-            return response
+            return response.data
         }
     } catch (e) {
         console.log(e)
@@ -536,6 +550,24 @@ const api_getDetailOrder = async (id_order) => {
     }
 };
 
+// Gọi API chỉnh sửa status của đơn hàng
+const api_editStatusOrder = async (id_order, newStatus) => {
+    try{
+        const response = await AxiosInstance().put(`/order/update/${id_order}`, {
+            status: newStatus,
+        });
+
+        if(response.data.status){
+            return{
+                success: true,
+                updatedOrder: response.data.data
+            }
+        }
+    } catch(e){
+        console.log(e);
+    }
+}
+
 // Gọi API lấy chi tiết địa chỉ theo id_address
 const api_getDetailAddress = async (id_address) => {
     try {
@@ -565,7 +597,8 @@ const api_getDetailPayment = async (id_payment) => {
 }
 
 // API update Image người dùng
-const BASE_URL_2 = "https://gshopbackend.onrender.com/user";
+// const BASE_URL_2 = "https://gshopbackend-1.onrender.com/user";
+ const BASE_URL_2 = "http://10.0.2.2:3000/user"
 const api_uploadAvatar = async (id_user, imageUri) => {
     try {
         console.log('user: ', id_user);
@@ -608,17 +641,9 @@ const api_getAddressList = async (id_user) => {
         console.log("API response:", response.data); // Kiểm tra dữ liệu trả về từ API
 
         // Kiểm tra nếu response trả về trực tiếp là một mảng
-        if (Array.isArray(response.data)) {
+        if (response.status == true) {
             return response.data;
         }
-
-        // Nếu response.data.data là một mảng, trả về nó
-        if (response.data.status === true && Array.isArray(response.data.data)) {
-            return response.data.data;
-        }
-
-        console.error("Lỗi: API không trả về danh sách hợp lệ!", response.data);
-        return [];
     } catch (error) {
         console.error("Lỗi khi lấy danh sách địa chỉ:", error);
         return [];
@@ -710,6 +735,43 @@ const api_updateAddressSelected = async (id_user, id_address, selected) => {
     }
 }
 
+// API gửi otp xác nhận qua mail
+const api_sendOTP = async(email) => {
+    try{
+        const response = await AxiosInstance().post('/user/send-mail', {email});
+        console.log("Lấy data OTP từ api: ", response)
+        if(response.status == true){
+            return response
+        }
+    }catch(e){
+        console.log(e)
+    }
+};
+
+const api_verifyOTP = async(email, code) => {
+    try{
+        const response = await AxiosInstance().post('/user/verify-code', {email, code});
+        console.log("Xác nhận OTP từ api: ", response)
+        if(response.status == true){
+            return response
+        }
+    } catch(e){
+        console.log(e)
+    }
+};
+
+const api_forgotPass = async(email, newPassword, confirmPassword) => {
+    try{
+        const response = await AxiosInstance().put('/user/forgotPass', {email, newPassword, confirmPassword});
+
+        if (response.status === true) {
+            return response;
+        }
+    }catch(e){
+        console.log(e)
+    }
+}
+ 
 export {
     api_login,
     api_signUp,
@@ -724,6 +786,7 @@ export {
     api_getDetailProduct,
     api_getNews,
     api_getDetailNews,
+    api_getRateByUser,
     api_getRateByProduct,
     api_addReview,
     api_uploadImage,
@@ -740,6 +803,7 @@ export {
     api_addOrder,
     api_getOrders,
     api_getDetailAddress,
+    api_editStatusOrder,
     api_getDetailOrder,
     api_getDetailPayment,
     api_uploadAvatar,
@@ -748,5 +812,8 @@ export {
     api_addAddress,
     api_loginUser,
     api_deleteAddress,
-    api_updateAddressSelected
+    api_updateAddressSelected,
+    api_sendOTP,
+    api_verifyOTP,
+    api_forgotPass
 }

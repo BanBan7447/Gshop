@@ -128,7 +128,6 @@ const Page_Detail = (props) => {
         }, 1979)
     };
 
-
     // Xử lý hiển thị thứ tự ảnh sản phẩm
     const [currentIndex, setCurrentIndex] = useState(0); // State để theo dõi ảnh hiện tại
     // const flastListRef = useRef(null);

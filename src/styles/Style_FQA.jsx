@@ -6,50 +6,49 @@ const Style_FQA = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#FFFFFF",
-        padding: 16,
+        padding: 20,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 20
+        marginLeft: 20,
+        marginBottom: 8
     },
     backIcon: {
         width: 24,
         height: 24,
     },
     headerTitle: {
-        fontSize: 18,
-        marginLeft: 10,
+        fontFamily: 'Inter Medium',
+        fontSize: 16,
+        marginLeft: 16,
         textAlignVertical: 'center',
         color: colors.Black,
     },
     backButton: {
         marginRight: 16,
     },
-    // headerTitle: {
-    //     fontSize: 18,
-    //     fontWeight: 'bold',
-    // },
     item: {
         padding: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
     question: {
+        width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 10
     },
     questionText: {
-        fontSize: 18,
+        width: '90%',
+        fontSize: 14,
         color: "#d9534f",
     },
     answer: {
         paddingTop: 8,
     },
     answerText: {
-        fontSize: 15,
+        fontSize: 14,
         color: '#282828',
         lineHeight: 20,
         textAlign: "justify",

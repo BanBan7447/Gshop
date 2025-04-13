@@ -26,25 +26,25 @@ const Style_Payment = StyleSheet.create({
     text_navigation: {
         fontFamily: 'Inter Medium',
         color: colors.Black,
-        fontSize: 20
+        fontSize: 16
     },
 
     text_title: {
         fontFamily: 'Inter Bold',
         color: colors.Black,
-        fontSize: 20,
+        fontSize: 16,
         marginBottom: 8
     },
 
     text_body_1: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'Inter Bold',
         color: colors.Black,
         marginBottom: 4
     },
 
     text_body_2: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'Inter Regular',
         color: colors.Black,
         lineHeight: 24
@@ -91,14 +91,14 @@ const Style_Payment = StyleSheet.create({
 
     text_name: {
         fontFamily: 'Inter SemiBold',
-        fontSize: 18,
+        fontSize: 16,
         color: colors.Black,
         marginBottom: 4
     },
 
     text_price: {
         fontFamily: 'Inter SemiBold',
-        fontSize: 18,
+        fontSize: 14,
         color: colors.Red,
         marginBottom: 4
     },
@@ -125,7 +125,7 @@ const Style_Payment = StyleSheet.create({
     text_quantity: {
         fontFamily: 'Inter SemiBold',
         color: colors.Black,
-        fontSize: 16
+        fontSize: 14
     },
 
     btn_delete: {
@@ -179,7 +179,7 @@ const Style_Payment = StyleSheet.create({
     text_totalPrice: {
         fontFamily: 'Inter Bold',
         color: colors.Black,
-        fontSize: 20
+        fontSize: 18
     },
 
     container_bottom: {
@@ -198,7 +198,7 @@ const Style_Payment = StyleSheet.create({
     text_oder: {
         color: colors.White,
         fontFamily: 'Inter Bold',
-        fontSize: 20
+        fontSize: 16
     },
 
     modalContainer: {
@@ -217,7 +217,7 @@ const Style_Payment = StyleSheet.create({
 
     modalTitle: {
         fontFamily: 'Inter Bold',
-        fontSize: 20,
+        fontSize: 16,
         color: colors.Black,
         textAlign: 'center',
         marginBottom: 12
@@ -231,13 +231,13 @@ const Style_Payment = StyleSheet.create({
     },
 
     modalTextButton: {
-        fontSize: 16,
+        fontSize: 12,
         color: colors.White,
         fontFamily: 'Inter Bold'
     },
 
     modalLabel: {
-        fontSize: 16,
+        fontSize: 14,
         color: colors.Grey,
         textAlign: 'left',
         marginBottom: 8
@@ -250,7 +250,7 @@ const Style_Payment = StyleSheet.create({
         backgroundColor: colors.Light_Blue,
         borderRadius: 12,
         paddingLeft: 12,
-        fontSize: 16
+        fontSize: 14
     }
 })
 
