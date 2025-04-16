@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, ToastAndroid, Alert, ScrollView } from 'react-native';
 import Style_SignUp from '../../styles/Style_SignUp';
-import { api_signUp } from '../../helper/ApiHelper';
+import { api_getAllUser, api_signUp } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
 import colors from '../../styles/colors';
 import Style_ForgotPass from '../../styles/Style_ForgotPass';
@@ -18,6 +18,16 @@ const Page_SignUp = (props) => {
     const [emailError, setEmailError] = useState("");
     const [phoneError, setPhoneError] = useState("");
     const [passError, setPassError] = useState("");
+
+    const isFormValid =
+        name.trim() !== "" &&
+        email.trim() !== "" &&
+        phone_number.trim() !== "" &&
+        password.trim() !== "" &&
+        emailError === "" &&
+        phoneError === "" &&
+        passError.length === 0;
+
 
     // Hàm tự động định dạng số điện thoại khi đăng nhập
     const formatPhone = (text) => {
@@ -60,32 +70,51 @@ const Page_SignUp = (props) => {
         } else {
             setPhoneError("");
         }
-        setPhone_number(formatPhone(cleaned));
+        setPhone_number(text);
+        //setPhone_number(formatPhone(cleaned));
     };
 
     const validatePassword = (text) => {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-        if (!passwordRegex.test(text)) {
-            setPassError("Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt")
+        const hasUpperCase = /[A-Z]/.test(text);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(text);
+        const isValidLength = text.length >= 8;
+
+        let errors = [];
+
+        if (!isValidLength) errors.push("• Ít nhất 8 ký tự");
+        if (!hasUpperCase) errors.push("• 1 chữ cái viết hoa và 1 số");
+        if (!hasSpecialChar) errors.push("• 1 ký tự đặc biệt (# ? ! $ & @)");
+
+        if (errors.length > 0) {
+            setPassError(["Mật khẩu không hợp lệ:", ...errors]);
         } else {
-            setPassError("");
+            setPassError([]);
         }
+
         setPassword(text);
-    }
+    };
+
 
     // Hàm đăng ký
     const onSignUp = async () => {
-        if (!name || !email || !phone_number || !password) {
-            Alert.alert("Lỗi đăng ký", "Vui lòng nhập đầy đủ thông tin");
-            return;
-        }
-
-        if (emailError || phoneError || passError) {
-            Alert.alert("Lỗi đăng ký", "Vui lòng kiểm tra lại thông tin nhập vào và thử lại.");
-            return;
-        }
+        // Gọi lại validate để cập nhật lỗi mới nhất
+        validateEmail(email);
+        validatePhoneNumber(phone_number);
+        validatePassword(password);
 
         try {
+            // Gọi API để kiểm tra trùng lặp của email và số điện thoại
+            const getUsers = await api_getAllUser();
+            const allUsers = getUsers?.data || [];
+
+            const isEmailExist = allUsers.some(user => user.email === email);
+            const isPhoneExist = allUsers.some(user => user.phone_number === phone_number);
+
+            if(isEmailExist || isPhoneExist){
+                Alert.alert("Lỗi đăng ký", "Email hoặc Số điện thoại đã được đăng ký trước đó");
+                return;
+            };
+
             const body = {
                 name: name,
                 email: email,
@@ -97,16 +126,13 @@ const Page_SignUp = (props) => {
 
             if (response) {
                 ToastAndroid.show('Đăng ký thành công', ToastAndroid.LONG);
-
-                // Chuyển đến màn hình đăng nhập và truyền email + password
                 navigation.navigate('Login', { email, password });
-            } else {
-                Alert.alert('Đăng ký thất bại', 'Email hoặc SĐT đã tồn tại');
             }
         } catch (e) {
             Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng ký.');
         }
     };
+
 
     return (
         <ScrollView style={{ backgroundColor: colors.White }}>
@@ -129,7 +155,7 @@ const Page_SignUp = (props) => {
                     style={Style_SignUp.input}
                     keyboardType='phone-pad'
                     value={phone_number}
-                    onChangeText={setPhone_number}
+                    onChangeText={validatePhoneNumber}
                 />
                 {phoneError ? <Text style={Style_SignUp.error}>{phoneError}</Text> : null}
 
@@ -147,8 +173,9 @@ const Page_SignUp = (props) => {
                         style={Style_ForgotPass.textInput}
                         secureTextEntry={hidePassword}
                         value={password}
-                        onChangeText={setPassword}
+                        onChangeText={validatePassword} // <-- đúng là hàm validatePassword
                     />
+
                     <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
                         <Image
                             source={
@@ -160,12 +187,30 @@ const Page_SignUp = (props) => {
                         />
                     </TouchableOpacity>
                 </View>
-                {passError ? <Text style={Style_SignUp.error}>{passError}</Text> : null}
+                {/* {passError ? <Text style={Style_SignUp.error}>{passError}</Text> : null} */}
 
-                <TouchableOpacity style={Style_SignUp.registerButton}
-                    onPress={() => onSignUp()}>
+                {passError.length > 0 && (
+                    <View style={{ marginTop: 8 }}>
+                        {passError?.map((err, index) => (
+                            <Text key={index} style={{ color: 'red', marginBottom: 4 }}>
+                                {err}
+                            </Text>
+                        ))}
+                    </View>
+                )}
+
+
+                <TouchableOpacity
+                    style={[
+                        Style_SignUp.registerButton,
+                        !isFormValid && { backgroundColor: '#ccc' } // đổi màu xám nếu form chưa hợp lệ
+                    ]}
+                    disabled={!isFormValid}
+                    onPress={onSignUp}
+                >
                     <Text style={Style_SignUp.registerButtonText}>Đăng ký</Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity>
                     <Text style={Style_SignUp.newUserText}>Bạn mới sử dụng GShop?</Text>
                 </TouchableOpacity>

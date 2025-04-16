@@ -69,6 +69,18 @@ const api_changePassword = async (data) => {
     }
 };
 
+// API lấy danh sách tất cả User
+const api_getAllUser = async () => {
+    try {
+        const response = await AxiosInstance().get('/user/list');
+        if(response.status == true){
+            return response.data
+        }
+    } catch(e){
+
+    }
+}
+
 // API lấy thông tin người dùng
 const api_getUserInfo = async (user_id) => {
     try {
@@ -288,8 +300,8 @@ const api_addReview = async (star, content, id_user, id_product) => {
 }
 
 // Gọi API upload image rating
-//const BASE_URL = "https://gshopbackend-1.onrender.com/rating";
-const BASE_URL = "http://10.0.2.2:3000/rating"
+const BASE_URL = "https://gshopbackend-1.onrender.com/rating";
+// const BASE_URL = "http://10.0.2.2:3000/rating"
 const api_uploadImage = async (id_rating, images) => {
     try {
         let formData = new FormData();
@@ -597,8 +609,8 @@ const api_getDetailPayment = async (id_payment) => {
 }
 
 // API update Image người dùng
-// const BASE_URL_2 = "https://gshopbackend-1.onrender.com/user";
- const BASE_URL_2 = "http://10.0.2.2:3000/user"
+const BASE_URL_2 = "https://gshopbackend-1.onrender.com/user";
+// const BASE_URL_2 = "http://10.0.2.2:3000/user"
 const api_uploadAvatar = async (id_user, imageUri) => {
     try {
         console.log('user: ', id_user);
@@ -776,6 +788,7 @@ export {
     api_login,
     api_signUp,
     api_changePassword,
+    api_getAllUser,
     api_getUserInfo,
     api_getDetailUser,
     api_updateProfile,
