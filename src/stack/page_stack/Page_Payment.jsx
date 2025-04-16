@@ -567,6 +567,7 @@ const Page_Payment = props => {
               </TouchableOpacity>
             </View>
           </View>
+          </View>
         </View>
       </Modal>
     </View>

@@ -58,7 +58,7 @@ const Style_SignUp = StyleSheet.create({
     },
     error: {
         fontFamily: "Inter Regular",
-        marginTop: -4,
+        marginTop: 0,
         marginBottom: 16,
         color: colors.Red
     },
