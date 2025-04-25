@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Image, Text, View, TextInput, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
+import { Image, Text, View, TextInput, TouchableOpacity, ToastAndroid, Alert, ActivityIndicator } from 'react-native';
 import Style_ChangPass from '../../styles/Style_ChangPass';
 import { api_changePassword } from '../../helper/ApiHelper';  // Import hàm gọi API
 import colors from '../../styles/colors';
@@ -14,8 +14,9 @@ const Page_ChangPass = ({ navigation, route }) => {
     const [hideNewPassword, setHideNewPassword] = useState(true);
     const [hideConfirmPassword, setHideConfirmPassword] = useState(true);
 
-
+    const [loading, setLoading] = useState(false);
     const { users, setUsers } = useContext(AppContext);
+    console.log("User đã đăng nhập: ", users)
 
     // Hàm kiểm tra mật khẩu có hợp lệ không
     const isPasswordValid = (password) => {
@@ -40,14 +41,11 @@ const Page_ChangPass = ({ navigation, route }) => {
 
     // Hàm đổi mật khẩu
     const handleChangePassword = async () => {
-        if (oldPassword !== users.password) {
-            Alert.alert("Lỗi", "Mật khẩu cũ không đúng.");
-            return;
-        }
-
+        setLoading(true);
         try {
             const response = await api_changePassword({
                 user_id: users?._id,
+                oldPassword: oldPassword,
                 newPassword: newPassword
             });
 
@@ -56,11 +54,17 @@ const Page_ChangPass = ({ navigation, route }) => {
                     { text: "OK", onPress: () => navigation.goBack() }
                 ]);
             } else {
-                Alert.alert("Thất bại", response.message || "Đổi mật khẩu không thành công, vui lòng thử lại.");
+                if (users.password !== oldPassword) {
+                    Alert.alert("Lỗi", "Mật khẩu cũ bạn nhập không chính xác. Vui lòng thử lại.");
+                } else {
+                    Alert.alert("Lỗi", response.message || "Đổi mật khẩu không thành công.");
+                }
             }
         } catch (error) {
             console.log("Lỗi đổi mật khẩu:", error);
             Alert.alert("Lỗi", "Có lỗi xảy ra, vui lòng thử lại sau.");
+        } finally{
+            setLoading(false);
         }
     };
 
@@ -181,7 +185,13 @@ const Page_ChangPass = ({ navigation, route }) => {
                 style={[Style_ChangPass.saveButton, { opacity: isSaveButtonEnabled() ? 1 : 0.5 }]}
                 onPress={handleChangePassword}
                 disabled={!isSaveButtonEnabled()}>
-                <Text style={Style_ChangPass.saveButtonText}>Lưu mật khẩu mới</Text>
+                {
+                    loading ? (
+                        <ActivityIndicator size='small' color={colors.White}/>
+                    ) : (
+                        <Text style={Style_ChangPass.saveButtonText}>Lưu mật khẩu mới</Text>
+                    )
+                }
             </TouchableOpacity>
         </View>
     );

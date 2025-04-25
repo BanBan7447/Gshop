@@ -9,7 +9,7 @@ import FastImage from 'react-native-fast-image';
 
 const Page_Write_Rate = (props) => {
   const { navigation, route } = props;
-  const { products, productImages, user } = route.params;
+  const { products, productImages, user, order } = route.params;
   const [star, setStar] = useState(0);
   const [content, setContent] = useState('');
   const [imagesRating, setImagesRating] = useState([]);
@@ -33,7 +33,9 @@ const Page_Write_Rate = (props) => {
             const response = await api_getRateByProduct(product._id);
             console.log(`Lấy danh sách đánh giá cho sản phẩm ${product.name}: `, response);
 
-            const filterReviews = response.filter(review => review.id_user === user._id)
+            const filterReviews = response.filter(review =>
+              review.id_user === user._id && review.id_order === order._id
+            );
             return filterReviews;
           })
         );
@@ -151,7 +153,7 @@ const Page_Write_Rate = (props) => {
         if (isReviewed) continue;
 
         if (!star || !content?.trim()) continue;
-        const response = await api_addReview(star, content, user._id, productId);
+        const response = await api_addReview(star, content, user._id, productId, order._id);
 
         if (response?.data?._id) {
           hasValidateReview = true;

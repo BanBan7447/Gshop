@@ -6,22 +6,22 @@ const Style_FQA = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#FFFFFF",
-        padding: 20,
+        paddingHorizontal: 20,
+        paddingTop: 20
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 20,
         marginBottom: 8
     },
     backIcon: {
-        width: 24,
-        height: 24,
+        width: 20,
+        height: 20,
     },
     headerTitle: {
         fontFamily: 'Inter Medium',
         fontSize: 16,
-        marginLeft: 16,
+        marginLeft: 14,
         textAlignVertical: 'center',
         color: colors.Black,
     },
@@ -29,7 +29,7 @@ const Style_FQA = StyleSheet.create({
         marginRight: 16,
     },
     item: {
-        padding: 16,
+        paddingVertical: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
@@ -42,7 +42,9 @@ const Style_FQA = StyleSheet.create({
     questionText: {
         width: '90%',
         fontSize: 14,
-        color: "#d9534f",
+        color: colors.Red,
+        fontFamily: 'Inter SemiBold',
+        lineHeight: 20
     },
     answer: {
         paddingTop: 8,
@@ -50,9 +52,10 @@ const Style_FQA = StyleSheet.create({
     answerText: {
         fontSize: 14,
         color: '#282828',
-        lineHeight: 20,
+        lineHeight: 24,
+        fontFamily: 'Inter Regular',
         textAlign: "justify",
-
+        marginTop: 12
     }
 });
 

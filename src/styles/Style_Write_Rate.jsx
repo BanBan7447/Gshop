@@ -112,7 +112,7 @@ const Style_Write_Rate = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
-        marginTop: -24
+        marginBottom: 24
     },
 
     text_review: {

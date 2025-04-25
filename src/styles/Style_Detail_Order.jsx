@@ -110,7 +110,7 @@ const Style_Detail_Order = StyleSheet.create({
         paddingVertical: 5
     },
     textRating: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'Inter Bold'
     },
     cancelOrderBtn: {

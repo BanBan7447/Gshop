@@ -100,7 +100,7 @@ const Style_Cart = StyleSheet.create({
 
     text_status: {
         fontFamily: 'Inter Medium',
-        fontSize: 16,
+        fontSize: 12,
         color: colors.Red
     },
 

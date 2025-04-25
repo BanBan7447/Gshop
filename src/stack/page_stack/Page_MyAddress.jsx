@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, FlatList, ActivityIndicator, ScrollView, RefreshControl } from 'react-native';
 import React, { useEffect, useState, useCallback, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import Style_MyAddress from '../../styles/Style_MyAddress';
 import { api_getAddressList, api_updateAddressSelected } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
+import colors from '../../styles/colors';
 
 const Page_MyAddress = (props) => {
     const { navigation, route } = props;
@@ -11,6 +12,13 @@ const Page_MyAddress = (props) => {
     const [loading, setLoading] = useState(true);
     const { users, setUsers } = useContext(AppContext);
     const [selectedAddressId, setSelectedAddressId] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await fetchAddress();
+        setRefreshing(false);
+    }
 
     const fromCheckout = route?.params?.fromCheckout || false;
 
@@ -24,10 +32,12 @@ const Page_MyAddress = (props) => {
                 setAddress(data);
 
                 const selectedAddress = data.find(addr => addr.selected);
-                if (selectedAddress) {
-                    setSelectedAddressId(selectedAddress?._id);
-                    console.log("ID của địa chỉ: ", selectedAddress?._id);
-                }
+                // if (selectedAddress) {
+                //     setSelectedAddressId(selectedAddress?._id);
+                //     console.log("ID của địa chỉ: ", selectedAddress?._id);
+                // }
+
+                setSelectedAddressId(selectedAddress?._id || null);
             } else {
                 setAddress([]);
             }
@@ -100,7 +110,17 @@ const Page_MyAddress = (props) => {
     }
 
     return (
-        <View style={Style_MyAddress.container}>
+        <ScrollView
+            style={Style_MyAddress.container}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[colors.Red]}
+                    tintColor={colors.Red}
+                />
+            }>
             <TouchableOpacity
                 style={Style_MyAddress.header}
                 onPress={() => navigation.goBack()}>
@@ -115,7 +135,7 @@ const Page_MyAddress = (props) => {
             </TouchableOpacity>
 
             {loading ? (
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 24 }}>
                     <ActivityIndicator size="large" color="#ff0000" />
                 </View>
             ) : (
@@ -124,15 +144,15 @@ const Page_MyAddress = (props) => {
                         data={address}
                         keyExtractor={(item) => item._id || item.id}
                         renderItem={renderAddressItem}
-                        showsVerticalScrollIndicator={false}
+                        scrollEnabled={false}
                     />
                 ) : (
-                    <View>
-                        <Text style={{ textAlign: 'center', marginTop: 20 }}>Không có địa chỉ nào</Text>
+                    <View style={{ marginTop: 24 }}>
+                        <Text style={{ textAlign: 'center' }}>Không có địa chỉ nào</Text>
                     </View>
                 )
             )}
-        </View>
+        </ScrollView>
     );
 };
 

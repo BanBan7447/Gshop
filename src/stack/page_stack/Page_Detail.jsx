@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, ScrollView, Modal, FlatList, ActivityIndicator, Alert, ToastAndroid } from 'react-native'
+import { View, Text, Image, TouchableOpacity, ScrollView, RefreshControl, FlatList, ActivityIndicator, Alert, ToastAndroid, useWindowDimensions, LogBox } from 'react-native'
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 
 import { api_getDetailProduct, api_getRateByProduct, api_addToCart, api_getCarts, api_updateSelected } from '../../helper/ApiHelper';
@@ -11,23 +11,73 @@ import { Dimensions } from 'react-native';
 import { CartContext } from '../../context/CartContext';
 import { useFocusEffect } from '@react-navigation/native';
 import { AppContext } from '../../context';
+import RenderHTML from 'react-native-render-html';
+
+// Tắt cảnh báo cụ thể
+LogBox.ignoreLogs([
+    'Support for defaultProps will be removed from function components',
+    'MemoizedTNodeRenderer: Support for defaultProps will be removed from memo components in a future major release. Use JavaScript default parameters instead.',
+    'bound renderChildren: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.',
+    'TNodeChildrenRenderer: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.',
+    'You seem to update props of the "TRenderEngineProvider" component'
+]);
 
 const Page_Detail = (props) => {
     const { navigation, route } = props;
-
+    const { width } = useWindowDimensions();
     const { id, images, productView } = route.params;
     const [product, setProduct] = useState(null);
     const { cart, setCart } = useContext(CartContext);
     const [totalRate, setTotalRate] = useState(0);
     const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     console.log("Detail page loaded with ID:", id, "Image URL:", images);
 
     const [notification, setNotification] = useState(false);
-
     const screenWidth = Dimensions.get('window').width; // Lấy chiều rộng màn hình
     const isOutStock = product?.quantity <= 0; // Thêm trạng thái để kiểm tra nếu sản phẩm đã hết hàng
     const { users } = useContext(AppContext);
+
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await funGetDetailProduct();
+        await funGetRating();
+        setRefreshing(false);
+    }
+
+    const customStyle = {
+        h2: {
+            color: colors.Black,
+            fontSize: 20,
+            fontWeight: 'bold',
+            backgroundColor: 'white',
+        },
+        h3: {
+            color: colors.Black,
+            fontSize: 18,
+            fontWeight: 'bold',
+            backgroundColor: 'white',
+        },
+        p: {
+            color: colors.Black,
+            fontSize: 14,
+            lineHeight: 20,
+            backgroundColor: 'white',
+            textAlign: 'justify',
+        },
+        img: {
+            width: '100%',
+            height: 'auto',
+            resizeMode: 'contain',
+        },
+        a: {
+            color: 'blue',
+            textDecorationLine: 'underline',
+        },
+    };
 
     // Hàm lấy dữ liệu sản phẩm
     const funGetDetailProduct = async () => {
@@ -88,6 +138,7 @@ const Page_Detail = (props) => {
             quantity: 1
         });
 
+        setLoading(true);
         try {
             const response = await api_addToCart(users._id, product._id, 1);
 
@@ -120,6 +171,8 @@ const Page_Detail = (props) => {
 
         } catch (e) {
             console.log('Lỗi khi gọi API addToCart: ', e)
+        } finally {
+            setLoading(false);
         }
 
         setNotification(true)
@@ -180,7 +233,17 @@ const Page_Detail = (props) => {
                             </TouchableOpacity>
                         </View>
 
-                        <ScrollView style={Style_Detail.container}>
+                        <ScrollView
+                            style={Style_Detail.container}
+                            showsVerticalScrollIndicator={false}
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={refreshing}
+                                    onRefresh={onRefresh}
+                                    colors={[colors.Red]}
+                                    tintColor={colors.Red}
+                                />
+                            }>
                             <View style={{ position: 'relative' }}>
                                 <FlatList
                                     data={images.flatMap(item => item.image)} // Trải phẳng mảng ảnh
@@ -260,9 +323,20 @@ const Page_Detail = (props) => {
                                     </Text>
                                 ) : null}
 
-                                <Text style={Style_Detail.text_title_describe}>Mô tả</Text>
+                                <Text style={Style_Detail.text_title_describe}>Mô tả:</Text>
 
-                                <Text style={Style_Detail.text_describe}>{product.description}</Text>
+                                {/* <Text style={Style_Detail.text_describe}>{product.description}</Text> */}
+
+                                <View style={{ flex: 1, backgroundColor: colors.White }}>
+                                    <ScrollView>
+                                        <RenderHTML
+                                            contentWidth={screenWidth}
+                                            source={{ html: product.description || "<p>Không có mô tả</p>" }}
+                                            enableExperimentalMarginCollapsing={true}
+                                            tagsStyles={customStyle}
+                                            ignoredDomTags={['source']} />
+                                    </ScrollView>
+                                </View>
                             </View>
                         </ScrollView>
 
@@ -275,9 +349,15 @@ const Page_Detail = (props) => {
                                 disabled={isOutStock}
                                 onPress={addToCart}>
 
-                                <Text style={Style_Detail.text_AddCart}>
-                                    {isOutStock ? 'Sản phẩm đã hết hàng' : 'Thêm vào giỏ hàng'}
-                                </Text>
+                                {
+                                    loading ? (
+                                        <ActivityIndicator size='small' color={colors.White} />
+                                    ) : (
+                                        <Text style={Style_Detail.text_AddCart}>
+                                            {isOutStock ? 'Sản phẩm đã hết hàng' : 'Thêm vào giỏ hàng'}
+                                        </Text>
+                                    )
+                                }
                             </TouchableOpacity>
                         </View>
                     </View>

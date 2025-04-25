@@ -32,14 +32,15 @@ const Style_Rating = StyleSheet.create({
     },
 
     container: {
-        paddingHorizontal: 20,
+        // paddingHorizontal: 20,
         paddingTop: 8
     },
 
     text_name: {
         fontFamily: 'Inter Bold',
         color: colors.Black,
-        fontSize: 20
+        fontSize: 16,
+        paddingHorizontal: 20,
     },
 
     container_rating: {
@@ -47,7 +48,8 @@ const Style_Rating = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: 8,
-        marginBottom: 24
+        marginBottom: 16,
+        paddingHorizontal: 20,
     },
 
     text_rating: {
@@ -61,6 +63,26 @@ const Style_Rating = StyleSheet.create({
         color: colors.Black,
         fontSize: 16,
         marginStart: 4
+    },
+
+    container_filter: {
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        marginBottom: 24
+    },
+
+    btn_filter: {
+        height: 32,
+        paddingHorizontal: 12,
+        borderRadius: 16,
+        marginRight: 12,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    text_filter: {
+        fontFamily: 'Inter Bold',
+        fontSize: 12,
     },
 
     container_customer: {

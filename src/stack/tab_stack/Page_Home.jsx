@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView, LogBox, ToastAndroid, BackHandler, Alert, Platform } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Image, ActivityIndicator, ScrollView, LogBox, ToastAndroid, BackHandler, Alert, Platform, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import {
   api_getProducts,
@@ -24,6 +24,7 @@ LogBox.ignoreLogs([
 const Page_Home = (props) => {
   const { navigation } = props;
 
+  const { users } = useContext(AppContext);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [productImages, setProductImages] = useState({});
@@ -41,6 +42,14 @@ const Page_Home = (props) => {
   const navigationExit = useNavigation();
 
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await funGetAllProducts();
+    await funGetCategories();
+    setRefreshing(false);
+  }
 
   useEffect(() => {
     const backAction = () => {
@@ -124,9 +133,9 @@ const Page_Home = (props) => {
     const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
 
     return products
-      .filter(product =>
-        keyWords.some(keyWords => product.name.includes(keyWords))
-      )
+      // .filter(product =>
+      //   keyWords.some(keyWords => product.name.includes(keyWords))
+      // )
       .sort((a, b) => b.viewer - a.viewer);
   }
 
@@ -153,7 +162,7 @@ const Page_Home = (props) => {
     try {
       const response = await api_getProductsByCategory(selectCategory);
       const filterDataProducts = processProducts(response);
-      //setProducts(filterDataProducts);
+      setProducts(filterDataProducts);
       setProducts([
         ...filterDataProducts.filter(product => product.quantity > 0),
         ...filterDataProducts.filter(product => product.quantity <= 0)
@@ -326,17 +335,29 @@ const Page_Home = (props) => {
         ) : (
           <ScrollView
             style={Style_Home.container}
-            showsVerticalScrollIndicator={false}>
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[colors.Red]}
+                tintColor={colors.Red}
+              />
+            }>
             <View style={Style_Home.container_title}>
               <Image
                 source={require('../../assets/image/logo_app_2.png')}
                 style={Style_Home.img_logo} />
 
               <TouchableOpacity
-                onPress={() => navigation.navigate('Search')}>
-                <Image
-                  source={require('../../assets/icon/icon_search.png')}
-                  style={Style_Home.img_icon} />
+                onPress={() => navigation.navigate('Tab', { screen: 'Profile' })}>
+                <Image source={
+                  users?.avatar?.startsWith("https")
+                    ? { uri: users.avatar }
+                    : require("../../assets/icon/icon_deafult_profile.png")
+                }
+                  style={Style_Home.avatar}
+                />
               </TouchableOpacity>
             </View>
 

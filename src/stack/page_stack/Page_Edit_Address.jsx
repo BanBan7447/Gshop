@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ToastAndroid, Switch } from 'react-native';
-import React, { useState, useEffect, useContext } from 'react';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ToastAndroid, Switch, Animated, ActivityIndicator, Modal, FlatList } from 'react-native';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { api_updateAddress, api_deleteAddress, api_updateAddressSelected } from '../../helper/ApiHelper';
 import Style_Edit_Address from '../../styles/Style_Edit_Address';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -27,6 +27,106 @@ const Page_Edit_Address = (props) => {
     const [wardOpen, setWardOpen] = useState(false);
 
     const [isSelected, setIsSelected] = useState(address.selected || false);
+    const [modalVisible, setModalVisible] = useState({ province: false, district: false, ward: false });
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading2, setIsLoading2] = useState(false);
+
+    const ModalSelector = ({ visible, data, onSelect, onClose, title }) => {
+        const fadeAnim = useRef(new Animated.Value(0)).current;
+        const slideAnim = useRef(new Animated.Value(300)).current;
+        const [showModal, setShowModal] = useState(visible);
+
+        useEffect(() => {
+            if (visible) {
+                setShowModal(true);
+                Animated.parallel([
+                    Animated.timing(fadeAnim, {
+                        toValue: 1,
+                        duration: 300,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(slideAnim, {
+                        toValue: 0,
+                        duration: 300,
+                        useNativeDriver: true,
+                    }),
+                ]).start();
+            } else {
+                Animated.parallel([
+                    Animated.timing(fadeAnim, {
+                        toValue: 0,
+                        duration: 200,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(slideAnim, {
+                        toValue: 300,
+                        duration: 200,
+                        useNativeDriver: true,
+                    }),
+                ]).start(() => {
+                    setShowModal(false);
+                });
+            }
+        }, [visible]);
+
+        const handleClose = () => {
+            Animated.parallel([
+                Animated.timing(fadeAnim, {
+                    toValue: 0,
+                    duration: 200,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(slideAnim, {
+                    toValue: 300,
+                    duration: 200,
+                    useNativeDriver: true,
+                }),
+            ]).start(() => {
+                onClose();
+            });
+        };
+
+        if (!showModal) return null;
+
+        return (
+            <Modal transparent visible={showModal} animationType="none" onRequestClose={handleClose}>
+                <Animated.View
+                    style={{
+                        flex: 1,
+                        backgroundColor: 'rgba(0,0,0,0.4)',
+                        opacity: fadeAnim,
+                        justifyContent: 'flex-end',
+                    }}
+                >
+                    <Animated.View
+                        style={[
+                            Style_Add_Address.modalContainer,
+                            {
+                                transform: [{ translateY: slideAnim }],
+                            },
+                        ]}
+                    >
+                        <Text style={Style_Add_Address.modalTitle}>{title}</Text>
+                        <FlatList
+                            data={data}
+                            keyExtractor={(item, index) => item?.value?.toString() || index.toString()}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={Style_Add_Address.modalItem}
+                                    onPress={() => onSelect(item)}
+                                >
+                                    <Text style={Style_Add_Address.modalItemText}>{item.label}</Text>
+                                </TouchableOpacity>
+                            )}
+                        />
+                        <TouchableOpacity style={Style_Add_Address.modalClose} onPress={handleClose}>
+                            <Text style={Style_Add_Address.modalCloseText}>Đóng</Text>
+                        </TouchableOpacity>
+                    </Animated.View>
+                </Animated.View>
+            </Modal>
+        );
+    };
 
     // Load tỉnh
     useEffect(() => {
@@ -77,21 +177,25 @@ const Page_Edit_Address = (props) => {
             return;
         }
 
-        const provinceName = provinceList.find(p => p.value === province)?.label;
-        const districtName = districtList.find(d => d.value === district)?.label;
-        const wardName = wardList.find(w => w.value === ward)?.label;
+        setIsLoading(true);
 
-        const response = await api_updateAddress(address._id, detail, wardName, districtName, provinceName, address.id_user);
-        if (response) {
-            if (isSelected) {
-                await api_updateAddressSelected(users._id, address._id, true);
+        try {
+            const provinceName = provinceList.find(p => p.value === province)?.label;
+            const districtName = districtList.find(d => d.value === district)?.label;
+            const wardName = wardList.find(w => w.value === ward)?.label;
+
+            const response = await api_updateAddress(address._id, detail, wardName, districtName, provinceName, address.id_user);
+            if (response) {
+                await api_updateAddressSelected(users._id, address._id, isSelected);
+                ToastAndroid.show("Cập nhật thành công", ToastAndroid.SHORT);
+                navigation.goBack();
+            } else {
+                Alert.alert("Lỗi", "Cập nhật thất bại!");
             }
-
-            Alert.alert("Thành công", "Địa chỉ đã được cập nhật!", [
-                { text: "OK", onPress: () => navigation.goBack() }
-            ]);
-        } else {
-            Alert.alert("Lỗi", "Cập nhật thất bại!");
+        } catch (e) {
+            console.log(e);
+        } finally {
+            setIsLoading(false)
         }
     };
 
@@ -101,12 +205,20 @@ const Page_Edit_Address = (props) => {
             {
                 text: "Xóa", style: "destructive",
                 onPress: async () => {
-                    const success = await api_deleteAddress(address._id);
-                    if (success) {
-                        ToastAndroid.show("Đã xóa địa chỉ", ToastAndroid.SHORT);
-                        navigation.goBack()
-                    } else {
-                        Alert.alert("Lỗi", "Không thể xóa địa chỉ.");
+                    setIsLoading2(true);
+
+                    try {
+                        const success = await api_deleteAddress(address._id);
+                        if (success) {
+                            ToastAndroid.show("Đã xóa địa chỉ", ToastAndroid.SHORT);
+                            navigation.goBack()
+                        } else {
+                            Alert.alert("Lỗi", "Không thể xóa địa chỉ.");
+                        }
+                    } catch (e) {
+                        console.log(e)
+                    } finally {
+                        setIsLoading2(false);
                     }
                 }
             }
@@ -130,7 +242,42 @@ const Page_Edit_Address = (props) => {
                 placeholderTextColor={colors.Black}
             />
 
-            <View style={{ zIndex: 3000 }}>
+            <TouchableOpacity
+                onPress={() => setModalVisible({ ...modalVisible, province: true })}
+                style={Style_Add_Address.input}>
+                <Text style={{ fontSize: 14, color: colors.Black }}>
+                    {provinceList.find(p => p.value === province)?.label || "Chọn tỉnh/thành phố"}
+                </Text>
+                <Image
+                    source={require('../../assets/icon/icon_arrow_down.png')}
+                    style={{ width: 14, height: 14 }} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                onPress={() => setModalVisible({ ...modalVisible, district: true })}
+                style={[Style_Add_Address.input, !province && { opacity: 0.6 }]}
+                disabled={!province}>
+                <Text style={{ fontSize: 14, color: colors.Black }}>
+                    {districtList.find(p => p.value === district)?.label || 'Chọn quận/huyện'}
+                </Text>
+                <Image
+                    source={require('../../assets/icon/icon_arrow_down.png')}
+                    style={{ width: 14, height: 14 }} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                onPress={() => setModalVisible({ ...modalVisible, ward: true })}
+                style={[Style_Add_Address.input, !district && { opacity: 0.6 }]}
+                disabled={!district}>
+                <Text style={{ fontSize: 14, color: colors.Black }}>
+                    {wardList.find(p => p.value === ward)?.label || 'Chọn phường/xã'}
+                </Text>
+                <Image
+                    source={require('../../assets/icon/icon_arrow_down.png')}
+                    style={{ width: 14, height: 14 }} />
+            </TouchableOpacity>
+
+            {/* <View style={{ zIndex: 3000 }}>
                 <DropDownPicker
                     open={provinceOpen}
                     value={province}
@@ -199,7 +346,7 @@ const Page_Edit_Address = (props) => {
                     zIndex={1000}
                     zIndexInverse={3000}
                 />
-            </View>
+            </View> */}
 
             <View style={Style_Add_Address.container_switch}>
                 <Text style={Style_Add_Address.text_switch}>Đặt làm mặc định</Text>
@@ -213,14 +360,62 @@ const Page_Edit_Address = (props) => {
             <View style={{ flex: 1 }}></View>
 
             <View style={Style_Edit_Address.containerBTN}>
-                <TouchableOpacity style={Style_Edit_Address.deleteButton} onPress={handleDeleteAddress}>
-                    <Text style={Style_Edit_Address.deleteButtonText}>Xóa</Text>
+                <TouchableOpacity
+                    style={Style_Edit_Address.deleteButton}
+                    onPress={handleDeleteAddress}>
+                    {
+                        isLoading2 ? (
+                            <ActivityIndicator size='small' color={colors.White} />
+                        ) : (
+                            <Text style={Style_Edit_Address.deleteButtonText}>Xóa</Text>
+                        )
+                    }
                 </TouchableOpacity>
 
-                <TouchableOpacity style={Style_Edit_Address.loginButton} onPress={handleUpdateAddress}>
-                    <Text style={Style_Edit_Address.loginButtonText}>Cập nhật</Text>
+                <TouchableOpacity
+                    style={Style_Edit_Address.loginButton}
+                    onPress={handleUpdateAddress}>
+                    {
+                        isLoading ? (
+                            <ActivityIndicator size='small' color={colors.White} />
+                        ) : (
+                            <Text style={Style_Edit_Address.loginButtonText}>Cập nhật</Text>
+                        )
+                    }
                 </TouchableOpacity>
             </View>
+
+            <ModalSelector
+                visible={modalVisible.province}
+                data={provinceList}
+                title={"Chọn tỉnh/thành phố"}
+                onSelect={(val) => {
+                    setProvince(val.value);
+                    setDistrict(null);
+                    setWard(null);
+                    setModalVisible({ ...modalVisible, province: false });
+                }}
+                onClose={() => setModalVisible({ ...modalVisible, province: false })} />
+
+            <ModalSelector
+                visible={modalVisible.district}
+                data={districtList}
+                title={"Chọn quận/huyện"}
+                onSelect={(val) => {
+                    setDistrict(val.value);
+                    setModalVisible({ ...modalVisible, district: false });
+                }}
+                onClose={() => setModalVisible({ ...modalVisible, district: false })} />
+
+            <ModalSelector
+                visible={modalVisible.ward}
+                data={wardList}
+                title={"Chọn phường/xã"}
+                onSelect={(val) => {
+                    setWard(val.value);
+                    setModalVisible({ ...modalVisible, ward: false });
+                }}
+                onClose={() => setModalVisible({ ...modalVisible, ward: false })} />
         </View>
     );
 };

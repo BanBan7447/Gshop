@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, Modal, ScrollView, TextInput, Alert, ToastAndroid } from 'react-native'
+import { View, Text, TouchableOpacity, Image, Modal, ScrollView, TextInput, Alert, ToastAndroid, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import {
     api_getDetailOrder,
@@ -185,12 +185,18 @@ const Page_Detail_Order = (props) => {
                     style: "destructive",
                     onPress: async () => {
                         setLoading(true);
-                        const result = await api_editStatusOrder(order._id, "Đã hủy");
-                        if (result.success) {
-                            setOrderData(result.updatedOrder)
-                            navigation.goBack();
-                        } else {
-                            Alert.alert("Thất bại", result.message || "Không thể hủy đơn hàng.");
+                        try {
+                            const result = await api_editStatusOrder(order._id, "Đã hủy");
+                            if (result.success) {
+                                setOrderData(result.updatedOrder)
+                                navigation.goBack();
+                            } else {
+                                Alert.alert("Thất bại", result.message || "Không thể hủy đơn hàng.");
+                            }
+                        } catch (e) {
+                            console.log(e);
+                        } finally {
+                            setLoading(false)
                         }
                     }
                 }
@@ -241,7 +247,7 @@ const Page_Detail_Order = (props) => {
             {renderProductOrder()}
             {
                 order.status === 'Đã giao' && (
-                    <TouchableOpacity style={{ alignItems: 'flex-end', marginTop: 16 }} onPress={() => navigation.navigate('WriteRate', { products, user, productImages })}>
+                    <TouchableOpacity style={{ alignItems: 'flex-end', marginTop: 16 }} onPress={() => navigation.navigate('WriteRate', { products, user, productImages, order })}>
                         <Text style={[Style_Detail_Order.textRating, { color: colors.Red }]}>Đánh giá sản phẩm</Text>
                     </TouchableOpacity>
                 )
@@ -251,8 +257,8 @@ const Page_Detail_Order = (props) => {
             {
                 paymentMethod ? (
                     <View style={[Style_Detail_Order.row]}>
-                        <Text style={{fontSize: 14}}>Phương thức:</Text>
-                        <Text style={{fontSize: 14, width: '50%', textAlign: 'right'}}>{paymentMethod.name}</Text>
+                        <Text style={{ fontSize: 14 }}>Phương thức:</Text>
+                        <Text style={{ fontSize: 14, width: '50%', textAlign: 'right' }}>{paymentMethod.name}</Text>
                     </View>
                 ) : (
                     <Text style={Style_Detail_Order.centerText}>Đang tải...</Text>
@@ -260,13 +266,13 @@ const Page_Detail_Order = (props) => {
             }
 
             <View style={Style_Detail_Order.row}>
-                <Text style={{fontSize: 14}}>Tổng sản phẩm:</Text>
-                <Text style={{fontSize: 14}}>{productTotalPrice().toLocaleString('vi-VN')}đ</Text>
+                <Text style={{ fontSize: 14 }}>Tổng sản phẩm:</Text>
+                <Text style={{ fontSize: 14 }}>{productTotalPrice().toLocaleString('vi-VN')}đ</Text>
             </View>
 
             <View style={Style_Detail_Order.row}>
-                <Text style={{fontSize: 14}}>Phí vận chuyển:</Text>
-                <Text style={{fontSize: 14}}>{order.shipping_fee.toLocaleString('vi-VN')}đ</Text>
+                <Text style={{ fontSize: 14 }}>Phí vận chuyển:</Text>
+                <Text style={{ fontSize: 14 }}>{order.shipping_fee.toLocaleString('vi-VN')}đ</Text>
             </View>
 
             <View style={Style_Detail_Order.row}>
@@ -275,11 +281,17 @@ const Page_Detail_Order = (props) => {
             </View>
 
             {
-                (orderData?.status !== "Đã giao" && orderData?.status !== "Đã hủy") && (
+                (orderData?.status !== "Đã giao" && orderData?.status !== "Đã hủy" && orderData?.status !== "Đang giao hàng") && (
                     <TouchableOpacity
                         style={Style_Detail_Order.cancelOrderBtn}
                         onPress={handleCancelOrder}>
-                        <Text style={Style_Detail_Order.textCancelOrder}>Hủy hàng</Text>
+                        {
+                            loading ? (
+                                <ActivityIndicator size='small' color={colors.White} />
+                            ) : (
+                                <Text style={Style_Detail_Order.textCancelOrder}>Hủy hàng</Text>
+                            )
+                        }
                     </TouchableOpacity>
                 )
             }

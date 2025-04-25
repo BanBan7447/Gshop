@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, ToastAndroid, Alert, ScrollView } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, ToastAndroid, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import Style_SignUp from '../../styles/Style_SignUp';
 import { api_getAllUser, api_signUp } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
@@ -18,6 +18,7 @@ const Page_SignUp = (props) => {
     const [emailError, setEmailError] = useState("");
     const [phoneError, setPhoneError] = useState("");
     const [passError, setPassError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const isFormValid =
         name.trim() !== "" &&
@@ -75,14 +76,14 @@ const Page_SignUp = (props) => {
     };
 
     const validatePassword = (text) => {
-        const hasUpperCase = /[A-Z]/.test(text);
+        const hasUpperCase = /[A-Za-z]/.test(text) && /\d/.test(text);
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(text);
         const isValidLength = text.length >= 8;
 
         let errors = [];
 
         if (!isValidLength) errors.push("• Ít nhất 8 ký tự");
-        if (!hasUpperCase) errors.push("• 1 chữ cái viết hoa và 1 số");
+        if (!hasUpperCase) errors.push("• 1 chữ cái và 1 số");
         if (!hasSpecialChar) errors.push("• 1 ký tự đặc biệt (# ? ! $ & @)");
 
         if (errors.length > 0) {
@@ -97,24 +98,12 @@ const Page_SignUp = (props) => {
 
     // Hàm đăng ký
     const onSignUp = async () => {
-        // Gọi lại validate để cập nhật lỗi mới nhất
         validateEmail(email);
         validatePhoneNumber(phone_number);
         validatePassword(password);
 
+        setLoading(true);
         try {
-            // Gọi API để kiểm tra trùng lặp của email và số điện thoại
-            const getUsers = await api_getAllUser();
-            const allUsers = getUsers?.data || [];
-
-            const isEmailExist = allUsers.some(user => user.email === email);
-            const isPhoneExist = allUsers.some(user => user.phone_number === phone_number);
-
-            if(isEmailExist || isPhoneExist){
-                Alert.alert("Lỗi đăng ký", "Email hoặc Số điện thoại đã được đăng ký trước đó");
-                return;
-            };
-
             const body = {
                 name: name,
                 email: email,
@@ -127,9 +116,13 @@ const Page_SignUp = (props) => {
             if (response) {
                 ToastAndroid.show('Đăng ký thành công', ToastAndroid.LONG);
                 navigation.navigate('Login', { email, password });
+            }else{
+                Alert.alert("Lỗi đăng ký", "Email hoặc Số điện thoại đã được đăng ký trước đó");
             }
         } catch (e) {
             Alert.alert('Lỗi', 'Có lỗi xảy ra trong quá trình đăng ký.');
+        } finally{
+            setLoading(false);
         }
     };
 
@@ -208,7 +201,13 @@ const Page_SignUp = (props) => {
                     disabled={!isFormValid}
                     onPress={onSignUp}
                 >
-                    <Text style={Style_SignUp.registerButtonText}>Đăng ký</Text>
+                    {
+                        loading ? (
+                            <ActivityIndicator size='small' color={colors.White}/>
+                        ) : (
+                            <Text style={Style_SignUp.registerButtonText}>Đăng ký</Text>
+                        )
+                    }
                 </TouchableOpacity>
 
                 <TouchableOpacity>

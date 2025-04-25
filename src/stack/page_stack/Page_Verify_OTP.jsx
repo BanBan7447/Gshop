@@ -9,10 +9,12 @@ import { api_verifyOTP } from '../../helper/ApiHelper';
 const CELL_COUNT = 6;
 
 const Page_Verify_OTP = ({ navigation, route }) => {
-    const { email } = route.params;
+    const { email, otpCode } = route.params;
     const { users } = useContext(AppContext);
     const [value, setValue] = useState("");
     const [loading, setLoading] = useState(false);
+    console.log("Email: ", email)
+    console.log("Mã otp: ", otpCode)
 
     const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
     const [props, getCellOnLayoutHandler] = useClearByFocusCell({
@@ -22,25 +24,36 @@ const Page_Verify_OTP = ({ navigation, route }) => {
 
     const handleVerityfyOTP = async () => {
         if (value.length !== 6) {
-            Alert.alert("Lỗi", "Mã OTP phải đủ 6 chữ số");
+            Alert.alert("Lỗi xác nhận", "Mã OTP phải đủ 6 chữ số");
             return;
         };
-        setLoading(true);
 
+        // if (value === otpCode) {
+        //     ToastAndroid.show("Xác nhận thành công", ToastAndroid.SHORT);
+        //     navigation.navigate("ForgotPass", { email });
+        // } else {
+        //     Alert.alert("Cảnh báo", "Mã xác nhận không hợp lệ");
+        // }
+
+        setLoading(true);
         try {
             const response = await api_verifyOTP(email, value);
-            if (response.status) {
+            console.log("Email: ", email);
+            console.log("Mã xác nhận nhập vào: ", value);
+        
+            if (response?.status) {
                 ToastAndroid.show("Xác nhận thành công", ToastAndroid.SHORT);
                 navigation.navigate("ForgotPass", { email });
             } else {
-                Alert.alert("Cảnh báo", "Mã xác nhận không hợp lệ");
+                Alert.alert("Cảnh báo", response?.message || "Mã xác nhận không hợp lệ");
             }
         } catch (e) {
             Alert.alert("Thông báo", "Xác minh thất bại");
-        } finally {
+            console.log("Lỗi xác minh OTP:", e);
+        } finally{
             setLoading(false);
         }
-
+        
         // navigation.navigate("ForgotPass", { email });
     };
 
@@ -85,7 +98,7 @@ const Page_Verify_OTP = ({ navigation, route }) => {
                 disabled={loading}>
                 {
                     loading ? (
-                        <ActivityIndicator color={colors.White} />
+                        <ActivityIndicator size='small' color={colors.White} />
                     ) : (
                         <Text style={Style_Verify_OTP.textVerity}>Xác nhận</Text>
                     )

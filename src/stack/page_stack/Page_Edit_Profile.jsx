@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ToastAndroid, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Alert, ToastAndroid, ScrollView, ActivityIndicator } from 'react-native';
 import React, { useContext, useState, useEffect } from 'react';
 import Style_Edit_Profile from '../../styles/Style_Edit_Profile';
 import { api_updateProfile, api_uploadAvatar } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
 import { launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import colors from '../../styles/colors';
 
 const Page_Edit_Profile = (props) => {
     const { navigation } = props
@@ -182,7 +183,13 @@ const Page_Edit_Profile = (props) => {
                 style={Style_Edit_Profile.saveButton}
                 onPress={updateProfile}
                 disabled={loading}>
-                <Text style={Style_Edit_Profile.saveButtonText}>Cập nhật</Text>
+                {
+                    loading ? (
+                        <ActivityIndicator size='small' color={colors.White}/>
+                    ) : (
+                        <Text style={Style_Edit_Profile.saveButtonText}>Cập nhật</Text>
+                    )
+                }
             </TouchableOpacity>
         </ScrollView>
     );

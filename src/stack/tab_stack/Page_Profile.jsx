@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Button, Image } from 'react-native'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { AppContext } from '../../context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Style_Profile from '../../styles/Style_Profile';
@@ -7,7 +7,7 @@ import colors from '../../styles/colors';
 
 const Page_Profile = (props) => {
   const { navigation } = props;
-  const { users, setUsers } = useContext(AppContext); // Lay thong tin nguoi dung tu Context
+  const { users, setUsers } = useContext(AppContext);
 
   //Ham dang xuat
   const onLogout = async () => {
@@ -79,7 +79,7 @@ const Page_Profile = (props) => {
 
           <ProfileOption
             icon={require('../../assets/icon/icon_logout.png')}
-            label={'Đăng suất'}
+            label={'Đăng xuất'}
             onPress={() => onLogout()}
             textColor={colors.Red}
             arrowIcon={require('../../assets/icon/icon_arrow_red.png')} />

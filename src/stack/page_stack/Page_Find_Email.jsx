@@ -1,13 +1,14 @@
-import { View, Text, TouchableOpacity, Image, TextInput, Alert, ToastAndroid } from 'react-native'
+import { View, Text, TouchableOpacity, Image, TextInput, Alert, ToastAndroid, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import Style_Search from '../../styles/Style_Search'
 import Style_Find_Email from '../../styles/Style_Find_Email'
-import { api_sendOTP } from '../../helper/ApiHelper'
+import { api_sendOTP, api_getAllUser } from '../../helper/ApiHelper'
 import colors from '../../styles/colors'
 
 const Page_Find_Email = (props) => {
     const { navigation } = props
-    const [email, setEmail] = useState("phongntps37397@fpt.edu.vn");
+    const [email, setEmail] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const sendOTP = async () => {
         if (!email) {
@@ -15,18 +16,35 @@ const Page_Find_Email = (props) => {
             return;
         }
 
+        setLoading(true);
         try {
+            const users = await api_getAllUser();
+            console.log("Danh sách tất cả user: ", users);
+            if (!users) {
+                Alert.alert("Lỗi", "Không thể kiểm tra danh sách người dùng");
+                return;
+            }
+
+            const findEmailUser = users.find((user) => user.email.toLowerCase() === email.toLocaleLowerCase());
+            if (!findEmailUser) {
+                Alert.alert("Email chưa được đăng ký", "Vui lòng kiểm tra lại địa chỉ email của bạn.");
+                return;
+            }
+
             const response = await api_sendOTP(email);
+
             console.log("Data OTP: ", response)
             if (response?.status) {
-                const code = response.code;
+                console.log('Lấy mã otp: ', response.code);
                 ToastAndroid.show("Gửi mã OTP thành công", ToastAndroid.SHORT);
-                navigation.navigate("VerityOTP", { email });
+                navigation.navigate("VerityOTP", { email, otpCode: response.code });
             } else {
                 Alert.alert("Lỗi", response.message || "Gửi mã OTP thất bại");
             }
         } catch (e) {
             Alert.alert("Lỗi", "Tìm email thất bại")
+        } finally{
+            setLoading(false);
         }
 
         // navigation.navigate("VerityOTP", { email });
@@ -45,7 +63,7 @@ const Page_Find_Email = (props) => {
             </TouchableOpacity>
 
             <Text style={Style_Find_Email.title}>Tìm tài khoản</Text>
-            <Text style={Style_Find_Email.label}>Nhập địa chỉ email của bạn</Text>
+            <Text style={Style_Find_Email.label}>Nhập địa chỉ email đã dăng ký của bạn</Text>
             <TextInput
                 style={Style_Find_Email.text_input}
                 placeholder='Email'
@@ -56,7 +74,13 @@ const Page_Find_Email = (props) => {
             <TouchableOpacity
                 style={Style_Find_Email.btn_next}
                 onPress={() => sendOTP()}>
-                <Text style={Style_Find_Email.text_next}>Tiếp tục</Text>
+                {
+                    loading ? (
+                        <ActivityIndicator size='small' color={colors.White}/>
+                    ) : (
+                        <Text style={Style_Find_Email.text_next}>Tiếp tục</Text>
+                    )
+                }
             </TouchableOpacity>
         </View>
     )
