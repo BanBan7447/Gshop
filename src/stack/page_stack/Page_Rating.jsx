@@ -1,9 +1,9 @@
-import { View, Text, TouchableOpacity, Image, FlatList, ActivityIndicator, ScrollView, Modal, TextInput, Alert, ToastAndroid, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native'
+import { View, Text, TouchableOpacity, Image, FlatList, ActivityIndicator, ScrollView, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import Style_Rating from '../../styles/Style_Rating'
 import { useRoute } from '@react-navigation/native'
 import colors from '../../styles/colors'
-import { api_getDetailUser, api_addReview, api_getRateByProduct } from '../../helper/ApiHelper'
+import { api_getDetailUser, api_getRateByProduct } from '../../helper/ApiHelper'
 import { AppContext } from '../../context'
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder'
 
@@ -18,6 +18,21 @@ const Page_Rating = (props) => {
   const [totalRate, setTotalRate] = useState(0);
   const [averageRate, setAverageRate] = useState(totalRate);
   const [loading, setLoading] = useState(true);
+  const [filterRating, setFilterRating] = useState('all');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getUserName();
+    await getRatings();
+    setRefreshing(false);
+  }
+
+  const ratingFilter = ratings.filter(item => {
+    if (filterRating === 'all') return true;
+    if (filterRating === 'my') return item.id_user === users._id;
+    return item.star === Number(filterRating);
+  });
 
   // Hàm lấy thông tin user theo ID
   const getUserName = async (userdId) => {
@@ -63,14 +78,26 @@ const Page_Rating = (props) => {
     try {
       const reviews = await api_getRateByProduct(product._id);
       if (reviews && reviews.length > 0) {
+
+        // Tính điểm đánh giá trung bình
         const totalPoints = reviews.reduce((sum, review) => sum + review.star, 0);
         const avarageRating = totalPoints / reviews.length;
         setTotalRate(avarageRating.toFixed(1));
 
-        const myReview = reviews.find(my => my.id_user === users._id);
-        const othersReview = reviews.filter(my => my.id_user !== users._id);
+        // Sắp xếp đánh giá theo thời gian
+        const sortedReviews = [...reviews].sort((a, b) => {
+          const getFullDateTime = (dateSort, timeSort) => {
+            const [day, month, year] = dateSort.split('/').map(Number);
+            const [hour, minute, second] = timeSort.split(':').map(Number);
+            return new Date(year, month - 1, day, hour, minute, second);
+          };
 
-        const sortedReviews = myReview ? [myReview, ...othersReview] : reviews;
+          const dateTimeA = getFullDateTime(a.date, a.time || "00:00:00");
+          const dateTimeB = getFullDateTime(b.date, b.time || "00:00:00");
+
+          return dateTimeB - dateTimeA;
+        });
+
         setRatings(sortedReviews);
       }
     } catch (e) {
@@ -120,7 +147,9 @@ const Page_Rating = (props) => {
 
         <View style={Style_Rating.contain_name_date}>
           <Text style={Style_Rating.name_customer}>
-            {item.id_user === users._id ? "Đánh giá của tôi" : userNames[item.id_user]}
+            {/* {item.id_user === users._id ? "Đánh giá của tôi" : userNames[item.id_user]} */}
+
+            {userNames[item.id_user]}
           </Text>
           <Text style={{ fontSize: 12 }}>{item.date}</Text>
         </View>
@@ -201,7 +230,17 @@ const Page_Rating = (props) => {
               <Text style={Style_Rating.text_navigation}>Đánh giá</Text>
             </TouchableOpacity>
 
-            <ScrollView style={Style_Rating.container}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={[Style_Rating.container, { marginBottom: 24 }]}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[colors.Red]}
+                  tintColor={colors.Red}
+                />
+              }>
               <Text style={Style_Rating.text_name}>
                 {product.name}
               </Text>
@@ -217,10 +256,55 @@ const Page_Rating = (props) => {
                 </View>
               </View>
 
-              <FlatList
-                data={ratings}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={renderRating} />
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingStart: 20 }}
+                style={Style_Rating.container_filter}>
+                {
+                  ['all', 'my', 5, 4, 3, 2, 1].map((type) => (
+                    <TouchableOpacity
+                      key={type}
+                      onPress={() => setFilterRating(type)}
+                      style={[
+                        Style_Rating.btn_filter,
+                        {
+                          backgroundColor: filterRating === type ? colors.Red : colors.White,
+                          borderColor: filterRating === type ? 'transparent' : colors.Grey,
+                          borderWidth: 1,
+                        }
+                      ]}>
+
+                      <Text style={[
+                        Style_Rating.text_filter,
+                        {
+                          color: filterRating === type ? colors.White : colors.Black
+                        }
+                      ]}>
+                        {
+                          type === 'all' ? 'Tất cả' :
+                            type === 'my' ? 'Đã đánh giá' :
+                              `${type} ★`
+                        }
+                      </Text>
+                    </TouchableOpacity>
+                  ))
+                }
+              </ScrollView>
+
+              {
+                ratingFilter.length === 0 ? (
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={{ fontFamily: 'Inter Medium', fontSize: 16 }}>Không có đánh giá</Text>
+                  </View>
+                ) : (
+                  <FlatList
+                    data={ratingFilter}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={renderRating}
+                    contentContainerStyle={{ paddingHorizontal: 20 }} />
+                )
+              }
             </ScrollView>
           </View>
         )

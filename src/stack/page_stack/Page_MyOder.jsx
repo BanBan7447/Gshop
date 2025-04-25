@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, Image, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, Image, ActivityIndicator, Alert, ScrollView, RefreshControl } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Để lấy id_user
 import { api_getOrders } from '../../helper/ApiHelper';
 import { AppContext } from '../../context';
@@ -15,6 +15,7 @@ const Page_MyOder = (props) => {
     const [selectedStatus, setSelectedStatus] = useState('Tất cả'); // Trạng thái lọc
     const { users } = useContext(AppContext);
     const prevOrdersRef = useRef([]);
+    const [refreshing, setRefreshing] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -22,7 +23,19 @@ const Page_MyOder = (props) => {
                 fetchOrders(users._id, setOrders, setLoading);
             }
         }, [])
-    )
+    );
+
+    const loadOrders = async () => {
+        if (!users?._id) return;
+        setLoading(true);
+        await fetchOrders(users._id, setOrders, setLoading);
+    };
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await loadOrders();
+        setRefreshing(false);
+    };
 
     const fetchOrders = async (userId, setOrders, setLoading) => {
         try {
@@ -42,7 +55,7 @@ const Page_MyOder = (props) => {
         switch (status) {
             case 'Đang xử lý':
                 return colors.Blue; // Màu xanh dương
-            case 'Đang vận chuyển':
+            case 'Đang giao hàng':
                 return colors.Orange; // Màu vàng cam
             case 'Đã giao':
                 return colors.Green; // Màu xanh lá
@@ -92,7 +105,7 @@ const Page_MyOder = (props) => {
                     <TouchableOpacity
                         style={[Style_MyOder.detailButton]}
                         onPress={() => navigation.navigate('DetailOrder', { order: item, user: users })}>
-                        <Text style={{fontSize: 12, fontFamily: 'Inter Medium', color: colors.White}}>Chi tiết</Text>
+                        <Text style={{ fontSize: 12, fontFamily: 'Inter Medium', color: colors.White }}>Chi tiết</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -109,9 +122,17 @@ const Page_MyOder = (props) => {
     }
 
     return (
-        <ScrollView style={Style_MyOder.container}>
+        <ScrollView
+            style={Style_MyOder.container}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[colors.Red]}
+                    tintColor={colors.Red}
+                />
+            }>
             <View>
-                {/* Header */}
                 <TouchableOpacity
                     style={Style_MyOder.header}
                     onPress={() => navigation.navigate('Tab', { screen: 'Profile' })}>
@@ -119,7 +140,6 @@ const Page_MyOder = (props) => {
                     <Text style={Style_MyOder.headerTitle}>Đơn hàng của tôi</Text>
                 </TouchableOpacity>
 
-                {/* Bộ lọc trạng thái */}
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View style={Style_MyOder.filterContainer}>
                         {['Tất cả', 'Đang xử lý', 'Đang giao hàng', 'Đã giao', "Đã hủy"].map(status => (
@@ -142,7 +162,6 @@ const Page_MyOder = (props) => {
                     </View>
                 </ScrollView>
 
-                {/* Danh sách đơn hàng */}
                 <FlatList
                     data={filteredOrders}
                     keyExtractor={item => item._id.toString()}

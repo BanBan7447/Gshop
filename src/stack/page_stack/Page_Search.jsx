@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, ActivityIndicator, TextInput, FlatList, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, Image, ActivityIndicator, TextInput, FlatList, ScrollView, RefreshControl } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import Style_Home from '../../styles/Style_Home'
@@ -21,6 +21,14 @@ const Page_Search = (props) => {
 
     const [filterProducts, setFilterProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await funGetAllProducts();
+        await funGetCategories();
+        setRefreshing(false);
+    }
 
     // Hàm lấy tất cả sản phẩm
     const funGetAllProducts = async () => {
@@ -30,14 +38,14 @@ const Page_Search = (props) => {
             const keyWords = ["Entry Grade", "High Grade", "Real Grade", "Master Grade", "Perfect Grade"];
 
             const filterDataProduct = response
-                .filter(product =>
-                    keyWords.some(keyWords => product.name.includes(keyWords))
-                )
+                // .filter(product =>
+                //     keyWords.some(keyWords => product.name.includes(keyWords))
+                // )
                 // Sắp xếp sản phẩm theo lượt xem từ cao đến thấp (nổi bật)
                 //.sort((a, b) => b.viewer - a.viewer);
                 .sort((a, b) => {
-                    if(a.quantity === 0 && b.quantity !== 0) return 1;
-                    if(a.quantity !== 0 && b.quantity === 0) return -1;
+                    if (a.quantity === 0 && b.quantity !== 0) return 1;
+                    if (a.quantity !== 0 && b.quantity === 0) return -1;
 
                     return b.viewer - a.viewer;
                 });
@@ -134,7 +142,7 @@ const Page_Search = (props) => {
 
             const formatPrice = productPrice.toLocaleString('vi-VN'); // Định dạng giá tiền
 
-            return(
+            return (
                 productName.includes(lowerText) || // Tìm tên sản phẩm
                 categoryName.includes(lowerText) || // Tìm loại sản phẩm
                 (isNumber && (productPrice <= parseFloat(text.replace(/\./g, '')) || formatPrice.includes(text))) // Tìm giá sản phẩm
@@ -232,20 +240,21 @@ const Page_Search = (props) => {
                 ) : (
                     <ScrollView
                         style={Style_Search.container}
-                        showsVerticalScrollIndicator={false}>
-                        <TouchableOpacity
-                            style={Style_Search.navigation}
-                            onPress={() => navigation.navigate('Tab', { screen: 'Home' })}>
-                            <Image
-                                source={require('../../assets/icon/icon_long_arrow.png')}
-                                style={Style_Search.img_icon} />
+                        showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                                colors={[colors.Red]}
+                                tintColor={colors.Red}
+                            />
+                        }>
 
-                            <Text style={Style_Search.text_navigation}>Tìm kiếm</Text>
-                        </TouchableOpacity>
+                        <Text style={Style_Search.title}>Tìm kiếm</Text>
 
                         <View style={Style_Search.contain_text_input}>
                             <Image
-                                source={require('../../assets/icon/icon_search.png')}
+                                source={require('../../assets/icon/icon_search_thin.png')}
                                 style={Style_Search.img_icon} />
 
                             <TextInput

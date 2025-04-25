@@ -4,7 +4,7 @@ import colors from './colors'
 
 const Style_Detail_News = StyleSheet.create({
     container: {
-        paddingHorizontal: 20,
+        flex: 1,
         backgroundColor: colors.White
     },
 
@@ -29,8 +29,7 @@ const Style_Detail_News = StyleSheet.create({
     },
 
     thumbnails_news: {
-        width: '100%',
-        height: 200,
+        height: 220,
         marginTop: 16,
         marginBottom: 24,
         borderRadius: 24

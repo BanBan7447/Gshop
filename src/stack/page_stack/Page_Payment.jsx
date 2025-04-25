@@ -11,12 +11,13 @@ import {
   StyleSheet,
   Modal,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Style_Payment from '../../styles/Style_Payment';
 import colors from '../../styles/colors';
-import {AppContext} from '../../context';
-import {CartContext} from '../../context/CartContext';
+import { AppContext } from '../../context';
+import { CartContext } from '../../context/CartContext';
 import {
   api_addOrder,
   api_getAddressUser,
@@ -25,11 +26,11 @@ import {
 } from '../../helper/ApiHelper';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import FastImage from 'react-native-fast-image';
-import {hmacSHA256} from 'react-native-hmac';
+import { hmacSHA256 } from 'react-native-hmac';
 import axios from 'axios';
 import WebView from 'react-native-webview';
-import {useToast} from 'react-native-toast-notifications';
-import {useFocusEffect} from '@react-navigation/native';
+import { useToast } from 'react-native-toast-notifications';
+import { useFocusEffect } from '@react-navigation/native';
 
 const clientID = '523baaf6-60a1-455a-9676-fd005f76e7f5';
 const apiKey = '53a1c476-71c3-4c4c-aebc-58764ed56b58';
@@ -37,10 +38,10 @@ const checkSum =
   'b4bf6567e8a351b0617b45eef67cfcbdbaa52026cb1482df3f31aa330192024a';
 
 const Page_Payment = props => {
-  const {navigation, route} = props;
-  const {users} = useContext(AppContext);
-  const {cart, setCart} = useContext(CartContext);
-  const {selectProduct} = route.params || {selectProduct: []};
+  const { navigation, route } = props;
+  const { users } = useContext(AppContext);
+  const { cart, setCart } = useContext(CartContext);
+  const { selectProduct } = route.params || { selectProduct: [] };
   const [productImages, setProductImages] = useState({});
   const [paymentMethod, setPaymentMethod] = useState([]);
   const [address, setAddress] = useState([]);
@@ -58,6 +59,7 @@ const Page_Payment = props => {
   const [editName, setEditName] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [editAddress, setEditAddress] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -74,10 +76,16 @@ const Page_Payment = props => {
 
   useEffect(() => {
     if (address) {
-      setNewAddress(
-        prevAddress =>
-          prevAddress ||
-          `${address.detail}, ${address.commune}, ${address.district}, ${address.province}`,
+      const { detail, commune, district, province } = address;
+      const isAddressVaild = detail && commune && district && province;
+
+      setNewAddress(prevAddress =>
+        prevAddress ||
+        (
+          isAddressVaild ?
+            `${detail}, ${commune}, ${district}, ${province}`
+            : null
+        )
       );
     }
   }, [address]);
@@ -177,14 +185,14 @@ const Page_Payment = props => {
   };
 
   // Hàm render payment method
-  const renderPaymentMethod = ({item}) => {
-    const {_id, image, name} = item;
+  const renderPaymentMethod = ({ item }) => {
+    const { _id, image, name } = item;
     return (
       <View style={Style_Payment.item_payment}>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{ flexDirection: 'row' }}>
           <Image
-            source={{uri: image}}
-            style={{width: 24, height: 24, marginRight: 12}}
+            source={{ uri: image }}
+            style={{ width: 24, height: 24, marginRight: 12 }}
           />
           <Text style={Style_Payment.text_name_paymentMethod}>{name}</Text>
         </View>
@@ -197,7 +205,7 @@ const Page_Payment = props => {
           ]}>
           {selectedPayment === _id && (
             <Image
-              style={{width: 12, height: 12}}
+              style={{ width: 12, height: 12 }}
               source={require('../../assets/icon/icon_tick_white.png')}
             />
           )}
@@ -213,9 +221,9 @@ const Page_Payment = props => {
     );
 
     if (updatedProducts.length === 0) {
-      navigation.navigate('Tab', {screen: 'Cart'});
+      navigation.navigate('Tab', { screen: 'Cart' });
     } else {
-      navigation.setParams({selectProduct: updatedProducts});
+      navigation.setParams({ selectProduct: updatedProducts });
     }
   };
 
@@ -235,15 +243,15 @@ const Page_Payment = props => {
     var returnUrl = 'https://localhost:3000/success';
     var signature = await hmacSHA256(
       'amount=' +
-        amount +
-        '&cancelUrl=' +
-        cancelUrl +
-        '&description=' +
-        description +
-        '&orderCode=' +
-        orderCode +
-        '&returnUrl=' +
-        returnUrl,
+      amount +
+      '&cancelUrl=' +
+      cancelUrl +
+      '&description=' +
+      description +
+      '&orderCode=' +
+      orderCode +
+      '&returnUrl=' +
+      returnUrl,
       checkSum,
     );
 
@@ -290,15 +298,12 @@ const Page_Payment = props => {
   // Hàm đặt hàng
   const handleOrder = async () => {
     if (!selectedPayment) {
-      ToastAndroid.show(
-        'Vui lòng chọn phương thức thanh toán',
-        ToastAndroid.SHORT,
-      );
+      Alert.alert("Lỗi thanh toán", 'Vui lòng chọn phương thức thanh toán');
       return;
     }
 
-    if (!address) {
-      ToastAndroid.show('Vui lòng chọn địa chỉ giao hàng', ToastAndroid.SHORT);
+    if (!address || !address.detail || !address.commune || !address.district || !address.province) {
+      Alert.alert("Lỗi thanh toán", 'Vui lòng điền đầy đủ địa chỉ giao hàng');
       return;
     }
 
@@ -306,6 +311,7 @@ const Page_Payment = props => {
       return Payment();
     }
 
+    setLoading(true);
     try {
       console.log('user đặt hàng: ', users._id);
       console.log('phương thức thanh toán: ', selectedPayment);
@@ -324,19 +330,21 @@ const Page_Payment = props => {
       );
       if (response) {
         showToast();
-        navigation.navigate('Tab', {screen: 'Cart'});
+        navigation.navigate('Tab', { screen: 'Cart' });
       } else {
         Alert.alert('Lỗi', 'Đặt hàng thất bại. Vui lòng thử lại');
       }
     } catch (e) {
       console.log(e);
       Alert.alert('Lỗi', 'Có lỗi xảy ra khi đặt hàng');
+    } finally {
+      setLoading(false);
     }
   };
 
   //Theo dõi sự thay đổi của link payOS
   const handleNavigationChange = async navState => {
-    const {url} = navState;
+    const { url } = navState;
 
     console.log('Current URL:', url);
     if (url.includes('/success')) {
@@ -350,7 +358,7 @@ const Page_Payment = props => {
       );
       showToast();
       setPaymentLink('');
-      navigation.navigate('Tab', {screen: 'Cart'});
+      navigation.navigate('Tab', { screen: 'Cart' });
     } else if (url.includes('/cancel')) {
       Alert.alert('Thất bại', 'Đã hủy thanh toán.');
       setPaymentLink('');
@@ -361,7 +369,7 @@ const Page_Payment = props => {
     <View style={Style_Payment.container}>
       <TouchableOpacity
         style={Style_Payment.navigation}
-        onPress={() => navigation.navigate('Tab', {screen: 'Cart'})}>
+        onPress={() => navigation.navigate('Tab', { screen: 'Cart' })}>
         <Image
           source={require('../../assets/icon/icon_long_arrow.png')}
           style={Style_Payment.img_icon}
@@ -370,7 +378,7 @@ const Page_Payment = props => {
         <Text style={Style_Payment.text_navigation}>Xác nhận đơn hàng</Text>
       </TouchableOpacity>
 
-      <ScrollView contentContainerStyle={{gap: 24}}>
+      <ScrollView contentContainerStyle={{ gap: 24 }}>
         <View style={Style_Payment.container_info}>
           <View style={Style_Payment.container_title}>
             <Text style={Style_Payment.text_title}>Người nhận</Text>
@@ -421,7 +429,7 @@ const Page_Payment = props => {
                   </SkeletonPlaceholder>
                 ) : (
                   <FastImage
-                    source={{uri: ImageData}}
+                    source={{ uri: ImageData }}
                     style={Style_Payment.img_product}
                     resizeMode={FastImage.resizeMode.cover}
                   />
@@ -461,16 +469,16 @@ const Page_Payment = props => {
         <View style={Style_Payment.container_payment}>
           <Text style={Style_Payment.text_title}>Chi phí thanh toán</Text>
 
-          <View style={[Style_Payment.container_totalPrice, {marginBottom: 8}]}>
-            <Text style={{fontSize: 16}}>Tổng tiền sản phẩm: </Text>
-            <Text style={{fontSize: 16}}>
+          <View style={[Style_Payment.container_totalPrice, { marginBottom: 8 }]}>
+            <Text style={{ fontSize: 16 }}>Tổng tiền sản phẩm: </Text>
+            <Text style={{ fontSize: 16 }}>
               {cart.totalPrice?.toLocaleString('vi-VN')}đ
             </Text>
           </View>
 
-          <View style={[Style_Payment.container_totalPrice, {marginBottom: 8}]}>
-            <Text style={{fontSize: 16}}>Phí vận chuyển</Text>
-            <Text style={{fontSize: 16}}>
+          <View style={[Style_Payment.container_totalPrice, { marginBottom: 8 }]}>
+            <Text style={{ fontSize: 16 }}>Phí vận chuyển</Text>
+            <Text style={{ fontSize: 16 }}>
               {shippingFee.toLocaleString('vi-VN')}đ
             </Text>
           </View>
@@ -486,7 +494,13 @@ const Page_Payment = props => {
 
       <View style={Style_Payment.container_bottom}>
         <TouchableOpacity style={Style_Payment.btn_order} onPress={handleOrder}>
-          <Text style={Style_Payment.text_oder}>Đặt hàng</Text>
+          {
+            loading ? (
+              <ActivityIndicator size='small' color={colors.White} />
+            ) : (
+              <Text style={Style_Payment.text_oder}>Đặt hàng</Text>
+            )
+          }
         </TouchableOpacity>
       </View>
 
@@ -494,8 +508,8 @@ const Page_Payment = props => {
       {paymentLink ? (
         <View style={StyleSheet.absoluteFillObject}>
           <WebView
-            source={{uri: paymentLink}}
-            style={{flex: 1}}
+            source={{ uri: paymentLink }}
+            style={{ flex: 1 }}
             javaScriptEnabled={true}
             domStorageEnabled={true}
             onNavigationStateChange={handleNavigationChange}
@@ -540,21 +554,11 @@ const Page_Payment = props => {
               <Text style={{ lineHeight: 20, fontSize: 14, color: colors.Black }}>{editAddress}</Text>
             </TouchableOpacity>
 
-            <View style={{flexDirection: 'row', gap: 16}}>
-              <TouchableOpacity
-                style={[
-                  Style_Payment.modalButton,
-                  {backgroundColor: colors.Blue},
-                ]}
-                onPress={handleUpdate}>
-                <Text style={Style_Payment.modalTextButton}>Cập nhật</Text>
-              </TouchableOpacity>
-
             <View style={{ flexDirection: 'row', gap: 16 }}>
               <TouchableOpacity
                 style={[
                   Style_Payment.modalButton,
-                  {backgroundColor: colors.Red},
+                  { backgroundColor: colors.Red },
                 ]}
                 onPress={() => setModelVisible(false)}>
                 <Text style={Style_Payment.modalTextButton}>Hủy</Text>
@@ -566,7 +570,6 @@ const Page_Payment = props => {
                 <Text style={Style_Payment.modalTextButton}>Cập nhật</Text>
               </TouchableOpacity>
             </View>
-          </View>
           </View>
         </View>
       </Modal>

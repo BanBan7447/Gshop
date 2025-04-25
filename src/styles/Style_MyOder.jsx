@@ -45,10 +45,10 @@ const Style_MyOder = StyleSheet.create({
     },
     orderContainer: {
         backgroundColor: colors.White,
-        backgroundColor: '#FFFFFF',
         bottom: 1,
         color: '#AAAAAA',
         borderBottomWidth: 1,
+        borderColor: colors.Light_Grey,
         paddingVertical: 20,
         paddingHorizontal: 20
     },
@@ -133,8 +133,8 @@ const Style_MyOder = StyleSheet.create({
         fontSize: 16,
     },
     loading: {
-        flex: 1, 
-        justifyContent: 'center', 
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center'
     },
     emptyContainer: {

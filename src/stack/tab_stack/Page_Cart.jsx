@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid, ActivityIndicator, KeyboardAvoidingView, TextInput, Alert, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Image, ToastAndroid, ActivityIndicator, RefreshControl, TextInput, Alert, ScrollView } from 'react-native'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 
 import Style_Cart from '../../styles/Style_Cart'
@@ -19,14 +19,28 @@ const Page_Cart = (props) => {
   const [isCheckedAll, setIsCheckedAll] = useState(false);
   const { users } = useContext(AppContext);
   const [productImages, setProductImages] = useState({});
-
+  const [refreshing, setRefreshing] = useState(false);
   console.log('Danh sách sản phẩm có trong Cart: ', cart);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getCarts();
+    setRefreshing(false);
+  };
 
   const shopping = () => {
     if (!users?._id) {
       navigation.navigate('Login');
     } else {
       navigation.navigate('Tab', { screen: 'Home' })
+    }
+  }
+
+  const historyShopping = () => {
+    if (!users?._id) {
+      navigation.navigate('Login');
+    } else {
+      navigation.navigate('MyOrder')
     }
   }
 
@@ -360,7 +374,7 @@ const Page_Cart = (props) => {
   // Hàm đặt hàng
   const order = async () => {
     if (selectedItems.length === 0) {
-      ToastAndroid.show("Bạn chưa chọn sản phẩm nào!", ToastAndroid.SHORT);
+      Alert.alert("Cảnh báo", "Bạn chưa chọn sản phẩm nào");
       return;
     }
 
@@ -507,7 +521,7 @@ const Page_Cart = (props) => {
 
         <TouchableOpacity
           onPress={() => toggleSelectItems(item._id)}
-          style={[Style_Cart.checkBox, isChecked && Style_Cart.checkBox_selected]}>
+          style={[Style_Cart.checkBox, isChecked && Style_Cart.checkBox_selected, { borderColor: colors.Grey }]}>
           {isChecked &&
             <Image
               style={{ width: 12, height: 12 }}
@@ -555,7 +569,7 @@ const Page_Cart = (props) => {
           Giỏ hàng (<Text>{cart?.items?.length || 0}</Text>)
         </Text>
 
-        <TouchableOpacity onPress={() => navigation.navigate('MyOrder')}>
+        <TouchableOpacity onPress={() => historyShopping()}>
           <Image
             source={require('../../assets/icon/icon_history_order.png')}
             style={{ width: 26.5, height: 24.5 }} />
@@ -571,7 +585,17 @@ const Page_Cart = (props) => {
           cart && cart.items && cart.items.length > 0 ? (
             <View style={Style_Cart.container_cart}>
 
-              <ScrollView style={{ marginBottom: 120 }} showsVerticalScrollIndicator={false}>
+              <ScrollView
+                style={{ marginBottom: 120 }}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[colors.Red]} // Màu xoay vòng trên Android
+                    tintColor={colors.Red} // Màu xoay vòng trên iOS
+                  />
+                }>
                 {availableItems.length > 0 && (
                   <View>
                     <FlatList

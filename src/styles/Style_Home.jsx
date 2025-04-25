@@ -7,6 +7,14 @@ const Style_Home = StyleSheet.create({
         paddingTop: 20,
     },
 
+    avatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 100,
+        borderWidth: 2,
+        borderColor: colors.Red
+    },
+
     container_title: {
         width: '100%',
         flexDirection: 'row',

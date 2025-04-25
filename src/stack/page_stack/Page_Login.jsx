@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, Alert, ToastAndroid } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, Image, Alert, ToastAndroid, ActivityIndicator } from 'react-native';
 import colors from '../../styles/colors';
 import Style_Login from '../../styles/Style_Login';
 import { api_login } from '../../helper/ApiHelper';
@@ -11,7 +11,8 @@ const Page_Login = ({ navigation, route }) => {
     const { users, setUsers } = useContext(AppContext);
     const [email_phone, setEmail_phone] = useState(route.params?.email || '');
     const [password, setPassword] = useState(route.params?.password || '');
-    const [hidePassword, setHidePassword] = useState(false);
+    const [hidePassword, setHidePassword] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     // Hàm tự động định dạng số điện thoại khi nhập
     const formatPhone = (text) => {
@@ -58,6 +59,8 @@ const Page_Login = ({ navigation, route }) => {
             Alert.alert('Chưa nhập thông tin', 'Vui lòng nhập thông tin đầy đủ');
             return;
         }
+
+        setLoading(true);
         try {
             const body = {
                 email_phone: email_phone.includes('@') ? email_phone : null, // Tra ve email neu co @ hoac nguoc lai
@@ -81,6 +84,8 @@ const Page_Login = ({ navigation, route }) => {
             }
         } catch (e) {
             Alert.alert('Lỗi kết nối', 'Có lỗi xảy ra khi kết nối đến máy chủ. Vui lòng thử lại sau');
+        } finally{
+            setLoading(false);
         }
     }
 
@@ -129,8 +134,13 @@ const Page_Login = ({ navigation, route }) => {
             <TouchableOpacity
                 style={Style_Login.loginButton}
                 onPress={() => onLogin()}>
-
-                <Text style={Style_Login.loginButtonText}>Đăng nhập</Text>
+                    {
+                        loading ? (
+                            <ActivityIndicator size='small' color={colors.White}/>
+                        ) : (
+                            <Text style={Style_Login.loginButtonText}>Đăng nhập</Text>
+                        )
+                    }
             </TouchableOpacity>
 
             <View style={Style_Login.newUserContainer}>

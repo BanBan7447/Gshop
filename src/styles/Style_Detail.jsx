@@ -115,7 +115,7 @@ const Style_Detail = StyleSheet.create({
   },
 
   text_title_describe: {
-    fontFamily: 'Inter Medium',
+    fontFamily: 'Inter Bold',
     color: colors.Black,
     fontSize: 16,
   },
@@ -125,6 +125,7 @@ const Style_Detail = StyleSheet.create({
     color: colors.Black,
     fontSize: 14,
     marginBottom: 24,
+    marginTop: -12,
     textAlign: 'justify',
   },
 
@@ -139,7 +140,7 @@ const Style_Detail = StyleSheet.create({
 
   text_AddCart: {
     fontFamily: 'Inter Bold',
-    fontSize: 16,
+    fontSize: 14,
     color: colors.White,
   },
 

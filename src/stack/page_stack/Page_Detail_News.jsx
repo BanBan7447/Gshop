@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, Image, FlatList, TouchableOpacity, ActivityIndicator, useWindowDimensions, LogBox } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, ScrollView, Image, FlatList, TouchableOpacity, ActivityIndicator, useWindowDimensions, LogBox, Dimensions, RefreshControl } from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
 import Style_Detail_News from '../../styles/Style_Detail_News';
 import { api_getDetailNews } from '../../helper/ApiHelper';
 import colors from '../../styles/colors';
@@ -10,16 +10,25 @@ LogBox.ignoreLogs([
     'Support for defaultProps will be removed from function components',
     'MemoizedTNodeRenderer: Support for defaultProps will be removed from memo components in a future major release. Use JavaScript default parameters instead.',
     'bound renderChildren: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.',
-    'TNodeChildrenRenderer: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.'
+    'TNodeChildrenRenderer: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.',
+    'You seem to update props of the "TRenderEngineProvider" component'
 ]);
 
 const Page_Detail_News = (props) => {
-    const { width } = useWindowDimensions();
+    const screenWidth = Dimensions.get('window').width;
     const { navigation, route } = props
     const { newsId } = route.params;
 
     const [news, setNews] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await getDetailNews();
+        setRefreshing(false);
+    }
 
     const getDetailNews = async () => {
         try {
@@ -49,69 +58,81 @@ const Page_Detail_News = (props) => {
 
     console.log("Content tin tức: ", news.content);
 
-    // Format lại nội dung HTML để đảm bảo hiển thị đúng
-    // const formattedHTML = `
-    //     <!DOCTYPE html>
-    //     <html lang="vi">
-    //     <head>
-    //         <meta charset="UTF-8">
-    //         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    //         <style>
-    //             body { font-size: 16px; padding: 0px; color: ${colors.Black}; }
-    //             img { max-width: 100%; height: auto; }
-    //             a { color: blue; text-decoration: none; }
-    //         </style>
-    //     </head>
-    //     <body>
-    //         ${news.content}
-    //     </body>
-    //     </html>
-    // `;
-
     const customStyle = {
-        p: {color: colors.Black, fontSize: 18, lineHeight: 24},
-        img: {maxWidth: '100%', height: 'auto'},
-        a: { color: 'blue', textDecorationLine: 'underline' },
+        h2: {
+            color: colors.Black,
+            fontSize: 20,
+            fontWeight: 'bold',
+            backgroundColor: 'white',
+        },
+        h3: {
+            color: colors.Black,
+            fontSize: 18,
+            fontWeight: 'bold',
+            backgroundColor: 'white',
+        },
+        p: {
+            color: colors.Black,
+            fontSize: 14,
+            lineHeight: 20,
+            backgroundColor: 'white',
+            textAlign: 'justify',
+        },
+        img: {
+            width: '100%',
+            height: 'auto',
+            resizeMode: 'contain',
+        },
+        a: {
+            color: 'blue',
+            textDecorationLine: 'underline',
+        },
     };
 
     return (
-        <ScrollView style={Style_Detail_News.container}>
-            <TouchableOpacity
-                style={Style_Detail_News.navigation}
-                onPress={() => navigation.navigate('Tab', { screen: 'News' })}>
+        <ScrollView
+            style={Style_Detail_News.container}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+                <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[colors.Red]}
+                    tintColor={colors.Red}
+                />
+            }>
+            <View style={{ marginHorizontal: 20 }}>
+                <TouchableOpacity
+                    style={Style_Detail_News.navigation}
+                    onPress={() => navigation.navigate('Tab', { screen: 'News' })}>
+                    <Image
+                        source={require('../../assets/icon/icon_long_arrow.png')}
+                        style={Style_Detail_News.img_icon} />
+
+                    <Text style={Style_Detail_News.text_navigation}>Tin tức</Text>
+                </TouchableOpacity>
+
+                <Text style={Style_Detail_News.title_news}>{news.title}</Text>
+
+
+                <Text style={Style_Detail_News.date_news}>{news.date}</Text>
+
                 <Image
-                    source={require('../../assets/icon/icon_long_arrow.png')}
-                    style={Style_Detail_News.img_icon} />
+                    source={{ uri: news.thumbnail }}
+                    style={Style_Detail_News.thumbnails_news} />
 
-                <Text style={Style_Detail_News.text_navigation}>Tin tức</Text>
-            </TouchableOpacity>
-
-            <Text style={Style_Detail_News.title_news}>{news.title}</Text>
-
-
-            <Text style={Style_Detail_News.date_news}>{news.date}</Text>
-
-            <Image
-                source={{ uri: news.thumbnail }}
-                style={Style_Detail_News.thumbnails_news} />
-
-            <RenderHTML
-                contentWidth={width}
-                source={{ html: news.content }}
-                enableExperimentalMarginCollapsing={true}
-                tagsStyles={customStyle}
-            />
-
-            {/* <ScrollView style={{flex: 1}}>
-                <WebView
-                    originWhitelist={['*']}
-                    source={{ html: formattedHTML }}
-                    javaScriptEnabled={true}
-                    domStorageEnabled={true}
-                    scrollEnabled={false}
-                    style={{ flex: 1, width: '100%', height: 100 }} />
-            </ScrollView> */}
-
+                <View style={{ flex: 1 }}>
+                    <ScrollView>
+                        <RenderHTML
+                            contentWidth={screenWidth}
+                            source={{ html: news.content }}
+                            enableExperimentalMarginCollapsing={true}
+                            tagsStyles={customStyle}
+                            ignoredDomTags={['source']}
+                        />
+                    </ScrollView>
+                </View>
+            </View>
         </ScrollView>
     )
 }

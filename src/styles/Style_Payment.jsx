@@ -63,7 +63,7 @@ const Style_Payment = StyleSheet.create({
     container_title: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        marginBottom: 8
     },
 
     container_product: {
@@ -159,7 +159,6 @@ const Style_Payment = StyleSheet.create({
         borderColor: colors.Black,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 16
     },
 
     checkBox_selected: {
@@ -246,7 +245,7 @@ const Style_Payment = StyleSheet.create({
     textInput: {
         width: '100%',
         marginBottom: 16,
-        padding: 6,
+        padding: 8,
         backgroundColor: colors.Light_Blue,
         borderRadius: 12,
         paddingLeft: 12,

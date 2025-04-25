@@ -4,7 +4,8 @@ import colors from './colors'
 
 const Style_Search = StyleSheet.create({
     container: {
-        backgroundColor: colors.White
+        backgroundColor: colors.White,
+        paddingTop: 20
     },
 
     navigation: {
@@ -28,6 +29,13 @@ const Style_Search = StyleSheet.create({
         fontSize: 16
     },
 
+    title: {
+        fontFamily: 'Inter Bold',
+        color: colors.Black,
+        fontSize: 20,
+        paddingStart: 20
+    },
+
     contain_text_input: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -36,13 +44,13 @@ const Style_Search = StyleSheet.create({
         marginHorizontal: 20,
         paddingHorizontal: 16,
         borderRadius: 12,
-        marginTop: 8,
+        marginTop: 16,
         marginBottom: 24
     },
 
     text_input: {
         flex: 1,
-        fontSize: 16,
+        fontSize: 14,
         marginStart: -4
     },
 

@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Image, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, FlatList, Image, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import colors from '../../styles/colors'
 import Styles_News from '../../styles/Styles_News'
@@ -13,12 +13,26 @@ const Page_News = (props) => {
   const [news, setNews] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await get_News();
+    setRefreshing(false);
+  }
 
   // Lấy data tin tức
   const get_News = async () => {
     try {
       const response = await api_getNews();
-      setNews(response);
+
+      const sortedNews = response.sort((a, b) => {
+        const dateTimeA = new Date(`${a.date.split('/').reverse().join('-')}T${a.time}`);
+        const dateTimeB = new Date(`${b.date.split('/').reverse().join('-')}T${b.time}`);
+        return dateTimeB - dateTimeA
+      });
+
+      setNews(sortedNews);
     } catch (e) {
       console.log(e);
     } finally {
@@ -55,7 +69,7 @@ const Page_News = (props) => {
                 thumbnail && thumbnail.startsWith('https') ? (
                   <FastImage
                     source={{ uri: thumbnail }}
-                    style={Styles_News.thumbnails_news}/>
+                    style={Styles_News.thumbnails_news} />
                 ) : (
                   <Image
                     source={{ uri: 'https://phutungnhapkhauchinhhang.com/wp-content/uploads/2020/06/default-thumbnail.jpg' }}
@@ -90,12 +104,20 @@ const Page_News = (props) => {
   }
 
   return (
-    <ScrollView style={Styles_News.container}>
+    <ScrollView
+      style={Styles_News.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[colors.Red]}
+          tintColor={colors.Red}/>
+      }>
       <Text style={Styles_News.title}> Tin tức </Text>
 
       <View style={Styles_News.container_input}>
         <Image
-          source={require('../../assets/icon/icon_search.png')}
+          source={require('../../assets/icon/icon_search_thin.png')}
           style={Styles_News.img_icon} />
 
         <TextInput

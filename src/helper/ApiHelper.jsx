@@ -51,9 +51,10 @@ const api_signUp = async (data) => {
 // API đổi mật khẩu
 const api_changePassword = async (data) => {
     try {
-        const { user_id, email, newPassword } = data;
+        const { user_id, oldPassword, newPassword } = data;
         const body = {
             user_id: user_id,
+            oldPassword: oldPassword,
             newPassword: newPassword
         };
 
@@ -74,10 +75,11 @@ const api_getAllUser = async () => {
     try {
         const response = await AxiosInstance().get('/user/list');
         if(response.status == true){
+            console.log("Danh sách tất cả user: ", response);
             return response.data
         }
     } catch(e){
-
+        console.log(e)
     }
 }
 
@@ -282,20 +284,20 @@ const api_getRateByProduct = async (id_product) => {
 }
 
 // Gọi API thêm đánh giá
-const api_addReview = async (star, content, id_user, id_product) => {
+const api_addReview = async (star, content, id_user, id_product, id_order) => {
     try {
         console.log('>>>>>>>>>>>>>>>>>> get Add Review');
         const response = await AxiosInstance().post('/rating/add', {
-            star, content, id_user, id_product
+            star, content, id_user, id_product, id_order
         });
 
-        console.log('📌 Phản hồi từ server:', response);
+        console.log('Phản hồi từ server:', response);
 
         if (response.status == true) {
             return response;
         }
     } catch (e) {
-        console.log('❌ Lỗi khi thêm đánh giá:', e);
+        console.log('Lỗi khi thêm đánh giá:', e);
     }
 }
 

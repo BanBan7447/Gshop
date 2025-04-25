@@ -7,6 +7,7 @@ import Page_Cart from '../stack/tab_stack/Page_Cart'
 import Page_Notification from '../stack/tab_stack/Page_Notification'
 import Page_Profile from '../stack/tab_stack/Page_Profile'
 import Page_Payment from '../stack/page_stack/Page_Payment'
+import Page_Search from '../stack/page_stack/Page_Search'
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import colors from '../styles/colors'
@@ -42,17 +43,17 @@ const Tab_Navigation = () => {
             }
           }
 
-          if (route.name === 'News') {
+          if (route.name === 'Search') {
             if (focused) {
               return (
                 <Image
-                  source={require('../assets/icon/icon_newspaper_red.png')}
+                  source={require('../assets/icon/icon_search_red.png')}
                   style={{ width: iconSize, height: iconSize }} />
               )
             } else {
               return (
                 <Image
-                  source={require('../assets/icon/icon_newspaper.png')}
+                  source={require('../assets/icon/icon_search.png')}
                   style={{ width: iconSize, height: iconSize }} />
               )
             }
@@ -74,17 +75,17 @@ const Tab_Navigation = () => {
             }
           }
 
-          if (route.name === 'Notification') {
+          if (route.name === 'News') {
             if (focused) {
               return (
                 <Image
-                  source={require('../assets/icon/icon_notification_red.png')}
+                  source={require('../assets/icon/icon_newspaper_red.png')}
                   style={{ width: iconSize, height: iconSize }} />
               )
             } else {
               return (
                 <Image
-                  source={require('../assets/icon/icon_notification.png')}
+                  source={require('../assets/icon/icon_newspaper.png')}
                   style={{ width: iconSize, height: iconSize }} />
               )
             }
@@ -111,9 +112,9 @@ const Tab_Navigation = () => {
       })}>
 
       <TabStack.Screen name='Home' component={Page_Home} />
-      <TabStack.Screen name='News' component={Page_News} />
+      <TabStack.Screen name='Search' component={Page_Search} />
       <TabStack.Screen name='Cart' component={Page_Cart} />
-      <TabStack.Screen name='Notification' component={Page_Notification} />
+      <TabStack.Screen name='News' component={Page_News} />
       <TabStack.Screen name='Profile' component={Page_Profile} />
 
     </TabStack.Navigator>

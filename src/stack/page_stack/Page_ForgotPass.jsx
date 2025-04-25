@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image, Alert, ToastAndroid } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, ToastAndroid, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import Style_Find_Email from '../../styles/Style_Find_Email'
 import Style_ForgotPass from '../../styles/Style_ForgotPass'
@@ -13,6 +13,7 @@ const Page_ForgotPass = ({ navigation, route }) => {
 
   const [hideNewPassword, setHideNewPassword] = useState(true);
   const [hideConfirmPassword, setHideConfirmPassword] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleForgotPass = async () => {
     if (!newPassword || !confirmPassword) {
@@ -32,6 +33,7 @@ const Page_ForgotPass = ({ navigation, route }) => {
       return;
     }
 
+    setLoading(true);
     try {
       const response = await api_forgotPass(email, newPassword, confirmPassword);
       if (response?.status) {
@@ -45,6 +47,8 @@ const Page_ForgotPass = ({ navigation, route }) => {
       }
     } catch (e) {
       Alert.alert("Lỗi hệ thống", "Đã có lỗi xảy ra, vui lòng thử lại sau");
+    } finally{
+      setLoading(false);
     }
   };
 
@@ -114,7 +118,13 @@ const Page_ForgotPass = ({ navigation, route }) => {
         <TouchableOpacity
           style={[Style_ForgotPass.btnChange, { backgroundColor: colors.Red }]}
           onPress={handleForgotPass}>
-          <Text style={Style_ForgotPass.textBtn}>Đổi mật khẩu</Text>
+          {
+            loading ? (
+              <ActivityIndicator size='small' color={colors.White}/>
+            ) : (
+              <Text style={Style_ForgotPass.textBtn}>Đổi mật khẩu</Text>
+            )
+          }
         </TouchableOpacity>
       </View>
     </View>

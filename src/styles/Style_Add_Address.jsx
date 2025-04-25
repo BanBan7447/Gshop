@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Platform } from 'react-native'
 import colors from './colors'
 
 const Style_Add_Address = StyleSheet.create({
@@ -45,13 +45,68 @@ const Style_Add_Address = StyleSheet.create({
     // },
     input: {
         width: '100%',
-        height: 48,
+        height: 56,
         borderRadius: 16,
         paddingHorizontal: 16,
         backgroundColor: colors.Light_Blue,
         marginBottom: 16,
         marginTop: 6,
-        borderWidth: 0
+        borderWidth: 0,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row'
+    },
+    modalContainer: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        height: '60%',
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        backgroundColor: colors.White,
+        padding: 16
+    },
+    modalOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        zIndex: 1,
+    },
+    modalWrapper: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        zIndex: 2,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontFamily: 'Inter Bold',
+        padding: 16,
+        color: colors.Black
+    },
+    modalItem: {
+        padding: 16,
+        borderBottomWidth: 1,
+        borderColor: '#ccc'
+    },
+    modalItemText: {
+        fontSize: 16
+    },
+    modalClose: {
+        padding: 16,
+        backgroundColor: colors.Red,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    modalCloseText: {
+        fontFamily: 'Inter SemiBold',
+        color: colors.White,
+        fontSize: 14,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     loginButton: {
         width: '100%',
