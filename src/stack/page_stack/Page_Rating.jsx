@@ -262,7 +262,7 @@ const Page_Rating = (props) => {
                 contentContainerStyle={{ paddingStart: 20 }}
                 style={Style_Rating.container_filter}>
                 {
-                  ['all', 'my', 5, 4, 3, 2, 1].map((type) => (
+                  ['all', 5, 4, 3, 2, 1].map((type) => (
                     <TouchableOpacity
                       key={type}
                       onPress={() => setFilterRating(type)}
@@ -282,9 +282,7 @@ const Page_Rating = (props) => {
                         }
                       ]}>
                         {
-                          type === 'all' ? 'Tất cả' :
-                            type === 'my' ? 'Đã đánh giá' :
-                              `${type} ★`
+                          type === 'all' ? 'Tất cả' : `${type} ★`
                         }
                       </Text>
                     </TouchableOpacity>

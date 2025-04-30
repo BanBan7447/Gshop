@@ -13,7 +13,7 @@ const Page_SignUp = (props) => {
     const [email, setEmail] = useState("");
     const [phone_number, setPhone_number] = useState("");
     const [password, setPassword] = useState("");
-    const [hidePassword, setHidePassword] = useState(false);
+    const [hidePassword, setHidePassword] = useState(true);
 
     const [emailError, setEmailError] = useState("");
     const [phoneError, setPhoneError] = useState("");
@@ -166,7 +166,7 @@ const Page_SignUp = (props) => {
                         style={Style_ForgotPass.textInput}
                         secureTextEntry={hidePassword}
                         value={password}
-                        onChangeText={validatePassword} // <-- đúng là hàm validatePassword
+                        onChangeText={validatePassword}
                     />
 
                     <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
