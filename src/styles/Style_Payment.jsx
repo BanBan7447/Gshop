@@ -63,7 +63,7 @@ const Style_Payment = StyleSheet.create({
     container_title: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 8
+        marginTop: 16
     },
 
     container_product: {

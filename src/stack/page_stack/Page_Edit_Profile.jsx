@@ -63,6 +63,11 @@ const Page_Edit_Profile = (props) => {
 
     // Cập nhật thông tin user
     const updateProfile = async () => {
+        if (!name?.trim() || !phone_number?.trim()) {
+            Alert.alert("Lỗi", "Không được để trống thông tin.");
+            return;
+        }
+
         if (emailError || phoneError) {
             Alert.alert("Lỗi cập nhật", "Vui lòng kiểm tra lại thông tin nhập vào và thử lại.");
             return;
@@ -185,7 +190,7 @@ const Page_Edit_Profile = (props) => {
                 disabled={loading}>
                 {
                     loading ? (
-                        <ActivityIndicator size='small' color={colors.White}/>
+                        <ActivityIndicator size='small' color={colors.White} />
                     ) : (
                         <Text style={Style_Edit_Profile.saveButtonText}>Cập nhật</Text>
                     )

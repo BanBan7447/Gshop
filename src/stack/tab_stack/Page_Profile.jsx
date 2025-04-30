@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Button, Image } from 'react-native'
+import { View, Text, TouchableOpacity, Button, Image, RefreshControl, ScrollView } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { AppContext } from '../../context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,6 +8,23 @@ import colors from '../../styles/colors';
 const Page_Profile = (props) => {
   const { navigation } = props;
   const { users, setUsers } = useContext(AppContext);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+
+    try {
+      const userInfo = await AsyncStorage.getItem('userInfo');
+      if (userInfo) {
+        setUsers(JSON.parse(userInfo));
+      }
+    } catch (e) {
+      console.log('Lỗi khi load lại dữ liệu người dùng:', e);
+    }
+
+    setRefreshing(false);
+  };
+
 
   //Ham dang xuat
   const onLogout = async () => {
@@ -33,7 +50,16 @@ const Page_Profile = (props) => {
   }
 
   return (
-    <View style={Style_Profile.container}>
+    <ScrollView
+      style={Style_Profile.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[colors.Red]}
+          tintColor={colors.Red}
+        />
+      }>
       {users ? (
         <View>
           <View style={Style_Profile.container_info}>
@@ -124,7 +150,7 @@ const Page_Profile = (props) => {
             onPress={() => navigation.navigate('Login')} />
         </View>
       )}
-    </View>
+    </ScrollView>
   )
 }
 

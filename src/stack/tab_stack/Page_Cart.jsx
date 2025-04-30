@@ -20,6 +20,8 @@ const Page_Cart = (props) => {
   const { users } = useContext(AppContext);
   const [productImages, setProductImages] = useState({});
   const [refreshing, setRefreshing] = useState(false);
+  const [tempQuantities, setTempQuantities] = useState({});
+  const [quantityErrors, setQuantityErros] = useState({});
   console.log('Danh sách sản phẩm có trong Cart: ', cart);
 
   const onRefresh = async () => {
@@ -399,7 +401,7 @@ const Page_Cart = (props) => {
       if (inputQuantity < 1) inputQuantity = 1;
       if (inputQuantity > findProduct.id_product.quantity) {
         inputQuantity = findProduct.id_product.quantity;
-        ToastAndroid.show("Sản phẩm đã hết hàng", ToastAndroid.SHORT);
+        Alert.alert("Cảnh báo", "Đã đạt đến giới hạn tồn kho");
       }
 
       setLoadingTotal(true);
@@ -439,73 +441,149 @@ const Page_Cart = (props) => {
     }
 
     return (
-      <View style={Style_Cart.container_product}>
-        <TouchableOpacity
-          onPress={() => toggleSelectItems(item._id)}
-          style={[Style_Cart.checkBox, isChecked && Style_Cart.checkBox_selected]}>
-          {isChecked &&
-            <Image
-              style={{ width: 12, height: 12 }}
-              source={require('../../assets/icon/icon_tick_white.png')} />
+      <View style={{ marginBottom: 24 }}>
+        <View style={Style_Cart.container_product}>
+          <TouchableOpacity
+            onPress={() => toggleSelectItems(item._id)}
+            style={[Style_Cart.checkBox, isChecked && Style_Cart.checkBox_selected]}>
+            {isChecked &&
+              <Image
+                style={{ width: 12, height: 12 }}
+                source={require('../../assets/icon/icon_tick_white.png')} />
+            }
+          </TouchableOpacity>
+
+          {
+            loadingImage ? (
+              <SkeletonPlaceholder>
+                <View style={Style_Cart.img_product} />
+              </SkeletonPlaceholder>
+            ) : (
+              <FastImage
+                source={{ uri: ImageData }}
+                style={Style_Cart.img_product}
+                resizeMode={FastImage.resizeMode.cover} />
+            )
           }
-        </TouchableOpacity>
 
-        {
-          loadingImage ? (
-            <SkeletonPlaceholder>
-              <View style={Style_Cart.img_product} />
-            </SkeletonPlaceholder>
-          ) : (
-            <FastImage
-              source={{ uri: ImageData }}
-              style={Style_Cart.img_product}
-              resizeMode={FastImage.resizeMode.cover} />
-          )
-        }
+          <View style={Style_Cart.container_info}>
+            <Text
+              style={Style_Cart.text_name}
+              numberOfLines={1}
+              ellipsizeMode='tail'>
+              {item.id_product?.name}
+            </Text>
+            <Text style={Style_Cart.text_price}>{item.id_product?.price?.toLocaleString('vi-VN')}đ</Text>
 
-        <View style={Style_Cart.container_info}>
-          <Text
-            style={Style_Cart.text_name}
-            numberOfLines={1}
-            ellipsizeMode='tail'>
-            {item.id_product?.name}
-          </Text>
-          <Text style={Style_Cart.text_price}>{item.id_product?.price?.toLocaleString('vi-VN')}đ</Text>
+            <View style={Style_Cart.container_quantity}>
+              <TouchableOpacity
+                style={Style_Cart.btn_quantity}
+                onPress={() => minusItem(item._id)}>
+                <Image
+                  source={require('../../assets/icon/icon_minus.png')}
+                  style={Style_Cart.icon_quantity} />
+              </TouchableOpacity>
 
-          <View style={Style_Cart.container_quantity}>
-            <TouchableOpacity
-              style={Style_Cart.btn_quantity}
-              onPress={() => minusItem(item._id)}>
-              <Image
-                source={require('../../assets/icon/icon_minus.png')}
-                style={Style_Cart.icon_quantity} />
-            </TouchableOpacity>
+              <TextInput
+                style={Style_Cart.text_quantity_input}
+                keyboardType='numeric'
+                // value={String(item.quantity)}
+                // onChangeText={inputChangeQuantity}
+                value={tempQuantities[item._id]?.toString() ?? item.quantity.toString()}
 
-            <TextInput
-              style={Style_Cart.text_quantity_input}
-              keyboardType='numeric'
-              value={String(item.quantity)}
-              onChangeText={inputChangeQuantity} />
+                onChangeText={(text) => {
+                  const numeric = text.replace(/[^0-9]/g, '');
+                  setTempQuantities(prev => ({ ...prev, [item._id]: numeric }));
+                }}
 
-            {/* <Text style={Style_Cart.text_quantity}>{item.quantity}</Text> */}
+                onEndEditing={async () => {
+                  let inputQuanity = parseInt(tempQuantities[item._id]) || 1;
+                  const findProduct = cart.items.find(cartItem => cartItem._id === item._id);
+                  if (!findProduct) return;
 
-            <TouchableOpacity
-              style={Style_Cart.btn_quantity}
-              onPress={() => plusItem(item._id)}>
-              <Image
-                source={require('../../assets/icon/icon_plus.png')}
-                style={Style_Cart.icon_quantity} />
-            </TouchableOpacity>
+                  const maxStock = findProduct.id_product.quantity;
+                  const maxPerOrder = 20;
+                  let errorMsg = '';
+
+                  if (!inputQuanity || inputQuanity < 1) {
+                    inputQuanity = 1;
+                  }
+
+                  if (inputQuanity > maxPerOrder) {
+                    inputQuanity = maxPerOrder;
+                    errorMsg = 'Tối đa 20sp trên mỗi đơn'
+                  }
+
+                  if (inputQuanity > maxStock) {
+                    inputQuanity = maxStock;
+                    Alert.alert("Cảnh báo", "Đã đạt hết giới hạn tồn kho");
+                  }
+
+                  setTempQuantities(prev => ({ ...prev, [item._id]: inputQuanity.toString() }));
+                  setQuantityErros(prev => ({ ...prev, [item._id]: errorMsg }));
+
+                  setLoadingTotal(true);
+                  await api_updateQuantity(cart.id_user, item.id_product._id, inputQuanity);
+
+                  setCart(prevCart => {
+                    const newItems = prevCart.items.map(cartItems =>
+                      cartItems._id === item._id ? { ...cartItems, quantity: inputQuanity, selected: true } : cartItems
+                    );
+
+                    const selectedItems = newItems
+                      .filter(cartItem => cartItem.selected)
+                      .map(cartItem => cartItem._id);
+                    const isAllSelected = newItems.every(cartItem => cartItem.selected);
+
+                    const newTotalPrice = newItems
+                      .filter(cartItem => cartItem.selected)
+                      .reduce((sum, item) => sum + item.quantity * item.id_product.price, 0);
+
+                    setSelectedItems(selectedItems);
+                    setIsCheckedAll(isAllSelected);
+
+                    return {
+                      ...prevCart,
+                      items: newItems,
+                      totalPrice: newTotalPrice
+                    };
+                  });
+
+                  if (!findProduct.selected) {
+                    await api_updateQuantity(cart.id_user, findProduct.id_product._id, true);
+                  }
+
+                  setLoadingTotal(false);
+                }}
+              />
+
+              {/* <Text style={Style_Cart.text_quantity}>{item.quantity}</Text> */}
+
+              <TouchableOpacity
+                style={Style_Cart.btn_quantity}
+                onPress={() => plusItem(item._id)}>
+                <Image
+                  source={require('../../assets/icon/icon_plus.png')}
+                  style={Style_Cart.icon_quantity} />
+              </TouchableOpacity>
+            </View>
           </View>
+
+          <TouchableOpacity
+            style={Style_Cart.btn_delete}
+            onPress={() => removeItem(item._id)}>
+            <Image
+              source={require('../../assets/icon/icon_x_black.png')}
+              style={Style_Cart.icon_quantity} />
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={Style_Cart.btn_delete}
-          onPress={() => removeItem(item._id)}>
-          <Image
-            source={require('../../assets/icon/icon_x_black.png')}
-            style={Style_Cart.icon_quantity} />
-        </TouchableOpacity>
+        {quantityErrors[item._id] ? (
+          <Text style={{ color: colors.Red, fontSize: 12, marginTop: 4, textAlign: 'right' }}>
+            {quantityErrors[item._id]}
+          </Text>
+        ) : null}
+
       </View>
     )
   }

@@ -31,7 +31,7 @@ const Style_Cart = StyleSheet.create({
         flexDirection: 'row',
         width: '100%',
         height: 88,
-        marginBottom: 24,
+        marginBottom: 8,
         alignItems: 'center'
     },
 
@@ -115,8 +115,8 @@ const Style_Cart = StyleSheet.create({
     },
 
     btn_quantity: {
-        width: 24,
-        height: 24,
+        width: 28,
+        height: 28,
         backgroundColor: colors.Light_Blue,
         borderRadius: 6,
         justifyContent: 'center',
