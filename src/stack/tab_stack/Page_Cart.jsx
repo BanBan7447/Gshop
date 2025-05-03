@@ -502,17 +502,17 @@ const Page_Cart = (props) => {
                   if (!findProduct) return;
 
                   const maxStock = findProduct.id_product.quantity;
-                  const maxPerOrder = 20;
+                  //const maxPerOrder = 20;
                   let errorMsg = '';
 
                   if (!inputQuanity || inputQuanity < 1) {
                     inputQuanity = 1;
                   }
 
-                  if (inputQuanity > maxPerOrder) {
-                    inputQuanity = maxPerOrder;
-                    errorMsg = 'Tối đa 20sp trên mỗi đơn'
-                  }
+                  // if (inputQuanity > maxPerOrder) {
+                  //   inputQuanity = maxPerOrder;
+                  //   errorMsg = 'Tối đa 20sp trên mỗi đơn'
+                  // }
 
                   if (inputQuanity > maxStock) {
                     inputQuanity = maxStock;
@@ -578,11 +578,11 @@ const Page_Cart = (props) => {
           </TouchableOpacity>
         </View>
 
-        {quantityErrors[item._id] ? (
+        {/* {quantityErrors[item._id] ? (
           <Text style={{ color: colors.Red, fontSize: 12, marginTop: 4, textAlign: 'right' }}>
             {quantityErrors[item._id]}
           </Text>
-        ) : null}
+        ) : null} */}
 
       </View>
     )

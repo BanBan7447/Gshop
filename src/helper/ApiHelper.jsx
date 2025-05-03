@@ -302,7 +302,7 @@ const api_addReview = async (star, content, id_user, id_product, id_order) => {
 }
 
 // Gọi API upload image rating
-const BASE_URL = "https://gshopbackend-1.onrender.com/rating";
+const BASE_URL = "https://gshopbackend.onrender.com/rating";
 // const BASE_URL = "http://10.0.2.2:3000/rating"
 const api_uploadImage = async (id_rating, images) => {
     try {
@@ -611,7 +611,7 @@ const api_getDetailPayment = async (id_payment) => {
 }
 
 // API update Image người dùng
-const BASE_URL_2 = "https://gshopbackend-1.onrender.com/user";
+const BASE_URL_2 = "https://gshopbackend.onrender.com/user";
 // const BASE_URL_2 = "http://10.0.2.2:3000/user"
 const api_uploadAvatar = async (id_user, imageUri) => {
     try {

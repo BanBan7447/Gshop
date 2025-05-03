@@ -46,6 +46,7 @@ const Page_Home = (props) => {
 
   const onRefresh = async () => {
     setRefreshing(true);
+    setValue("highlight");
     await funGetAllProducts();
     await funGetCategories();
     setRefreshing(false);
@@ -86,7 +87,7 @@ const Page_Home = (props) => {
         category.name_type.includes("Grade")
       )
 
-      setCategories(filterCategories);
+      setCategories(response);
       setSelectCategory(null);
     } catch (e) {
       console.log(e);
@@ -236,7 +237,11 @@ const Page_Home = (props) => {
     } else {
       sortedProducts = [...products];
     }
-    setProducts(sortedProducts);
+
+    const available = sortedProducts.filter(product => product.quantity > 0);
+    const outOfStock = sortedProducts.filter(product => product.quantity <= 0);
+
+    setProducts([...available, ...outOfStock]);
   }
 
   // Hàm getProductImages để lấy ảnh
