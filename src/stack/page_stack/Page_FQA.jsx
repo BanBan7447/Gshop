@@ -86,7 +86,7 @@ const Page_FQA = (props) => {
                 <Image
                     style={Style_FQA.backIcon}
                     source={require('../../assets/icon/icon_long_arrow.png')} />
-                <Text style={Style_FQA.headerTitle}>FAQ - Hỏi dáp</Text>
+                <Text style={Style_FQA.headerTitle}>FAQ - Hỏi đáp</Text>
             </TouchableOpacity>
 
             {faqItems.map((item, index) => (

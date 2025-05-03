@@ -3,12 +3,13 @@ import axios from "axios";
 // Cấu trúc dùng thư viện Axios
 const AxiosInstance = (token = '', contentType = 'application/json') => {
     const axiosInstance = axios.create({
-        baseURL: 'https://gshopbackend-1.onrender.com/' // domain
+        baseURL: 'https://gshopbackend.onrender.com/' // domain
     });
     // cmd -----> ipconfig -----> IPv4 Address (192.168.1.1)
 
     //http://10.0.2.2:3000/
     //https://gshopbackend-1.onrender.com/
+    //https://gshopbackend.onrender.com
 
     axiosInstance.interceptors.request.use( // thông tin gửi lên server
         async (config) => {
