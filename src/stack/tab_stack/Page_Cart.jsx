@@ -258,6 +258,7 @@ const Page_Cart = (props) => {
       await api_updateSelected(cart.id_user, findProduct.id_product._id, true);
     }
 
+    setTempQuantities(prev => ({...prev, [_id]: newQuantity.toString()}))
     setLoadingTotal(false);
   };
 
@@ -318,6 +319,7 @@ const Page_Cart = (props) => {
       await api_updateSelected(cart.id_user, findProduct.id_product._id, true)
     }
 
+    setTempQuantities(prev => ({...prev, [_id]: newQuantity.toString()}))
     setLoadingTotal(false);
   };
 
